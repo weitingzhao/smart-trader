@@ -1,0 +1,32 @@
+.highlight {
+    font-weight: bold;
+}
+
+.result-line1 {
+    font-size: 0.8em;
+    white-space: nowrap; /* Prevent text from wrapping to the next line */
+    overflow: hidden;    /* Hide the overflow text */
+    text-overflow: ellipsis; /* Add ellipsis (...) at the end of the text */
+}
+
+.result-line2 {
+    font-size: 0.6em;
+}
+
+#auto_reminder_results {
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    width: 180%;
+    border: 0px solid #ccc;
+    border-radius: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    top: 100%; /* Position it directly below the input */
+    margin-top: 5px; /* Add some space between the input and the results */
+}
+
+#auto_reminder_results .list-group-item {
+    height: 3rem; /* Adjust this value based on the actual height of each row */
+    cursor: pointer; /* Show hand cursor on hover */
+}

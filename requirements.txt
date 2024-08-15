@@ -1,0 +1,62 @@
+# Core
+django~=5.1
+django-allauth==0.60.1
+PyJWT==2.8.0
+python-dotenv==1.0.1
+str2bool==1.1
+django-quill-editor==0.1.40
+
+# Misc
+celery==5.3.4
+redis==5.0.1
+hiredis==2.2.3
+pillow==10.2.0
+tqdm~=4.66.5
+requests~=2.32.3
+DateTime~=5.5
+
+# Tools
+django-celery-results==2.5.1
+djangorestframework==3.14.0
+django-api-generator==1.0.17
+django-debug-toolbar==4.4.6
+drf-spectacular==0.26.5
+
+# Deployment
+whitenoise==6.5.0
+gunicorn==21.2.0
+cryptography==42.0.2
+
+# DB Layer
+psycopg2-binary~=2.9.9
+django-timescaledb~=0.2.13
+# mysqlclient
+
+# ENTERPRISE Version
+#  - CVS to Model
+#  - Loader 
+pandas~=2.2.2
+tzlocal~=5.2
+
+# Data Provider
+alpaca-py
+
+# reverse dictionary Index
+Whoosh~=2.7.4
+
+# Chart
+plotly~=5.23.0
+mplfinance~=0.12.10b0
+
+# Data Feed
+yfinance~=0.2.41
+
+# Science library
+numpy~=2.0.1
+matplotlib~=3.9.1.post1
+
+
+pydantic~=2.8.2
+scikit-learn~=1.5.1
+ordereddict~=1.1
+psycopg2~=2.9.9
