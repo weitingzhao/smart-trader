@@ -88,7 +88,7 @@ function selectResult() {
         console.log('Open Index:', currentIndex);
         const selectedResult = results[currentIndex];
         const symbol = selectedResult.getAttribute('data-symbol');
-        window.location.href = `/stock/quote/profile?symbol=${symbol}`;
+        window.location.href = `/stock/quote/${symbol}`;
     }
 }
 

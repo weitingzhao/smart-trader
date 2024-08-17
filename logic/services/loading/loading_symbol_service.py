@@ -1,10 +1,10 @@
 from django.db.models import Q
 
-from apps.fundamental.models import MarketSymbol
+from home.models import MarketSymbol
 from logic.engine import Engine
 from logic.services.base_service import BaseService
-from whoosh.qparser import MultifieldParser, WildcardPlugin, OrGroup, QueryParser
-from apps.fundamental.instance import Instance
+from whoosh.qparser import MultifieldParser, WildcardPlugin, OrGroup
+from home.instance import Instance
 
 class LoadingSymbolService(BaseService):
 

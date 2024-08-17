@@ -293,27 +293,27 @@ class TradingPatternChart(BaseChart):
 
     def _save_watch(self, watch_name, watch_value):
         # Add
-        data = self._engine.json_user().load_symbol_history() if self._engine.json_user().is_file() else {}
+        data = self.engine.json_user().load_symbol_history() if self.engine.json_user().is_file() else {}
         if "WATCH" not in data:
             data["WATCH"] = {}
         data["WATCH"][watch_name.upper()] = watch_value
         # Save
-        self._engine.json_user().save(data)
+        self.engine.json_user().save(data)
         exit(f"Added watchlist '{watch_name}' with value '{watch_value}'")
 
     def _remove_watch(self, name):
         # Check
         if name.upper() not in getattr(self.config, "WATCH"):
             exit(f"Error: No watchlist named: '{name}'")
-        if not self._engine.json_user().is_file():
+        if not self.engine.json_user().is_file():
             exit("No config file")
         # Delete
-        data = self._engine.json_user().load_symbol_history()
+        data = self.engine.json_user().load_symbol_history()
         if "WATCH" not in data or name.upper() not in data["WATCH"]:
             exit(f"Error: No watchlist named: '{name}'")
         del data["WATCH"][name.upper()]
         # Save
-        self._engine.json_user().save(data)
+        self.engine.json_user().save(data)
         exit(f"Watchlist '{name}' removed.")
 
     # </editor-fold>
@@ -334,7 +334,7 @@ class TradingPatternChart(BaseChart):
         if self.args.watch and self.args.watch.upper() not in self.config.WATCH:
             exit(f"Error: No watchlist named: '{self.args.watch}'")
         # Prepare
-        data = self._engine.json_user() if self._engine.json_user().is_file() else {}
+        data = self.engine.json_user() if self.engine.json_user().is_file() else {}
         # get a copy of __dict__ and filter only truthy values into a dict
         opts = {k: v for k, v in self.args.__dict__.items() if v}
         del opts["preset_save"]
@@ -342,22 +342,22 @@ class TradingPatternChart(BaseChart):
             data["PRESET"] = {}
         data["PRESET"][preset] = opts
         # Save
-        self._engine.json_user().save(data)
+        self.engine.json_user().save(data)
         print(f"Preset saved as '{preset}'")
 
     def _remove_preset(self, preset):
         # Check
-        if preset not in getattr(self._engine.config, "PRESET"):
+        if preset not in getattr(self.engine.config, "PRESET"):
             exit(f"Error: No preset named: '{preset}'")
-        if not self._engine.json_user().is_file():
-            exit(f"File not found: {self._engine.json_user().Path}")
+        if not self.engine.json_user().is_file():
+            exit(f"File not found: {self.engine.json_user().Path}")
         # Delete
-        data = self._engine.json_user().load_symbol_history()
+        data = self.engine.json_user().load_symbol_history()
         if "PRESET" not in data or preset not in data["PRESET"]:
             exit(f"Error: No preset named: '{preset}'")
         del data["PRESET"][preset]
         # Save
-        self._engine.json_user().save(data)
+        self.engine.json_user().save(data)
         exit(f"Preset '{preset}' removed.")
 
     # </editor-fold>
@@ -366,9 +366,9 @@ class TradingPatternChart(BaseChart):
     def _list_watch_and_preset(self):
         # setup watch list and preset list
         self.watch_list = [i.lower() for i in self.config.WATCH.keys()] \
-            if hasattr(self._engine.config, "WATCH") else []
+            if hasattr(self.engine.config, "WATCH") else []
         self.preset_lst = [i.lower() for i in self.config.PRESET.keys()] \
-            if hasattr(self._engine.config, "PRESET") else []
+            if hasattr(self.engine.config, "PRESET") else []
 
         # check & result
         if not len(self.watch_list):

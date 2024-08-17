@@ -3,7 +3,7 @@ from timescale.db.models.models import TimescaleModel
 
 
 class MarketSymbol(models.Model):
-    symbol = models.CharField(max_length=20, unique=True)
+    symbol = models.CharField(max_length=20, unique=True, primary_key=True)
     name = models.CharField(max_length=200)
     market = models.CharField(max_length=50)
     asset_type = models.CharField(max_length=50)

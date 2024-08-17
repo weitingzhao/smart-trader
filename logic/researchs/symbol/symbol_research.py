@@ -29,7 +29,7 @@ class SymbolResearch(BaseResearch):
         for name, group in pd_grouped_list.items():
             exchange = name[0]
             derivative = name[1]
-            csv = self._engine.csv("symbols", "exchange", exchange, f"{derivative}.csv")
+            csv = self.engine.csv("symbols", "exchange", exchange, f"{derivative}.csv")
             csv.save_df(group)
 
             # Collect json_symbols information
@@ -43,7 +43,7 @@ class SymbolResearch(BaseResearch):
                 json_symbols['count'][derivative] = 0
             json_symbols['count'][derivative] += total
         # Category 1.b Symbols json_symbols
-        self._engine.json_research("watch", "symbols_summary.json").save(json_symbols)
+        self.engine.json_research("watch", "symbols_summary.json").save(json_symbols)
 
         # Category 2. Equity by Sector & Industry
         json_file_sector = self.path_exist(self.config.FOLDER_Watch / "symbols_sector.json")

@@ -20,6 +20,14 @@
             {% csrf_token %}
             <button type="submit">Index Market Symbol</button>
         </form>
+        <form method="post" action="{% url 'refresh_company_overview' %}">
+            {% csrf_token %}
+            <button type="submit">Get Company Overview</button>
+        </form>
+        <form method="post" action="{% url 'refresh_market_stock' %}">
+            {% csrf_token %}
+            <button type="submit">Refresh Market Stock</button>
+        </form>
         <!-- Add this inside the block content -->
         {% if status_message %}
           <div class="alert alert-info">

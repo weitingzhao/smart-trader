@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom Apps
-    "apps.fundamental",
     'home',
 
     # Third Party Apps

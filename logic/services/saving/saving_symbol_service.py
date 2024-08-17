@@ -1,10 +1,10 @@
 from pathlib import Path
-from apps.fundamental.models import MarketSymbol
+from home.models import MarketSymbol
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from whoosh.index import create_in
-from whoosh.fields import Schema, TEXT, ID, KEYWORD, NGRAM
-import os
+from whoosh.fields import Schema, TEXT
+
 
 class SavingSymbolService(BaseService):
 
