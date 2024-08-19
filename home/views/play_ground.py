@@ -29,12 +29,6 @@ def index_market_symbol(request):
         return redirect(reverse('stock screener') + '?status_message=Market symbols indexed successfully')
     return redirect('stock screener')
 
-def refresh_company_overview(request):
-    if request.method == "POST":
-        company_view = instance.service.fetching().symbol().fetching_company_overview("AAPL")
-        return redirect(reverse('stock screener') + '?status_message=Refresh company overview')
-    return redirect('stock screener')
-
 def stock_screener(request):
     query = request.GET.get('q')
     if query:

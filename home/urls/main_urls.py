@@ -16,7 +16,6 @@ urlpatterns = [
     path('refresh_market_symbol/', views.play_ground.refresh_market_symbol, name='refresh_market_symbol'),
     path('refresh_market_stock/', views.play_ground.refresh_market_stock, name='refresh_market_stock'),
     path('index_market_symbol/', views.play_ground.index_market_symbol, name='index_market_symbol'),
-    path('refresh_company_overview/', views.play_ground.refresh_company_overview, name='refresh_company_overview'),
     # Dashboard
     path('', views.play_ground.index, name='index'),
 

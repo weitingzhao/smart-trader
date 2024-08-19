@@ -59,7 +59,7 @@ def execute_script(self, data: dict):
 
     print( '> EXEC [' + script + '] -> ('+args+')' ) 
 
-    scripts, ErrInfo = get_scripts()
+    scripts, err_info = get_scripts()
 
     if script and script in scripts:
         # Executing related script

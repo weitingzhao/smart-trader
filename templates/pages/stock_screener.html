@@ -11,7 +11,7 @@
           <form method="get" action="">
             <input type="text" name="q" placeholder="Search by symbol" value="{{ request.GET.q }}">
             <button type="submit">Search</button>
-          </form>         
+          </form>
         <form method="post" action="{% url 'refresh_market_symbol' %}">
             {% csrf_token %}
             <button type="submit">Refresh Market Symbol</button>
@@ -23,10 +23,6 @@
         <form method="post" action="{% url 'refresh_company_overview' %}">
             {% csrf_token %}
             <button type="submit">Get Company Overview</button>
-        </form>
-        <form method="post" action="{% url 'refresh_market_stock' %}">
-            {% csrf_token %}
-            <button type="submit">Refresh Market Stock</button>
         </form>
         <!-- Add this inside the block content -->
         {% if status_message %}

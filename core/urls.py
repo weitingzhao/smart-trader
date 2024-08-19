@@ -29,9 +29,13 @@ handler404 = 'home.views.accounts.error_404'
 handler500 = 'home.views.accounts.error_500'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include('home.urls')),
+    path('admin/', admin.site.urls),
 
+    # Notifications
+    # path('inbox/notifications/', include('apps.notifications.urls', namespace='notifications')),
+
+    path('tasks/', include('apps.tasks.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
     path('accounts/', include('allauth.urls')),
 

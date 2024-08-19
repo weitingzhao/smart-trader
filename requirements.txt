@@ -64,6 +64,8 @@ numpy~=2.0.1
 matplotlib~=3.9.1.post1
 
 
-
-
-
+alpha_vantage~=3.0.0
+jsonfield~=3.1.0
+django-model-utils~=4.5.1
+swapper~=1.4.0
+pytz~=2024.1

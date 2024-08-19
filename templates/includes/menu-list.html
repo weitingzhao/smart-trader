@@ -20,7 +20,7 @@
           </g>
         </svg>
       </div>
-      <span class="nav-link-text ms-1">Dashboards</span>
+      <span class="nav-link-text ms-1">Dashboard</span>
     </a>
     <div class="collapse {% if 'dashboard' in parent %}show{% endif %} " id="dashboardsExamples">
       <ul class="nav ms-4 ps-3">
@@ -30,6 +30,12 @@
             <span class="sidenav-normal"> Default </span>
           </a>
         </li>
+          <li class="nav-item {% if 'settings' in segment %}active{% endif %}">
+              <a class="nav-link {% if 'settings' in segment %}active{% endif %}" href="{% url 'settings' %}">
+                  <span class="sidenav-mini-icon text-xs"> S </span>
+                  <span class="sidenav-normal"> Settings </span>
+                </a>
+          </li>
       </ul>
     </div>
   </li>
@@ -73,7 +79,7 @@
     </div>
   </li>
   <li class="nav-item">
-    <a data-bs-toggle="collapse" href="#dashboardsExamples" class="nav-link {% if 'apps' in parent %}active{% endif %}" aria-controls="dashboardsExamples" role="button" aria-expanded="false">
+    <a data-bs-toggle="collapse" href="#dashboardsExamples" class="nav-link {% if 'tools' in parent %}active{% endif %}" aria-controls="dashboardsExamples" role="button" aria-expanded="false">
       <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
         <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <title>shop </title>
@@ -91,8 +97,14 @@
       </div>
       <span class="nav-link-text ms-1">Tools</span>
     </a>
-    <div class="collapse {% if 'apps' in parent %}show{% endif %} " id="dashboardsExamples">
+    <div class="collapse {% if 'tools' in parent %}show{% endif %} " id="dashboardsExamples">
       <ul class="nav ms-4 ps-3">
+          <li class="nav-item {% if 'tasks' in segment %}active{% endif %}">
+              <a class="nav-link {% if 'tasks' in segment %}active{% endif %}" href="{% url 'tasks' %}">
+                  <span class="sidenav-mini-icon"> T </span>
+                  <span class="sidenav-normal"> Tasks </span>
+              </a>
+          </li>
           <li class="nav-item {% if 'stock screener' in segment %}active{% endif %}">
               <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="/stock_screener/" target="_self">
                 <span class="sidenav-mini-icon"> C </span>

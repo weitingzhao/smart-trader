@@ -38,11 +38,12 @@ class FetchingSymbolService(BaseService):
                 }
             )
 
-    def fetch_symbols_info(self):
+    def fetch_symbols_info(self) -> list:
         # symbols = MarketSymbol.objects.values_list('symbol', flat=True)
         symbols = ["AAPL","UI"]
         tickers = yf.Tickers(" ".join(symbols))
 
+        # <editor-fold desc="save method">
         def save_stock(symbol, ticker_info):
             MarketStock.objects.update_or_create(
                 symbol=symbol,
@@ -242,8 +243,9 @@ class FetchingSymbolService(BaseService):
                         'unexercised_value': officer.get('unexercisedValue', 0)
                     }
                 )
+        # </editor-fold>
 
-
+        result = []
         for root_symbol in tqdm(symbols, desc="Fetching symbol info"):
             try:
                 ticker = tickers.tickers[root_symbol]
@@ -273,6 +275,8 @@ class FetchingSymbolService(BaseService):
 
             except Exception as e:
                 self.logger.error(f"Error: fetch {root_symbol} info - got Error:{e}")
+                result.append({'symbol': root_symbol, 'error': str(e)})
+        return result
 
 
     def fetching_alphav_company_overview(self, symbol) -> tuple:

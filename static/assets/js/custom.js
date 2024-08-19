@@ -101,3 +101,103 @@ document.getElementById('header_search').addEventListener('blur', function() {
 document.getElementById('header_search').addEventListener('focus', function() {
   document.getElementById('auto_reminder_results').style.display = 'block';
 });
+
+// Create a container for the toasts if it doesn't exist
+let toastContainer = document.getElementById('toast-container');
+if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-container';
+    toastContainer.className = 'position-fixed bottom-1 end-1 z-index-2';
+    document.body.appendChild(toastContainer);
+}
+//Notification
+function showNotification(level, title, content, timeAgo = 'just now') {
+    // Create the toast container
+    const toast = document.createElement('div');
+    toast.className = `toast fade hide p-2 mt-2 bg-white`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    // Declare the toast header
+    const toastHeader = document.createElement('div');
+    // Declare title
+    const titleSpan = document.createElement('span');
+    titleSpan.innerText = title;
+    // Declare time ago
+    const time = document.createElement('small');
+    time.innerText = timeAgo;
+    // Declare close button
+    const closeButton = document.createElement('i');
+    closeButton.setAttribute('data-bs-dismiss', 'toast');
+    closeButton.setAttribute('aria-label', 'Close');
+    // Declare horizontal line
+    const hr = document.createElement('hr');
+    // Declare toast body
+    const toastBody = document.createElement('div');
+    toastBody.innerText = content;
+
+    switch (level) {
+        case 'info':
+            toastHeader.className = 'toast-header bg-transparent border-0';
+            titleSpan.className = 'me-auto text-white font-weight-bold';
+            time.className = 'text-white';
+            closeButton.className = 'fas fa-times text-md text-white ms-3 cursor-pointer';
+
+            hr.className = 'horizontal light m-0';
+            toastBody.className = 'toast-body text-white';
+            break;
+        default:
+            toastHeader.className = 'toast-header border-0';
+            titleSpan.className = 'me-auto font-weight-bold';
+            time.className = 'text-body';
+            closeButton.className = 'fas fa-times text-md ms-3 cursor-pointer';
+
+            hr.className = 'horizontal dark m-0';
+            toastBody.className = 'toast-body';
+            break;
+    }
+    // Add icon based on level
+    const icon = document.createElement('i');
+    switch (level) {
+        case 'success':
+            icon.className = 'ni ni-check-bold text-success me-2';
+            break;
+        case 'info':
+            icon.className = 'ni ni-bell-55 text-white me-2';
+            toast.classList.add('bg-gradient-info');
+            break;
+        case 'warning':
+            icon.className = 'ni ni-spaceship text-warning me-2';
+            break;
+        case 'danger':
+            icon.className = 'ni ni-notification-70 text-danger me-2';
+            break;
+        default:
+            icon.className = 'ni ni-bell-55 text-white me-2';
+            break;
+    }
+    toastHeader.appendChild(icon);
+    toastHeader.appendChild(titleSpan);
+    toastHeader.appendChild(time);
+    toastHeader.appendChild(closeButton);
+    toast.appendChild(toastHeader);
+    toast.appendChild(hr);
+    toast.appendChild(toastBody);
+
+    // Append toast to the toast container
+    toastContainer.appendChild(toast);
+
+    // Show the toast
+    const bootstrapToast = new bootstrap.Toast(toast);
+    bootstrapToast.show();
+
+    // Remove the toast after it hides
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+//showNotification('success', 'Soft UI Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');
+// showNotification('info', 'Soft UI Dashboard', 'Hello, world! This is an info message.', '11 mins ago');
+// showNotification('warning', 'Soft UI Dashboard', 'Hello, world! This is a warning message.', '11 mins ago');
+// showNotification('danger', 'Soft UI Dashboard', 'Hello, world! This is a danger message.', '11 mins ago');

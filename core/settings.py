@@ -56,6 +56,8 @@ INSTALLED_APPS = [
 
     # Custom Apps
     'home',
+    'apps.tasks',
+    'apps.file_manager',
 
     # Third Party Apps
     'allauth',
@@ -224,8 +226,8 @@ CELERY_SCRIPTS_DIR        = os.path.join(BASE_DIR, "tasks_scripts" )
 CELERY_LOGS_URL           = "/tasks_logs/"
 CELERY_LOGS_DIR           = os.path.join(BASE_DIR, "tasks_logs"    )
 
-CELERY_BROKER_URL         = os.environ.get("CELERY_BROKER", "redis://redis:6379")
-CELERY_RESULT_BACKEND     = os.environ.get("CELERY_BROKER", "redis://redis:6379")
+CELERY_BROKER_URL         = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
+CELERY_RESULT_BACKEND     = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT    = 30 * 60

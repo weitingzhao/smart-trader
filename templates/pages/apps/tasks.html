@@ -69,12 +69,8 @@
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Name</th>
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Script</th>
                       <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">STATE</th>
-                      <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">
-                        Script
-                      </th>
-                      <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">
-                        ARGS
-                      </th>                   
+                      <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Script</th>
+                      <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">ARGS</th>
                       {% if request.user.is_authenticated %}
                       <th class="text-center text-dark opacity-7">Action</th>
                       {% endif %}
@@ -90,8 +86,7 @@
                     {% else %}
                     <form action="{% url 'run-task' task.name %}" method="post">                      
                     {% endif %}  
-
-                    
+                        
                       {% csrf_token %}
                       <tr>
                         <td>

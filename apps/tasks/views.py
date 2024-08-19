@@ -27,14 +27,14 @@ def index(request):
 # @login_required(login_url="/login/")
 def tasks(request):
 
-    scripts, ErrInfo = get_scripts()
+    scripts, err_info = get_scripts()
  
     context = {
-        'cfgError' : ErrInfo,
+        'cfgError' : err_info,
         'tasks'    : get_celery_all_tasks(),
         'scripts'  : scripts,
         'segment'  : 'tasks',
-        'parent'   : 'apps',
+        'parent'   : 'tools',
     }
 
     # django_celery_results_task_result
