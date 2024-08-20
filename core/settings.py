@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'home',
     'apps.tasks',
     'apps.file_manager',
+    'apps.notifications',
 
     # Third Party Apps
     'allauth',
@@ -218,6 +219,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+## Notifications
+DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
 # ### Async Tasks (Celery) Settings ###
 

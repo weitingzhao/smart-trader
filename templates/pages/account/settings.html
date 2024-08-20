@@ -855,112 +855,111 @@
       }, 1);
 
       for (y = 1900; y <= 2020; y++) {
-        var optn = document.createElement("OPTION");
-        optn.text = y;
-        optn.value = y;
+          let option = document.createElement("OPTION");
+          option.text = y;
+          option.value = y;
 
-        if (y == 2020) {
-          optn.selected = true;
+        if (y === 2020) {
+          option.selected = true;
         }
 
-        year.options.add(optn);
+        year.options.add(option);
       }
     }
 
     if (document.getElementById('choices-day')) {
-      var day = document.getElementById('choices-day');
-      setTimeout(function() {
-        const example = new Choices(day);
-      }, 1);
+        let day = document.getElementById('choices-day');
+        setTimeout(function () {
+            const example = new Choices(day);
+        }, 1);
 
+        for (y = 1; y <= 31; y++) {
+            let option = document.createElement("OPTION");
+            option.text = y;
+            option.value = y;
 
-      for (y = 1; y <= 31; y++) {
-        var optn = document.createElement("OPTION");
-        optn.text = y;
-        optn.value = y;
+            if (y === 1) {
+                option.selected = true;
+            }
 
-        if (y == 1) {
-          optn.selected = true;
+            day.options.add(option);
         }
-
-        day.options.add(optn);
-      }
-
     }
 
     if (document.getElementById('choices-month')) {
-      var month = document.getElementById('choices-month');
-      setTimeout(function() {
-        const example = new Choices(month);
-      }, 1);
+        var month = document.getElementById('choices-month');
+        setTimeout(function () {
+            const example = new Choices(month);
+        }, 1);
 
-      var d = new Date();
-      var monthArray = new Array();
-      monthArray[0] = "January";
-      monthArray[1] = "February";
-      monthArray[2] = "March";
-      monthArray[3] = "April";
-      monthArray[4] = "May";
-      monthArray[5] = "June";
-      monthArray[6] = "July";
-      monthArray[7] = "August";
-      monthArray[8] = "September";
-      monthArray[9] = "October";
-      monthArray[10] = "November";
-      monthArray[11] = "December";
-      for (m = 0; m <= 11; m++) {
-        var optn = document.createElement("OPTION");
-        optn.text = monthArray[m];
-        // server side month start from one
-        optn.value = (m + 1);
-        // if june selected
-        if (m == 1) {
-          optn.selected = true;
+        var d = new Date();
+        const monthArray = [];
+        monthArray[0] = "January";
+        monthArray[1] = "February";
+        monthArray[2] = "March";
+        monthArray[3] = "April";
+        monthArray[4] = "May";
+        monthArray[5] = "June";
+        monthArray[6] = "July";
+        monthArray[7] = "August";
+        monthArray[8] = "September";
+        monthArray[9] = "October";
+        monthArray[10] = "November";
+        monthArray[11] = "December";
+        for (m = 0; m <= 11; m++) {
+            let option = document.createElement("OPTION");
+            option.text = monthArray[m];
+            // server side month start from one
+            option.value = (m + 1);
+            // if june selected
+            if (m === 1) {
+                option.selected = true;
+            }
+            month.options.add(option);
         }
-        month.options.add(optn);
-      }
     }
 
     function visible() {
-      var elem = document.getElementById('profileVisibility');
-      if (elem) {
-        if (elem.innerHTML == "Switch to visible") {
-          elem.innerHTML = "Switch to invisible"
-        } else {
-          elem.innerHTML = "Switch to visible"
+        let elem = document.getElementById('profileVisibility');
+        if (elem) {
+            if (elem.innerHTML == "Switch to visible") {
+                elem.innerHTML = "Switch to invisible"
+            } else {
+                elem.innerHTML = "Switch to visible"
+            }
         }
-      }
     }
 
     var openFile = function(event) {
-      var input = event.target;
+        var input = event.target;
 
-      // Instantiate FileReader
-      var reader = new FileReader();
-      reader.onload = function() {
-        imageFile = reader.result;
+        // Instantiate FileReader
+        var reader = new FileReader();
+        reader.onload = function () {
+            image_file = reader.result;
 
-        document.getElementById("imageChange").innerHTML = '<img width="200" src="' + imageFile + '" class="rounded-circle w-100 shadow" />';
-      };
-      reader.readAsDataURL(input.files[0]);
-    };
+            document.getElementById("imageChange").innerHTML = 
+                '<img width="200" src="' + image_file + '" class="rounded-circle w-100 shadow" />';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 
     // Fetch Company Info
   function company_info_fetching(event) {
-      showNotification('success', 'Soft UI Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');
-
-    {#fetch('/admin/settings/fundamental-company-info-fetching/')#}
-    {#  .then(response => response.json())#}
-    {#  .then(data => {#}
-    {#    if (data.success) {#}
-    {#      showNotification('Company Info fetched successfully', 'success');#}
-    {#    } else {#}
-    {#      showNotification('Failed to fetch Company Info', 'error');#}
-    {#    }#}
-    {#  })#}
-    {#  .catch(error => {#}
-    {#    showNotification('Error: ' + error.message, 'error');#}
-    {#  });#}
+      {#showNotification('success', 'Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');#}
+      fetch('fetching/company-info/')
+          .then(response => response.json())
+          .then(data => {
+              const currentTime = new Date().toLocaleTimeString();
+              if (data.success) {
+                  showNotification('success','company Info',"fetched successfully", currentTime);
+              } else {
+                  showNotification('error','company Info',data.error, currentTime);
+              }
+          })
+          .catch(error => {
+              showNotification('error','Exception', error, new Date().toLocaleTimeString());
+          });
   }
   </script>
 

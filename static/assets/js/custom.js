@@ -92,12 +92,13 @@ function selectResult() {
     }
 }
 
+document.getElementById('header_search').addEventListener('input', fetchAutoReminder);
+document.getElementById('header_search').addEventListener('keydown', handleKeyEvents);
 document.getElementById('header_search').addEventListener('blur', function() {
   setTimeout(function() {
     document.getElementById('auto_reminder_results').style.display = 'none';
   }, 200); // Delay to allow click events on results
 });
-
 document.getElementById('header_search').addEventListener('focus', function() {
   document.getElementById('auto_reminder_results').style.display = 'block';
 });
@@ -110,6 +111,7 @@ if (!toastContainer) {
     toastContainer.className = 'position-fixed bottom-1 end-1 z-index-2';
     document.body.appendChild(toastContainer);
 }
+
 //Notification
 function showNotification(level, title, content, timeAgo = 'just now') {
     // Create the toast container
@@ -170,7 +172,7 @@ function showNotification(level, title, content, timeAgo = 'just now') {
         case 'warning':
             icon.className = 'ni ni-spaceship text-warning me-2';
             break;
-        case 'danger':
+        case 'error':
             icon.className = 'ni ni-notification-70 text-danger me-2';
             break;
         default:
@@ -201,3 +203,76 @@ function showNotification(level, title, content, timeAgo = 'just now') {
 // showNotification('info', 'Soft UI Dashboard', 'Hello, world! This is an info message.', '11 mins ago');
 // showNotification('warning', 'Soft UI Dashboard', 'Hello, world! This is a warning message.', '11 mins ago');
 // showNotification('danger', 'Soft UI Dashboard', 'Hello, world! This is a danger message.', '11 mins ago');
+
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationPanel = document.getElementById('notificationPanel');
+    //
+    // notificationButton.addEventListener('click', function () {
+    //     if (notificationPanel.style.display === 'none' || notificationPanel.style.display === '') {
+    //         notificationPanel.style.display = 'block';
+    //     } else {
+    //         notificationPanel.style.display = 'none';
+    //     }
+    // });
+
+    function generateNotificationPanel(notifications) {
+        notifications.forEach(notification => {
+            const listItem = document.createElement('li');
+            listItem.className = 'mb-2';
+            const link = document.createElement('a');
+            link.className = 'dropdown-item border-radius-md';
+            link.href = 'javascript:;';
+            const div1 = document.createElement('div');
+            div1.className = 'd-flex py-1';
+            const div2 = document.createElement('div');
+            div2.className = 'my-auto';
+            // const img = document.createElement('img');
+            // img.src = notification.image;
+            // img.className = 'avatar avatar-sm me-3';
+            // img.alt = 'user image';
+
+            const div3 = document.createElement('div');
+            div3.className = 'd-flex flex-column justify-content-center';
+            const h6 = document.createElement('h6');
+            h6.className = 'text-sm font-weight-normal mb-1';
+            h6.innerHTML = `<span class="font-weight-bold">${notification.verb}</span> by ${notification.actor}`;
+            const p = document.createElement('p');
+            p.className = 'text-xs text-secondary mb-0';
+            p.innerHTML = `<i class="fa fa-clock me-1"></i>${notification.timestamp}`;
+
+            div3.appendChild(h6);
+            div3.appendChild(p);
+
+            // div2.appendChild(img);
+
+            div1.appendChild(div2);
+            div1.appendChild(div3);
+
+            link.appendChild(div1);
+
+            listItem.appendChild(link);
+            notificationPanel.appendChild(listItem);
+        });
+    }
+    function fetchNotifications() {
+        fetch('/inbox/notifications/api/all_list/')
+            .then(response => response.json())
+            .then(data => {
+                notificationPanel.innerHTML = "";
+                // console.log("=>"+notificationPanel.innerHTML)
+                notificationPanel.innerHTML = ''; // Clear existing notifications
+                if (data.all_list) {
+                    generateNotificationPanel(data.all_list);
+                } else {
+                    console.error('Failed to fetch notifications:', data.error);
+                }
+                // console.log("after=>"+notificationPanel.innerHTML);
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
+            });
+        // console.log("init=>"+notificationPanel.innerHTML+" end")
+    }
+    fetchNotifications();
+});

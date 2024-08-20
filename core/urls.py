@@ -33,7 +33,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Notifications
-    # path('inbox/notifications/', include('apps.notifications.urls', namespace='notifications')),
+    path('inbox/notifications/', include('apps.notifications.urls', namespace='notifications')),
 
     path('tasks/', include('apps.tasks.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
