@@ -4,6 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 import re
 from django import template
+from django.http import request
 from django.utils.html import format_html
 from home.utils import get_menu_items
 from django.utils.safestring import mark_safe
@@ -12,23 +13,21 @@ from django.contrib.admin.views.main import (PAGE_VAR)
 register = template.Library()
 assignment_tag = register.assignment_tag if hasattr(register, 'assignment_tag') else register.simple_tag
 
+## Filter ################
 
 @register.filter
 def clean_text(value):
     res = value.replace('\n', ' ')
     return res
 
-
 @register.filter
 def checkbox(value):
     res = re.sub(r"</?(?i:td)(.|\n)*?>", "", value)
     return res
 
-
 @register.filter
 def sum_number(value, number):
     return value + number
-
 
 @register.filter
 def neg_num(value, number):
@@ -38,10 +37,11 @@ def neg_num(value, number):
 def length_is(value, length):
     return len(value) == length
 
+
+## Assignment Tag ################
 @assignment_tag(takes_context=True)
 def admin_get_menu(context):
     return get_menu_items(context)
-
 
 @assignment_tag(takes_context=True)
 def get_direction(context):
@@ -61,7 +61,6 @@ def get_direction(context):
         res['nav'] = 'mr-auto'
     return res
 
-
 @assignment_tag(takes_context=True)
 def get_admin_setting(context):
     # user = context.get('request').user
@@ -73,7 +72,6 @@ def get_admin_setting(context):
     }
 
     return res
-
 
 @register.simple_tag
 def paginator_number(cl, i):
@@ -92,3 +90,13 @@ def paginator_number(cl, i):
             i,
         )
 
+@register.simple_tag
+def check_menu_permission(user, anonymous:bool, authenticated:bool, superuser: bool):
+    if user is None or anonymous:
+        return True
+    elif user.is_authenticated and not user.is_superuser and user.is_authenticated == authenticated:
+        return True
+    elif user.is_superuser and user.is_superuser == superuser:
+        return True
+    return False
+  # {% if check_menu_permission(request, true, true, true)%}

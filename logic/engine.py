@@ -1,3 +1,5 @@
+from django.contrib.auth.models import AnonymousUser
+
 from core.configures_home import Config
 from pathlib import Path
 import logic.engines as engine
@@ -32,6 +34,9 @@ class Engine(BaseEngine):
         path = self.config.ROOT_Data.joinpath(*args)
         self.path_exist(path)
         return engine.CsvEngine(self.config, path)
+
+    def notify(self, sender: AnonymousUser) -> engine.NotifyEngine:
+        return engine.NotifyEngine(self.config, sender)
 
     def plugin(self) -> Plugin:
         return Plugin()

@@ -12,18 +12,6 @@
             <input type="text" name="q" placeholder="Search by symbol" value="{{ request.GET.q }}">
             <button type="submit">Search</button>
           </form>
-        <form method="post" action="{% url 'refresh_market_symbol' %}">
-            {% csrf_token %}
-            <button type="submit">Refresh Market Symbol</button>
-        </form>
-        <form method="post" action="{% url 'index_market_symbol' %}">
-            {% csrf_token %}
-            <button type="submit">Index Market Symbol</button>
-        </form>
-        <form method="post" action="{% url 'refresh_company_overview' %}">
-            {% csrf_token %}
-            <button type="submit">Get Company Overview</button>
-        </form>
         <!-- Add this inside the block content -->
         {% if status_message %}
           <div class="alert alert-info">

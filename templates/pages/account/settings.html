@@ -73,10 +73,10 @@
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Symbols</h6>
                                           <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" href="javascript:">
+                                            <a class="btn btn-link text-success px-1 mb-0" onclick="fetching_symbol((event))">
                                                 <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
                                             </a>
-                                            <a class="btn btn-link text-warning px-1 mb-0" href="javascript:">
+                                            <a class="btn btn-link text-warning px-1 mb-0" onclick="indexing_symbol(event)">
                                                 <i class="fas fa-copy text-dark me-2" aria-hidden="true"></i>Index
                                             </a>
                                           </div>
@@ -100,7 +100,7 @@
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Company Info</h6>
                                           <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" onclick="company_info_fetching(event)">
+                                            <a class="btn btn-link text-success px-1 mb-0" onclick="fetching_company_info(event)">
                                                 <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
                                             </a>
                                           </div>
@@ -815,152 +815,184 @@
   
 {% block extra_js %}
 
-  <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
-  <script>
-      document.getElementById('data-tab').addEventListener('click', function() {
-      document.getElementById('data').style.display = 'block';
-      document.getElementById('other').style.display = 'none';
-    });
+<script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
+<script>
+document.getElementById('data-tab').addEventListener('click', function() {
+    document.getElementById('data').style.display = 'block';
+    document.getElementById('other').style.display = 'none';
+});
 
-    document.getElementById('other-tab').addEventListener('click', function() {
-      document.getElementById('data').style.display = 'none';
-      document.getElementById('other').style.display = 'block';
-    });
+document.getElementById('other-tab').addEventListener('click', function() {
+    document.getElementById('data').style.display = 'none';
+    document.getElementById('other').style.display = 'block';
+});
 
-    if (document.getElementById('choices-gender')) {
-      var gender = document.getElementById('choices-gender');
-      const example = new Choices(gender);
-    }
+if (document.getElementById('choices-gender')) {
+    var gender = document.getElementById('choices-gender');
+    const example = new Choices(gender);
+}
 
-    if (document.getElementById('choices-language')) {
-      var language = document.getElementById('choices-language');
-      const example = new Choices(language);
-    }
+if (document.getElementById('choices-language')) {
+    var language = document.getElementById('choices-language');
+    const example = new Choices(language);
+}
 
-    if (document.getElementById('choices-skills')) {
-      var skills = document.getElementById('choices-skills');
-      const example = new Choices(skills, {
+if (document.getElementById('choices-skills')) {
+    let skills = document.getElementById('choices-skills');
+    const example = new Choices(skills, {
         delimiter: ',',
         editItems: true,
         maxItemCount: 5,
         removeItemButton: true,
         addItems: true
-      });
-    }
+    });
+}
 
-    if (document.getElementById('choices-year')) {
-      var year = document.getElementById('choices-year');
-      setTimeout(function() {
+if (document.getElementById('choices-year')) {
+    let year = document.getElementById('choices-year');
+    setTimeout(function () {
         const example = new Choices(year);
-      }, 1);
+    }, 1);
 
-      for (y = 1900; y <= 2020; y++) {
-          let option = document.createElement("OPTION");
-          option.text = y;
-          option.value = y;
+    for (y = 1900; y <= 2020; y++) {
+        let option = document.createElement("OPTION");
+        option.text = y;
+        option.value = y;
 
         if (y === 2020) {
-          option.selected = true;
+            option.selected = true;
         }
-
         year.options.add(option);
-      }
     }
+}
 
-    if (document.getElementById('choices-day')) {
-        let day = document.getElementById('choices-day');
-        setTimeout(function () {
-            const example = new Choices(day);
-        }, 1);
+if (document.getElementById('choices-day')) {
+    let day = document.getElementById('choices-day');
+    setTimeout(function () {
+        const example = new Choices(day);
+    }, 1);
 
-        for (y = 1; y <= 31; y++) {
-            let option = document.createElement("OPTION");
-            option.text = y;
-            option.value = y;
+    for (y = 1; y <= 31; y++) {
+        let option = document.createElement("OPTION");
+        option.text = y;
+        option.value = y;
 
-            if (y === 1) {
-                option.selected = true;
-            }
+        if (y === 1) {
+            option.selected = true;
+        }
 
-            day.options.add(option);
+        day.options.add(option);
+    }
+}
+
+if (document.getElementById('choices-month')) {
+    var month = document.getElementById('choices-month');
+    setTimeout(function () {
+        const example = new Choices(month);
+    }, 1);
+
+    var d = new Date();
+    const monthArray = [];
+    monthArray[0] = "January";
+    monthArray[1] = "February";
+    monthArray[2] = "March";
+    monthArray[3] = "April";
+    monthArray[4] = "May";
+    monthArray[5] = "June";
+    monthArray[6] = "July";
+    monthArray[7] = "August";
+    monthArray[8] = "September";
+    monthArray[9] = "October";
+    monthArray[10] = "November";
+    monthArray[11] = "December";
+    for (m = 0; m <= 11; m++) {
+        let option = document.createElement("OPTION");
+        option.text = monthArray[m];
+// server side month start from one
+        option.value = (m + 1);
+// if june selected
+        if (m === 1) {
+            option.selected = true;
+        }
+        month.options.add(option);
+    }
+}
+
+function visible() {
+    let elem = document.getElementById('profileVisibility');
+    if (elem) {
+        if (elem.innerHTML == "Switch to visible") {
+            elem.innerHTML = "Switch to invisible"
+        } else {
+            elem.innerHTML = "Switch to visible"
         }
     }
+}
 
-    if (document.getElementById('choices-month')) {
-        var month = document.getElementById('choices-month');
-        setTimeout(function () {
-            const example = new Choices(month);
-        }, 1);
+let openFile = function(event) {
+    let input = event.target;
+    // Instantiate FileReader
+    let reader = new FileReader();
+    reader.onload = function () {
+        image_file = reader.result;
+        document.getElementById("imageChange").innerHTML =
+            '<img width="200" src="' + image_file + '" class="rounded-circle w-100 shadow" />';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
 
-        var d = new Date();
-        const monthArray = [];
-        monthArray[0] = "January";
-        monthArray[1] = "February";
-        monthArray[2] = "March";
-        monthArray[3] = "April";
-        monthArray[4] = "May";
-        monthArray[5] = "June";
-        monthArray[6] = "July";
-        monthArray[7] = "August";
-        monthArray[8] = "September";
-        monthArray[9] = "October";
-        monthArray[10] = "November";
-        monthArray[11] = "December";
-        for (m = 0; m <= 11; m++) {
-            let option = document.createElement("OPTION");
-            option.text = monthArray[m];
-            // server side month start from one
-            option.value = (m + 1);
-            // if june selected
-            if (m === 1) {
-                option.selected = true;
-            }
-            month.options.add(option);
-        }
-    }
-
-    function visible() {
-        let elem = document.getElementById('profileVisibility');
-        if (elem) {
-            if (elem.innerHTML == "Switch to visible") {
-                elem.innerHTML = "Switch to invisible"
+// Index Symbols
+function indexing_symbol(event) {
+    fetch('indexing/symbols/')
+        .then(response => response.json())
+        .then(data => {
+            const currentTime = new Date().toLocaleTimeString();
+            if (data.success) {
+                showNotification('success', 'symbols', data.data, currentTime);
             } else {
-                elem.innerHTML = "Switch to visible"
+                showNotification('error', 'symbols', data.error, currentTime);
             }
-        }
-    }
+        })
+        .catch(error => {
+            showNotification('error', 'symbols', error, new Date().toLocaleTimeString());
+        });
+}
 
-    var openFile = function(event) {
-        var input = event.target;
+// Fetch Symbols
+function fetching_symbol(event) {
+    fetch('fetching/symbols/')
+        .then(response => response.json())
+        .then(data => {
+            const currentTime = new Date().toLocaleTimeString();
+            if (data.success) {
+                showNotification('success', 'symbols', data.data, currentTime);
+            } else {
+                showNotification('error', 'symbols', data.error, currentTime);
+            }
+        })
+        .catch(error => {
+            showNotification('error', 'symbols', error, new Date().toLocaleTimeString());
+        });
+}
 
-        // Instantiate FileReader
-        var reader = new FileReader();
-        reader.onload = function () {
-            image_file = reader.result;
+// Fetch Company Info
+function fetching_company_info(event) {
+    fetch('fetching/company-info/')
+        .then(response => response.json())
+        .then(data => {
+            const currentTime = new Date().toLocaleTimeString();
+            if (data.success) {
+                showNotification('success', 'company Info', data.data, currentTime);
+            } else {
+                showNotification('error', 'company Info', data.error, currentTime);
+            }
+        })
+        .catch(error => {
+            showNotification('error', 'Exception', error, new Date().toLocaleTimeString());
+        });
+}
+{#showNotification('success', 'Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');#}
 
-            document.getElementById("imageChange").innerHTML = 
-                '<img width="200" src="' + image_file + '" class="rounded-circle w-100 shadow" />';
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    // Fetch Company Info
-  function company_info_fetching(event) {
-      {#showNotification('success', 'Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');#}
-      fetch('fetching/company-info/')
-          .then(response => response.json())
-          .then(data => {
-              const currentTime = new Date().toLocaleTimeString();
-              if (data.success) {
-                  showNotification('success','company Info',"fetched successfully", currentTime);
-              } else {
-                  showNotification('error','company Info',data.error, currentTime);
-              }
-          })
-          .catch(error => {
-              showNotification('error','Exception', error, new Date().toLocaleTimeString());
-          });
-  }
-  </script>
+</script>
 
 {% endblock extra_js %}
