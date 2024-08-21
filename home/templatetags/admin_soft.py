@@ -4,7 +4,6 @@ Copyright (c) 2019 - present AppSeed.us
 """
 import re
 from django import template
-from django.http import request
 from django.utils.html import format_html
 from home.utils import get_menu_items
 from django.utils.safestring import mark_safe

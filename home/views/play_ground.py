@@ -1,8 +1,5 @@
-from django.urls import reverse
 from home.base_home import BaseHome
-from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
-from home.models import MarketStockHistoricalBars
+from django.shortcuts import render
 
 # Create your views here.
 instance = BaseHome()
