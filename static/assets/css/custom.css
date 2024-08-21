@@ -13,6 +13,10 @@
     font-size: 0.6em;
 }
 
+.close-button-wrapper .fas:hover {
+    color: #8c0404; /* Replace with the actual info color value */
+}
+
 #auto_reminder_results {
     position: absolute;
     z-index: 1000;
@@ -30,3 +34,4 @@
     height: 3rem; /* Adjust this value based on the actual height of each row */
     cursor: pointer; /* Show hand cursor on hover */
 }
+

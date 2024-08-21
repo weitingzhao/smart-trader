@@ -46,10 +46,9 @@
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
         <div class="input-group">
           <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-            <input type="text" class="form-control" id="header_search" autocomplete="off" 
-                   name="search_input_no_google_auto_complete_{% random_string %}"
-                   placeholder="Stock name or symbol">
-            <div id="auto_reminder_results" class="list-group" style="max-height: calc(5 * 3rem); overflow-y: auto;"></div>
+            <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+            <ul id="auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
         </div>
       </div>
       <ul class="navbar-nav  justify-content-end">
@@ -122,15 +121,12 @@
           </a>
         </li>
         <li class="nav-item dropdown pe-2 d-flex align-items-center">
-          <a class="nav-link text-body p-0"
-             id="notificationButton"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            <i class="fa fa-bell cursor-pointer"></i>
+          <a class="nav-link text-body p-0">
+              <i id="notificationButton" class="fa fa-bell cursor-pointer" aria-expanded="false" aria-haspopup="true"></i>
+              <span id="notificationCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
           </a>
-          <ul id="notificationPanel"
-              class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
-              aria-labelledby="dropdownMenuButton">
+          <ul id="notificationMenu" class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
+              aria-labelledby="notificationButton">
           </ul>
         </li>
       </ul>
