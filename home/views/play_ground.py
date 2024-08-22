@@ -1,8 +1,8 @@
-from home.base_home import BaseHome
+from logic.logic import Logic
 from django.shortcuts import render
 
 # Create your views here.
-instance = BaseHome()
+instance = Logic()
 
 # Pages
 def index(request):

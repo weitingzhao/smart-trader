@@ -1,11 +1,11 @@
 from django.http import JsonResponse
-from home.base_home import BaseHome
+from logic.logic import Logic
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 
 # Create your views here.
-instance = BaseHome()
+instance = Logic()
 
 @require_GET
 def auto_reminder(request):

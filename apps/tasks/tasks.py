@@ -1,15 +1,19 @@
+import logging
 import os, time, subprocess
 import datetime
+from io import StringIO
 from os import listdir
 from os.path import isfile, join
+from tokenize import String
 
+from django.contrib.auth import get_user_model
+from logic.engines.notify_engine import Level
+from logic.logic import Logic
 from .celery import app
 from celery.contrib.abortable import AbortableTask
-from django_celery_results.models import TaskResult
-
-from django.contrib.auth.models import User
 from django.conf import settings
-from celery.exceptions import Ignore, TaskError
+
+from ..file_manager.templatetags.info_value import info_value
 
 
 def get_scripts():
@@ -47,6 +51,7 @@ def write_to_log_file(logs, script_name):
     
     return log_file_path
 
+
 @app.task(bind=True, base=AbortableTask)
 def execute_script(self, data: dict):
     """
@@ -57,7 +62,7 @@ def execute_script(self, data: dict):
     script = data.get("script")
     args   = data.get("args")
 
-    print( '> EXEC [' + script + '] -> ('+args+')' ) 
+    print( '> EXEC [' + script + '] -> ('+args+')' )
 
     scripts, err_info = get_scripts()
 
@@ -71,7 +76,7 @@ def execute_script(self, data: dict):
         exit_code = process.wait()
         error = False
         status = "STARTED"
-        if exit_code == 0:  # If script execution successfull
+        if exit_code == 0:  # If script execution successful
             logs = process.stdout.read().decode()
             status = "SUCCESS"
         else:
@@ -83,3 +88,60 @@ def execute_script(self, data: dict):
         log_file = write_to_log_file(logs, script)
 
         return {"logs": logs, "input": script, "error": error, "output": "", "status": status, "log_file": log_file}
+
+
+
+support_tasks = [
+    "indexing-symbols",
+    "fetching-symbols",
+    "fetching-company-info"
+]
+
+@app.task(bind=True, base=AbortableTask)
+def backend_task(self, data):
+    # user_id
+    user_id = data.get('user_id')
+    if not user_id:
+        raise ValueError("User ID is required to send notifications")
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        raise ValueError(f"User with ID {user_id} does not exist")
+
+    # task_name
+    task_name = data.get('task_name')
+    if not task_name:
+        raise ValueError("Task name is required to execute")
+    if task_name not in support_tasks:
+        raise ValueError(f"Task name '{task_name}' is not supported")
+
+    # Setup logger
+    instance = Logic("celery task", need_info=False, need_error=False)
+    log_stream = StringIO()
+    task_log_handler = logging.StreamHandler(log_stream)
+    task_log_handler.setLevel(logging.INFO)
+    instance.logger.addHandler(task_log_handler)
+
+    # Execute the task
+    if task_name == 'fetching-symbols':
+        instance.service.fetching().symbol().fetching_symbol()
+    elif task_name == 'indexing-symbols':
+        instance.service.saving().symbol().index_symbol()
+    elif task_name == 'fetching-company-info':
+        instance.service.fetching().symbol().fetching_symbols_info()
+
+    # Send notification to the user
+    instance.engine.notify(user).send(
+        recipient=user,
+        verb=f'Start {task_name} task',
+        level=Level.INFO,
+        description=f'{task_name} task running at backend, go to task page to see the progress',
+    )
+
+    # Write logs to file
+    logs = log_stream.getvalue()
+    log_file = write_to_log_file(logs, task_name)
+
+    return {"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file}

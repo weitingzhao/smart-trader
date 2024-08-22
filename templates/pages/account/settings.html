@@ -73,10 +73,10 @@
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Symbols</h6>
                                           <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" onclick="fetching_symbol((event))">
+                                            <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-symbols', 'fetching symbols')">
                                                 <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
                                             </a>
-                                            <a class="btn btn-link text-warning px-1 mb-0" onclick="indexing_symbol(event)">
+                                            <a class="btn btn-link text-warning px-1 mb-0" onclick="call_celery_task('indexing-symbols', 'indexing symbols')">
                                                 <i class="fas fa-copy text-dark me-2" aria-hidden="true"></i>Index
                                             </a>
                                           </div>
@@ -100,7 +100,7 @@
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Company Info</h6>
                                           <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" onclick="fetching_company_info(event)">
+                                            <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-company-info', 'fetching company Info')">
                                                 <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
                                             </a>
                                           </div>
@@ -940,58 +940,6 @@ let openFile = function(event) {
     };
     reader.readAsDataURL(input.files[0]);
 }
-
-// Index Symbols
-function indexing_symbol(event) {
-    fetch('indexing/symbols/')
-        .then(response => response.json())
-        .then(data => {
-            const currentTime = new Date().toLocaleTimeString();
-            if (data.success) {
-                showNotification('success', 'symbols', data.data, currentTime);
-            } else {
-                showNotification('error', 'symbols', data.error, currentTime);
-            }
-        })
-        .catch(error => {
-            showNotification('error', 'symbols', error, new Date().toLocaleTimeString());
-        });
-}
-
-// Fetch Symbols
-function fetching_symbol(event) {
-    fetch('fetching/symbols/')
-        .then(response => response.json())
-        .then(data => {
-            const currentTime = new Date().toLocaleTimeString();
-            if (data.success) {
-                showNotification('success', 'symbols', data.data, currentTime);
-            } else {
-                showNotification('error', 'symbols', data.error, currentTime);
-            }
-        })
-        .catch(error => {
-            showNotification('error', 'symbols', error, new Date().toLocaleTimeString());
-        });
-}
-
-// Fetch Company Info
-function fetching_company_info(event) {
-    fetch('fetching/company-info/')
-        .then(response => response.json())
-        .then(data => {
-            const currentTime = new Date().toLocaleTimeString();
-            if (data.success) {
-                showNotification('success', 'company Info', data.data, currentTime);
-            } else {
-                showNotification('error', 'company Info', data.error, currentTime);
-            }
-        })
-        .catch(error => {
-            showNotification('error', 'Exception', error, new Date().toLocaleTimeString());
-        });
-}
-{#showNotification('success', 'Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');#}
 
 </script>
 

@@ -8,8 +8,5 @@ urlpatterns = [
     path('', views.setting.settings, name="settings"),
 
     # Dashboard -> Settings -> Data -> Fundamentals
-    path('fetching/symbols/', views.setting.fetching_symbol, name='settings_fetching_symbol'),
-    path('indexing/symbols/', views.setting.indexing_symbol, name='settings_indexing_symbol'),
-    path('fetching/company-info/', views.setting.fetching_company_info, name="settings_fetching_company_info"),
-
+    path('celery_task/<str:task_name>', views.setting.celery_task, name="celery_task"),
 ]

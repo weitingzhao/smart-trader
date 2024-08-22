@@ -7,7 +7,7 @@ import random
 from typing import Union, Type
 from types import ModuleType
 import requests
-
+from tqdm import tqdm
 
 class Tools:
 
@@ -57,3 +57,18 @@ class Tools:
 
         spec.loader.exec_module(module)
         return getattr(module, class_name) if class_name else module
+
+
+class TqdmLogger(tqdm):
+    def __init__(self, *args, **kwargs):
+        self.logger = kwargs.pop("logger", None)
+        self.elapsed = 0 # initialize elapsed attribute
+        super().__init__(*args, **kwargs)
+
+    def display(self, msg=None, pos=None):
+        if msg is None:
+            msg = self.format_meter(self.n, self.total, self.elapsed)
+        if self.logger:
+            self.logger.info(msg)
+        else:
+            super().display(msg, pos)

@@ -4,10 +4,10 @@ import logic
 import logging
 
 
-class BaseHome:
-    def __init__(self):
+class Logic:
+    def __init__(self, name: str = __name__, need_info = True, need_error = True):
         # Tier 1. Config.
-        self.config = core.Config()
+        self.config = core.Config(name, need_info, need_error)
         self.logger: logging.Logger = self.config.logger
         self.tools: Tools = Tools(self.config.logger)
 

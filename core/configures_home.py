@@ -104,7 +104,7 @@ class Config:
         "password": ""
     }
 
-    def __init__(self, name: str = __name__) -> None:
+    def __init__(self, name: str = __name__, need_info = True, need_error = True) -> None:
         self.__name__ = name
         self.FILE_user: Path = Path(__file__).parents[1] / "user.json"
 
@@ -170,7 +170,7 @@ class Config:
 
         # <editor-fold desc="Setup Tools">
         # Logger
-        self.logger = self._log_initial(self.__name__)
+        self.logger = self._log_initial(self.__name__, need_info = need_info, need_error = need_error)
         # Exception custom handler (Set the sys.excepthook)
         sys.excepthook = self._log_unhandled_exception
         # </editor-fold>
@@ -203,7 +203,7 @@ class Config:
             "Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback)
         )
 
-    def _log_initial(self, name: str) -> logging.Logger:
+    def _log_initial(self, name: str, need_info = True, need_error = True) -> logging.Logger:
         """Return a logger instance by name
         Creates a file handler to log messages with level WARNING and above
         Creates a stream handler to log messages with level INFO and above
@@ -214,18 +214,19 @@ class Config:
         logger = logging.getLogger(name)
         logger.setLevel(logging.INFO)
 
-        stdout_handler = logging.StreamHandler()
-        stdout_handler.setLevel(logging.INFO)
-        stdout_handler.setFormatter(
-            logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s'))
+        if need_info :
+            info_handler = logging.StreamHandler()
+            info_handler.setLevel(logging.INFO)
+            info_handler.setFormatter(
+                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s'))
+            logger.addHandler(info_handler)
 
-        file_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
-        file_handler.setLevel(logging.WARNING)
-        file_handler.setFormatter(
-            logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
-        )
-
-        logger.addHandler(stdout_handler)
-        logger.addHandler(file_handler)
+        if need_error:
+            error_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
+            error_handler.setLevel(logging.WARNING)
+            error_handler.setFormatter(
+                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
+            )
+            logger.addHandler(error_handler)
 
         return logger

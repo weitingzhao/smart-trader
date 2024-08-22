@@ -1,11 +1,11 @@
 from django.core.paginator import Paginator
-from home.base_home import BaseHome
+from logic.logic import Logic
 from django.shortcuts import render
 
 from home.models import MarketStockHistoricalBars
 
 # Create your views here.
-instance = BaseHome()
+instance = Logic()
 
 def stock_screener(request):
     query = request.GET.get('q')

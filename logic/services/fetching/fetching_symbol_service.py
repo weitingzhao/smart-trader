@@ -2,10 +2,15 @@ from datetime import datetime, timezone
 import pandas as pd
 import yfinance as yf
 from tqdm import tqdm
+
+from apps.tasks.templatetags.formats import log_to_text
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from home.models import *
 from alpha_vantage.fundamentaldata import FundamentalData
+
+from logic.utilities.tools import TqdmLogger
+
 
 class FetchingSymbolService(BaseService):
 
@@ -38,9 +43,10 @@ class FetchingSymbolService(BaseService):
                 }
             )
 
-    def fetch_symbols_info(self) -> list:
+    def fetching_symbols_info(self) -> list:
         # symbols = MarketSymbol.objects.values_list('symbol', flat=True)
-        symbols = ["AAPL","UI"]
+        # symbols = ["AAPL","UI"]
+        symbols = ["TSLA"]
         tickers = yf.Tickers(" ".join(symbols))
 
         # <editor-fold desc="save method">
@@ -246,7 +252,7 @@ class FetchingSymbolService(BaseService):
         # </editor-fold>
 
         result = []
-        for root_symbol in tqdm(symbols, desc="Fetching symbol info"):
+        for root_symbol in TqdmLogger(symbols, desc="Fetching symbol info", logger=self.logger):
             try:
                 ticker = tickers.tickers[root_symbol]
                 root_ticker_info = ticker.info
@@ -273,6 +279,7 @@ class FetchingSymbolService(BaseService):
                 # Company officers
                 save_company_officers(symbol_obj, root_ticker_info.get('companyOfficers', []))
 
+                self.logger.info(f"Success: fetch {root_symbol} info")
             except Exception as e:
                 self.logger.error(f"Error: fetch {root_symbol} info - got Error:{e}")
                 result.append({'symbol': root_symbol, 'error': str(e)})

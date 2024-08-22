@@ -11,6 +11,7 @@ from django.conf import settings
 
 register = template.Library()
 
+@register.filter
 def date_format(date):
     """
     Returns a formatted date string
@@ -24,8 +25,7 @@ def date_format(date):
     except:
         return date
 
-register.filter("date_format", date_format)
-
+@register.filter
 def get_result_field(result, field: str):
     """
     Returns a field from the content of the result attibute in result 
@@ -38,28 +38,20 @@ def get_result_field(result, field: str):
     if result:
         return result.get(field)
 
-register.filter("get_result_field", get_result_field)
 
-
-
+@register.filter
 def log_file_path(path):
     file_path = path.split("tasks_logs")[1]
     return file_path
 
-register.filter("log_file_path", log_file_path)
 
-
+@register.filter
 def log_to_text(path):
     path = path.lstrip('/')
-
     full_path = os.path.join(settings.CELERY_LOGS_DIR, path)
-
     try:
         with open(full_path, 'r') as file:
             text = file.read()
-        
         return text
     except:
         return 'NO LOGS'
-
-register.filter("log_to_text", log_to_text)

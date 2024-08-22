@@ -4,7 +4,7 @@ from home.models import MarketSymbol
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from whoosh.qparser import MultifieldParser, WildcardPlugin, OrGroup
-from home.instance import Instance
+from home.singleton import Instance
 
 class LoadingSymbolService(BaseService):
 
