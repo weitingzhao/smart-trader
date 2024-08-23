@@ -170,7 +170,7 @@ class Config:
 
         # <editor-fold desc="Setup Tools">
         # Logger
-        self.logger = self._log_initial(self.__name__, need_info = need_info, need_error = need_error)
+        self.logger = self.initial_log(self.__name__, need_info=need_info, need_error=need_error)
         # Exception custom handler (Set the sys.excepthook)
         sys.excepthook = self._log_unhandled_exception
         # </editor-fold>
@@ -203,7 +203,7 @@ class Config:
             "Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback)
         )
 
-    def _log_initial(self, name: str, need_info = True, need_error = True) -> logging.Logger:
+    def initial_log(self, name: str, need_info = True, need_error = True) -> logging.Logger:
         """Return a logger instance by name
         Creates a file handler to log messages with level WARNING and above
         Creates a stream handler to log messages with level INFO and above

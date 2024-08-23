@@ -1,15 +1,13 @@
+import time
 from datetime import datetime, timezone
 import pandas as pd
 import yfinance as yf
-from tqdm import tqdm
-
-from apps.tasks.templatetags.formats import log_to_text
-from logic.engine import Engine
-from logic.services.base_service import BaseService
 from home.models import *
+from logic.engine import Engine
+from logic.logic import TqdmLogger, Progress
+from logic.services.base_service import BaseService
 from alpha_vantage.fundamentaldata import FundamentalData
 
-from logic.utilities.tools import TqdmLogger
 
 
 class FetchingSymbolService(BaseService):
@@ -251,39 +249,51 @@ class FetchingSymbolService(BaseService):
                 )
         # </editor-fold>
 
+        dummy_data = list(range(30))
         result = []
-        for root_symbol in TqdmLogger(symbols, desc="Fetching symbol info", logger=self.logger):
+        for dummy_record in TqdmLogger(dummy_data, desc="Simulating workload", progress=self.progress):
             try:
-                ticker = tickers.tickers[root_symbol]
-                root_ticker_info = ticker.info
-                symbol_obj = MarketSymbol.objects.get(symbol=root_symbol)
-
-                # Stock basic info
-                save_stock(symbol_obj, root_ticker_info)
-                # Stock risk metrics
-                save_stock_risk_metrics(symbol_obj, root_ticker_info)
-                # Stock dividends
-                save_stock_dividends(symbol_obj, root_ticker_info)
-                # Stock price
-                save_stock_price(symbol_obj, root_ticker_info)
-                # Stock valuation
-                save_stock_valuation(symbol_obj, root_ticker_info)
-                # Stock target
-                save_stock_target(symbol_obj, root_ticker_info)
-                # Stock performance
-                save_stock_performance(symbol_obj, root_ticker_info)
-                # Stock share
-                save_stock_share(symbol_obj, root_ticker_info)
-                # Stock financial
-                save_stock_financial(symbol_obj, root_ticker_info)
-                # Company officers
-                save_company_officers(symbol_obj, root_ticker_info.get('companyOfficers', []))
-
-                self.logger.info(f"Success: fetch {root_symbol} info")
+                # Simulate real workload by sleeping for 1 second
+                time.sleep(1)
+                self.logger.info(f"Processed dummy record: {dummy_record}")
             except Exception as e:
-                self.logger.error(f"Error: fetch {root_symbol} info - got Error:{e}")
-                result.append({'symbol': root_symbol, 'error': str(e)})
+                self.logger.error(f"Error processing dummy record {dummy_record} - got Error: {e}")
+                result.append({'record': dummy_record, 'error': str(e)})
         return result
+
+        # result = []
+        # for root_symbol in TqdmLogger(symbols, desc="Fetching symbol info", logger=self.logger):
+        #     try:
+        #         ticker = tickers.tickers[root_symbol]
+        #         root_ticker_info = ticker.info
+        #         symbol_obj = MarketSymbol.objects.get(symbol=root_symbol)
+        #
+        #         # Stock basic info
+        #         save_stock(symbol_obj, root_ticker_info)
+        #         # Stock risk metrics
+        #         save_stock_risk_metrics(symbol_obj, root_ticker_info)
+        #         # Stock dividends
+        #         save_stock_dividends(symbol_obj, root_ticker_info)
+        #         # Stock price
+        #         save_stock_price(symbol_obj, root_ticker_info)
+        #         # Stock valuation
+        #         save_stock_valuation(symbol_obj, root_ticker_info)
+        #         # Stock target
+        #         save_stock_target(symbol_obj, root_ticker_info)
+        #         # Stock performance
+        #         save_stock_performance(symbol_obj, root_ticker_info)
+        #         # Stock share
+        #         save_stock_share(symbol_obj, root_ticker_info)
+        #         # Stock financial
+        #         save_stock_financial(symbol_obj, root_ticker_info)
+        #         # Company officers
+        #         save_company_officers(symbol_obj, root_ticker_info.get('companyOfficers', []))
+        #
+        #         self.logger.info(f"Success: fetch {root_symbol} info")
+        #     except Exception as e:
+        #         self.logger.error(f"Error: fetch {root_symbol} info - got Error:{e}")
+        #         result.append({'symbol': root_symbol, 'error': str(e)})
+        # return result
 
 
     def fetching_alphav_company_overview(self, symbol) -> tuple:

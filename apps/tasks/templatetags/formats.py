@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import json
 import os
-
+import ast
 from django import template
 from django.conf import settings
 
@@ -37,6 +37,27 @@ def get_result_field(result, field: str):
     result = json.loads(result.result)
     if result:
         return result.get(field)
+
+@register.filter
+def get_result_log_file(result):
+    if result is None:
+        return None
+    result = json.loads(result.result)
+    if result:
+        log_file = result.get("log_file")
+        if log_file:
+            log_file_name = os.path.splitext(os.path.basename(log_file))[0]
+            return log_file_name
+        return None
+    return None
+
+@register.filter
+def get_task_args_field(result, field: str):
+    task_args = result.task_args.strip('"')
+    task_args_tuple = ast.literal_eval(task_args)
+    task_args_dict = task_args_tuple[0]
+    if task_args_dict:
+        return task_args_dict.get(field)
 
 
 @register.filter

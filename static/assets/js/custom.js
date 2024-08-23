@@ -302,7 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
         h6.innerHTML = `<span class="font-weight-bold">${notification.verb}</span> by ${notification.actor}`;
         const p = document.createElement('p');
         p.className = 'text-xs text-secondary mb-0';
-        p.innerHTML = `<i class="fa fa-clock me-1"></i>${notification.timestamp}`;
+        const formattedTimestamp = new Date(notification.timestamp).toLocaleString('en-US').replace(',', '');
+        p.innerHTML = `<i class="fa fa-clock me-1"></i>${formattedTimestamp}  <span class="text-xs text-dark">${notification.description}</span>`;
 
         const closeButtonWrapper = document.createElement('div');
         closeButtonWrapper.className = 'close-button-wrapper d-flex justify-content-center align-items-center';
@@ -435,6 +436,29 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchNotifications();
 });
 
+function showFileView(fileName) {
+    const fileViewModal = document.getElementById('file-view');
+    const filePathElement = document.getElementById('file-path');
+    const fileContentElement = document.getElementById('file_content');
+    const fileDownloadElement = document.getElementById('file-download');
+
+    fetch(`/tasks_logs?file=${encodeURIComponent(fileName)}`)
+        .then(response => response.text())
+        .then(data => {
+            filePathElement.textContent = fileName;
+            fileContentElement.textContent = data;
+            fileDownloadElement.href = `/tasks_logs?file=${encodeURIComponent(fileName)}`;
+            const modal = new bootstrap.Modal(fileViewModal);
+            modal.show();
+        })
+        .catch(error => {
+            fileContentElement.textContent = 'Error loading file';
+            const modal = new bootstrap.Modal(fileViewModal);
+            modal.show();
+        });
+}
+
+
 // Celery Task
 function call_celery_task(task, task_name) {
     fetch(`celery_task/${task}`)
@@ -455,3 +479,8 @@ function call_celery_task(task, task_name) {
         });
 }
 
+//Cerlery Task Log
+function show_log(log) {
+    const logContainer = document.getElementById('celery_log');
+    logContainer.innerHTML = log;
+}

@@ -1,19 +1,13 @@
-import logging
 import os, time, subprocess
 import datetime
-from io import StringIO
 from os import listdir
 from os.path import isfile, join
-from tokenize import String
-
 from django.contrib.auth import get_user_model
 from logic.engines.notify_engine import Level
 from logic.logic import Logic
 from .celery import app
 from celery.contrib.abortable import AbortableTask
 from django.conf import settings
-
-from ..file_manager.templatetags.info_value import info_value
 
 
 def get_scripts():
@@ -38,18 +32,19 @@ def get_scripts():
     return scripts, None           
 
 def write_to_log_file(logs, script_name):
+    log_file_path = get_log_file_path(script_name)
+    with open(log_file_path, 'w') as log_file:
+        log_file.write(logs)
+    return log_file_path
+
+def get_log_file_path(script_name) -> str:
     """
     Writes logs to a log file with formatted name in the CELERY_LOGS_DIR directory.
     """
     script_base_name = os.path.splitext(script_name)[0]  # Remove the .py extension
     current_time = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
     log_file_name = f"{script_base_name}-{current_time}.log"
-    log_file_path = os.path.join(settings.CELERY_LOGS_DIR, log_file_name)
-    
-    with open(log_file_path, 'w') as log_file:
-        log_file.write(logs)
-    
-    return log_file_path
+    return os.path.join(settings.CELERY_LOGS_DIR, log_file_name)
 
 
 @app.task(bind=True, base=AbortableTask)
@@ -84,7 +79,6 @@ def execute_script(self, data: dict):
             error = True
             status = "FAILURE"
 
-
         log_file = write_to_log_file(logs, script)
 
         return {"logs": logs, "input": script, "error": error, "output": "", "status": status, "log_file": log_file}
@@ -118,12 +112,14 @@ def backend_task(self, data):
         raise ValueError(f"Task name '{task_name}' is not supported")
 
     # Setup logger
-    instance = Logic("celery task", need_info=False, need_error=False)
-    log_stream = StringIO()
-    task_log_handler = logging.StreamHandler(log_stream)
-    task_log_handler.setLevel(logging.INFO)
-    instance.logger.addHandler(task_log_handler)
+    instance = Logic("celery task")
+    log_file_path = get_log_file_path(task_name)
+    instance.progress.init_progress(log_file_path)
 
+    self.update_state(
+        state='PROGRESS',
+        meta={"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file_path}
+    )
     # Execute the task
     if task_name == 'fetching-symbols':
         instance.service.fetching().symbol().fetching_symbol()
@@ -132,16 +128,13 @@ def backend_task(self, data):
     elif task_name == 'fetching-company-info':
         instance.service.fetching().symbol().fetching_symbols_info()
 
-    # Send notification to the user
+    # Process done. Sent notification
+    log_file_name = os.path.splitext(os.path.basename(log_file_path))[0]
     instance.engine.notify(user).send(
         recipient=user,
-        verb=f'Start {task_name} task',
+        verb=f'{task_name} Task done!',
         level=Level.INFO,
-        description=f'{task_name} task running at backend, go to task page to see the progress',
+        description=f'click <a href="#" class="text-xs text-danger" onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
     )
 
-    # Write logs to file
-    logs = log_stream.getvalue()
-    log_file = write_to_log_file(logs, task_name)
-
-    return {"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file}
+    return {"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file_path}

@@ -35,7 +35,6 @@ class NotifyEngine(BaseEngine):
              target: models.Model = None,
              public: bool =True,
              data: object = None) -> JsonResponse:
-
         if isinstance(level, str):
             level = Level(level)
         elif not isinstance(level, Level):
@@ -47,7 +46,7 @@ class NotifyEngine(BaseEngine):
                 recipient=recipient,
                 verb=verb,
                 #optional
-                level=level,
+                level=level.value,
                 description=description,
                 action_object=action_object,
                 target=target,

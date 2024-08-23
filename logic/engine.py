@@ -3,13 +3,15 @@ from django.contrib.auth.models import AnonymousUser
 from core.configures_home import Config
 from pathlib import Path
 import logic.engines as engine
+from logic.logic import Progress
 from logic.utilities.plugin import Plugin
 from logic.engines.base_engine import BaseEngine
 
 
 class Engine(BaseEngine):
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, progress: Progress):
         super().__init__(config)
+        self.progress: Progress = progress
 
     def web(self, url: str) -> engine.WebEngine:
         return engine.WebEngine(self.config, url)

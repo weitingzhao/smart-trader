@@ -133,4 +133,25 @@
     </div>
   </div>
 </nav>
+<div  id="file-view" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false"
+tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="file-path"></h1>
+                <span>
+                    <a id="file-download" style="cursor: pointer;">
+                        <i title="Download" class="fas fa-download text-success fs-4"></i>
+                    </a>
+                </span>
+                <div class="" id="modal-close-btn" data-bs-dismiss="modal" aria-label="Close" style="cursor: pointer;">
+                    <i class="fas fa-times fs-5"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="file_content" class="bg-dark text-light p-3" style="max-height: 600px;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- End Navbar -->

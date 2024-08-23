@@ -13,6 +13,10 @@ from os.path import isfile, join
 from django.conf import settings
 from django.template  import loader
 
+from apps.tasks.templatetags import formats
+from apps.tasks.templatetags.formats import log_file_path
+
+
 # Create your views here.
 def index(request):
     return HttpResponse("INDEX Tasks")
@@ -63,10 +67,10 @@ def cancel_task(request, task_id):
     :rtype: (HttpResponseRedirect | HttpResponsePermanentRedirect)
     '''
     result = TaskResult.objects.get(task_id=task_id)
-    abortable_result = AbortableAsyncResult(
-        result.task_id, task_name=result.task_name, app=app)
+    abortable_result = AbortableAsyncResult(result.task_id, task_name=result.task_name, app=app)
     if not abortable_result.is_aborted():
         abortable_result.revoke(terminate=True)
+        # abortable_result.backend.store_result(result.id, result.result, result.status)
     time.sleep(1)
     return redirect("tasks")
 

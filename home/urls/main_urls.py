@@ -9,6 +9,7 @@ urlpatterns = [
 
     # Navigation:  Auto Reminder
     path('auto_reminder/', views.main.auto_reminder, name='auto_reminder'),
+    path('tasks_logs', views.main.get_task_log, name='get_task_log'),
 
     # Menu: Research
     path('stock_screener/', views.research.stock_screener, name='stock screener'),

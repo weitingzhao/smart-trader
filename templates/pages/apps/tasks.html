@@ -71,7 +71,7 @@
                     <!-- Running Task -->
                     {% for task in  tasks %}    
 
-                    {% if task.status == "STARTED" %}
+                    {% if task.status == "STARTED" or task.status == "PROGRESS"%}
                     <form action="{% url 'cancel-task' task.id %}" method="post">
                     {% else %}
                     <form action="{% url 'run-task' task.name %}" method="post">                      
@@ -104,7 +104,9 @@
                         </td>
                         <td class="align-middle text-center text-sm">
 
-                          {% if task.status == "STARTED" %}
+                          {% if task.status == "STARTED"%}
+                            <span class="badge bg-warning">INITIAL</span>
+                          {% elif task.status == "PROGRESS"%}
                             <span class="badge bg-warning">RUNNING</span>
                           {% elif task.status == "FAILURE" %}
                             <span class="badge bg-danger">FINISHED</span>
@@ -120,7 +122,7 @@
                             
                             {% if task.name == 'execute_script' %}
                               <select class="form-control" name="script" 
-                              {% if task.status == "STARTED" or not scripts %}
+                              {% if task.status == "STARTED" or task.status == "PROGRESS" or not scripts %}
                                 disabled
                               {% endif %}
                               >
@@ -154,27 +156,20 @@
 
                         {% if request.user.is_authenticated %}
                         <td class="align-middle text-center">
-
-                          {% if task.status == "STARTED" %}
-
+                          {% if task.status == "STARTED" or task.status == "PROGRESS"%}
                             <button href="javascript:;" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
                               Cancel Task
                             </button>
-
                           {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
-                              
                               <button href="javascript:;" 
                                       class="text-dark font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
                                 Execute
                               </button>
-
-                          {% else %}                               
-                            
+                          {% else %}
                               <button href="javascript:;" 
                                       class="text-dark font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
                                 Execute
                               </button>
-
                           {% endif %}
 
                         </td>
@@ -233,21 +228,22 @@
                         </td>
 
                         <td class="align-middle">
-                          <p class="text-sm mb-0">{{result|get_result_field:"input"}}</p>
+                          <p class="text-sm mb-0">
+                               {% if result.status == 'REVOKED' %}
+                                    {{result|get_task_args_field:"task_name"}}
+                               {% else %}
+                                   {{result|get_result_field:"input"}}
+                               {% endif %}
+                          </p>
                         </td>
 
                         <td class="align-middle">
-                          <p class="text-sm 
-                            {% if result|get_result_field:"status" == 'SUCCESS' %} text-success
-                            {% elif result|get_result_field:"status" == 'FAILURE' %} text-danger
-                            {% else %} text-warning {% endif %}
-                            text-center mb-0"
-                          >
-                          {% if result|get_result_field:"status" %}
-                            {{result|get_result_field:"status"}}
-                          {% else %}
-                            RUNNING
-                          {% endif %}
+                          <p class="text-sm text-center mb-0
+                            {% if result.status == 'SUCCESS' %} text-success
+                            {% elif result.status == 'FAILURE' %} text-danger
+                            {% elif result.status == 'REVOKED' %} text-primary
+                            {% else %} text-info {% endif %}">
+                          {{ result.status}}
                           </p>
                         </td>
                         
@@ -260,47 +256,21 @@
                         </td>      
                         
                         <td class="">
-                          <p class="text-sm text-center mb-0">{{result|get_result_field:"output"}}</p>
-                        </td>   
+                            <p class="text-sm text-center mb-0">
+                                {% if result.status == 'REVOKED' %}
+                                   {{result|get_result_field:"exc_message"}}
+                               {% else %}
+                                    {{result|get_result_field:"output"}}
+                               {% endif %}
+                            </p>
+                        </td>
                         <td class="">
                           <p class="text-sm text-center mb-0">
-                            <a data-bs-toggle="modal" data-bs-target="#view-log-{{result.id}}" href="#" >View LOG</a> 
+                              <a href="#" class="text-xs text-danger" onclick="showFileView('{{result|get_result_log_file}}')">View LOG</a>
                           </p>
                         </td>                                               
 
                       </tr>
-
-                      <div class="modal fade" id="view-log-{{result.id}}" data-bs-backdrop="static" data-bs-keyboard="false"
-                        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                                {% if result|get_result_field:"log_file" %}
-                                  {{result|get_result_field:"log_file"|log_file_path|cut:"/"}}
-                                {% endif %}
-                              </h1>
-                              <span>
-                                {% if result|get_result_field:"log_file" %}
-                                  <a href="{% url 'download_log_file' result|get_result_field:"log_file"|encoded_file_path %}">
-                                    <i title="Download" class="fas fa-download text-success fs-4"></i>
-                                </a>
-                                {% endif %}
-                              </span>
-                              <div class="" id="modal-close-btn-{{result.id}}" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="fas fa-times fs-5"></i>
-                              </div>
-                            </div>
-                            <div class="modal-body">
-                              {% if result|get_result_field:"log_file" %}
-                                <pre class="bg-dark text-light p-3" style="max-height: 600px;">{{result|get_result_field:"log_file"|log_file_path|log_to_text}}</pre>
-                              {% endif %}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-
                     {% endfor %}
 
                   </tbody>
