@@ -13,9 +13,6 @@ from os.path import isfile, join
 from django.conf import settings
 from django.template  import loader
 
-from apps.tasks.templatetags import formats
-from apps.tasks.templatetags.formats import log_file_path
-
 
 # Create your views here.
 def index(request):

@@ -31,7 +31,7 @@ class Progress:
         self.logger: logging.Logger = self.config.logger
 
         self.log_file_path = None
-        self.log_stream: StringIO = None
+        self.log_stream = None
         self.log_flush = None
 
     def init_progress(self, log_file_path: str):

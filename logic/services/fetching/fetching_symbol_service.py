@@ -4,7 +4,7 @@ import pandas as pd
 import yfinance as yf
 from home.models import *
 from logic.engine import Engine
-from logic.logic import TqdmLogger, Progress
+from logic.logic import TqdmLogger
 from logic.services.base_service import BaseService
 from alpha_vantage.fundamentaldata import FundamentalData
 
@@ -251,7 +251,7 @@ class FetchingSymbolService(BaseService):
 
         dummy_data = list(range(30))
         result = []
-        for dummy_record in TqdmLogger(dummy_data, desc="Simulating workload", progress=self.progress):
+        for dummy_record in TqdmLogger(dummy_data, progress=self.progress):
             try:
                 # Simulate real workload by sleeping for 1 second
                 time.sleep(1)

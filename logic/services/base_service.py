@@ -1,5 +1,4 @@
 from logic.engine import Engine
-from logic.logic import Progress
 from logic.engines.base_engine import BaseEngine
 
 

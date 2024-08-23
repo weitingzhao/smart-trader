@@ -51,7 +51,6 @@ def get_log_file_path(script_name) -> str:
 def execute_script(self, data: dict):
     """
     This task executes scripts found in settings.CELERY_SCRIPTS_DIR and logs are later generated and stored in settings.CELERY_LOGS_DIR
-    :param data dict: contains data needed for task execution. Example `input` which is the script to be executed.
     :rtype: None
     """
     script = data.get("script")
