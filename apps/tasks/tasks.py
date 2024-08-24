@@ -1,13 +1,17 @@
+import json
 import os, time, subprocess
 import datetime
 from os import listdir
 from os.path import isfile, join
 from django.contrib.auth import get_user_model
-from logic.engines.notify_engine import Level
+from django_celery_results.models import TaskResult
 from logic.logic import Logic
+from logic.engines.notify_engine import Level
 from .celery import app
 from celery.contrib.abortable import AbortableTask
 from django.conf import settings
+
+from .templatetags.formats import log_to_text
 
 
 def get_scripts():
@@ -85,9 +89,9 @@ def execute_script(self, data: dict):
 
 
 support_tasks = [
+    "fetching-company-info",
     "indexing-symbols",
     "fetching-symbols",
-    "fetching-company-info"
 ]
 
 @app.task(bind=True, base=AbortableTask)
@@ -113,27 +117,48 @@ def backend_task(self, data):
     # Setup logger
     instance = Logic("celery task")
     log_file_path = get_log_file_path(task_name)
+    log_file_name = os.path.splitext(os.path.basename(log_file_path))[0]
     instance.progress.init_progress(log_file_path)
 
-    self.update_state(
-        state='PROGRESS',
-        meta={"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file_path}
-    )
-    # Execute the task
-    if task_name == 'fetching-symbols':
-        instance.service.fetching().symbol().fetching_symbol()
-    elif task_name == 'indexing-symbols':
-        instance.service.saving().symbol().index_symbol()
-    elif task_name == 'fetching-company-info':
-        instance.service.fetching().symbol().fetching_symbols_info()
+    # Prepare meta data
+    meta = {
+        "input": task_name, "error": "false", "output": "", "status": "STARTED",
+        "log_file": log_file_path,
+        "initial": "true", "leftover": [], "done": []
+    }
 
-    # Process done. Sent notification
-    log_file_name = os.path.splitext(os.path.basename(log_file_path))[0]
-    instance.engine.notify(user).send(
-        recipient=user,
-        verb=f'{task_name} Task done!',
-        level=Level.INFO,
-        description=f'click <a href="#" class="text-xs text-danger" onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
-    )
+    # Update task state
+    self.update_state(state='STARTED', meta=meta)
 
-    return {"input": task_name, "error": False, "output": "", "status": "SUCCESS", "log_file": log_file_path}
+    # save result in TaskResult
+    task_result = TaskResult.objects.get(task_id=self.request.id)
+    task_result.result = json.dumps({"exc_type": "Info", "exc_message": meta, "exc_module": "builtins"})
+    task_result.save()
+
+    try:
+        # Execute the task
+        if task_name == 'fetching-symbols':
+            instance.service.fetching().symbol().fetching_symbol()
+        elif task_name == 'indexing-symbols':
+            instance.service.saving().symbol().index_symbol()
+        elif task_name == 'fetching-company-info':
+            # main function, run the task
+            instance.service.fetching().company_info_yahoo().run(task_result, meta)
+
+        # Process done. Sent notification
+        instance.engine.notify(user).send(
+            recipient=user,
+            verb=f'{task_name} Task done!',
+            level=Level.INFO,
+            description=f'click <a href="#" class="text-xs text-danger" onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
+        )
+        return meta
+    except Exception as e:
+        instance.logger.error(f"run task:{task_name} id:{self.request.id} Error: {str(e)}")
+        instance.engine.notify(user).send(
+            recipient=user,
+            verb=f'{task_name} Task done!',
+            level=Level.ERROR,
+            description=f'click <a href="#" class="text-xs text-danger" onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
+        )
+        raise Exception(meta)

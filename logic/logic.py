@@ -1,3 +1,8 @@
+import json
+from abc import ABC, abstractmethod
+from typing import List
+
+from django_celery_results.models import TaskResult
 from tqdm import tqdm
 import logic
 import logging
@@ -9,6 +14,7 @@ import  core.configures_home as core
 class Logic:
 
     def __init__(self, name: str = __name__):
+
         # Tier 1. Config.
         self.config = core.Config(name)
         self.logger: logging.Logger = self.config.logger
@@ -79,3 +85,67 @@ class TqdmLogger(tqdm):
             self.progress.flush()
         else:
             super().display(msg, pos)
+
+class TaskBuilder(ABC):
+
+    def __init__(self):
+        super().__init__()
+
+    @abstractmethod
+    def _get_init_load(self)->List:
+        """Abstract method that must be implemented in any subclass"""
+        pass
+
+    def _before_fetching(self, records: List) -> any:
+        return None
+
+    @abstractmethod
+    def _fetching_detail(self, record: str, tools: any):
+        """Abstract method that must be implemented in any subclass"""
+        pass
+
+    def run(self, task_result:TaskResult, meta: dict):
+
+        if not isinstance(meta, dict):
+            raise ValueError("task_kwargs must be a dictionary or a JSON string")
+
+        def flush_to_task_result():
+            meta["initial"] = "false"
+            task_result.result = json.dumps({"exc_type": "Info", "exc_message": meta, "exc_module": "builtins"})
+            task_result.save()
+
+        # Check if initial load is required
+        if meta.get("initial", "false") ==  "true":
+            meta["leftover"].extend(self._get_init_load())
+            meta["initial"] = "false"
+
+        # Before fetching
+        tools = self._before_fetching(meta["leftover"])
+
+        # Fetch the data
+        error_list = []
+        i = 0
+        for record in TqdmLogger(meta["leftover"], progress=self.progress):
+            try:
+                self._fetching_detail(record, tools)
+
+                # Move record from leftover to done
+                meta["done"].append(record)
+                meta["leftover"].remove(record)
+
+                i = i +1
+                if i % 5 == 0:
+                    flush_to_task_result()
+
+                self.logger.info(f"Success: fetch {record} info")
+            except Exception as e:
+                self.logger.error(f"Error: fetch {record} info - got Error:{e}")
+                error_list.append({"symbol": record, "error": str(e)})
+
+            if i % 8 == 0:
+                raise ValueError("Test error")
+
+        # Flush the task result at last time
+        flush_to_task_result()
+
+        return error_list, meta

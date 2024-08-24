@@ -8,6 +8,7 @@ import os
 import ast
 from django import template
 from django.conf import settings
+from django.template.defaultfilters import length
 
 register = template.Library()
 
@@ -34,22 +35,38 @@ def get_result_field(result, field: str):
     :param field str: Field to return from result object
     :rtype: str
     """
-    result = json.loads(result.result)
-    if result:
-        return result.get(field)
+    if result is None:
+        return None
+    if result.status == "SUCCESS":
+        result = json.loads(result.result)
+        if result:
+            return result.get(field)
+    if result.status == 'FAILURE' or result.status == 'FAILURE':
+        result = json.loads(result.result)
+        if result:
+            exc_message = result.get('exc_message', None)
+            if exc_message is None or length(exc_message) <= 0:
+                return None
+            return exc_message[0].get(field)
+    elif result.status == 'STARTED':
+        result = result.result.replace("'", '"')
+        result = json.loads(result)
+        exc_message = result.get('exc_message', None)
+        if exc_message is None:
+            return None
+        return exc_message.get(field)
+    return None
+
+
 
 @register.filter
 def get_result_log_file(result):
-    if result is None:
+    log_file = get_result_field(result, 'log_file')
+    if log_file is None:
         return None
-    result = json.loads(result.result)
-    if result:
-        log_file = result.get("log_file")
-        if log_file:
-            log_file_name = os.path.splitext(os.path.basename(log_file))[0]
-            return log_file_name
-        return None
-    return None
+    log_file_name = os.path.splitext(os.path.basename(log_file))[0]
+    return log_file_name
+
 
 @register.filter
 def get_task_args_field(result, field: str):

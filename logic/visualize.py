@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-import static.utilities as util
+from logic.utilities.plugin import Plugin
 from logic.research import Research
 from logic.visualizes import BaseChart
 from logic import visualizes as chart
@@ -17,7 +17,7 @@ class Visualize(BaseChart):
         return chart.TradingPatternChart(
             self._analyse,
             args,
-            util.Plugin(),
+            Plugin(),
             parser)
 
     def web_visualization(self) -> chart.TradingVisualizeChart:

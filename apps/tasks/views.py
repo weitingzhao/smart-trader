@@ -67,7 +67,7 @@ def cancel_task(request, task_id):
     abortable_result = AbortableAsyncResult(result.task_id, task_name=result.task_name, app=app)
     if not abortable_result.is_aborted():
         abortable_result.revoke(terminate=True)
-        # abortable_result.backend.store_result(result.id, result.result, result.status)
+
     time.sleep(1)
     return redirect("tasks")
 

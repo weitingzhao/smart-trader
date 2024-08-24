@@ -1,63 +1,34 @@
 import time
-from datetime import datetime, timezone
-import pandas as pd
+from typing import List
 import yfinance as yf
+from logic import Engine
 from home.models import *
-from logic.engine import Engine
-from logic.logic import TqdmLogger
-from logic.services.base_service import BaseService
-from alpha_vantage.fundamentaldata import FundamentalData
+from datetime import datetime, timezone
+from home.models import MarketSymbol
+from logic.logic import TaskBuilder
+from logic.services import BaseService
 
 
-
-class FetchingSymbolService(BaseService):
+class CompanyInfoYahoo(BaseService, TaskBuilder):
 
     def __init__(self, engine: Engine):
         super().__init__(engine)
-        self.API_KEY = self.config.API_KEY_Alphavantage
 
-    def fetching_symbol(self):
-        url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={self.API_KEY}'
-        df = pd.read_csv(url)
-
-        for index, row in df.iterrows():
-            ipo_date = pd.to_datetime(row.get('ipoDate'), errors='coerce')
-            delisting_date = pd.to_datetime(row.get('delistingDate'), errors='coerce')
-
-            if pd.isna(ipo_date):
-                ipo_date = None
-            if pd.isna(delisting_date):
-                delisting_date = None
-
-            MarketSymbol.objects.update_or_create(
-                symbol=row['symbol'],
-                defaults={
-                    'name': row['name'],
-                    'market': row['exchange'],
-                    'asset_type': row['assetType'],
-                    'ipo_date': ipo_date,
-                    'delisting_date': delisting_date,
-                    'status': row['status']
-                }
-            )
-
-    def fetching_symbols_info(self) -> list:
-        dummy_data = list(range(10000))
-        result = []
-        for dummy_record in TqdmLogger(dummy_data, progress=self.progress):
-            try:
-                # Simulate real workload by sleeping for 1 second
-                time.sleep(3)
-                self.logger.info(f"Processed dummy record: {dummy_record}")
-            except Exception as e:
-                self.logger.error(f"Error processing dummy record {dummy_record} - got Error: {e}")
-                result.append({'record': dummy_record, 'error': str(e)})
-        return result
-
-
+    def _get_init_load(self) -> List:
+        # Query the MarketSymbol model to get a list of symbols
         # symbols = MarketSymbol.objects.values_list('symbol', flat=True)
-        symbols = ["AAPL","UI","TSLA"]
-        tickers = yf.Tickers(" ".join(symbols))
+        # return list(symbols)
+
+        return [f"Item {i}" for i in range(1, 100)]
+
+    def _before_fetching(self, records: List) -> any:
+        # symbols = ["AAPL", "UI", "TSLA"]
+        tickers = yf.Tickers(" ".join(records))
+        return tickers
+
+    def _fetching_detail(self, record: str, tools : any):
+        # Simulate real workload by sleeping for 1 second
+        time.sleep(1)
 
         # <editor-fold desc="save method">
         def save_stock(symbol, ticker_info):
@@ -261,65 +232,29 @@ class FetchingSymbolService(BaseService):
                 )
         # </editor-fold>
 
-        # result = []
-        # for root_symbol in TqdmLogger(symbols, progress=self.progress):
-        #     try:
-        #         ticker = tickers.tickers[root_symbol]
-        #         root_ticker_info = ticker.info
-        #         symbol_obj = MarketSymbol.objects.get(symbol=root_symbol)
+        # ### Save the data to the database ####
+        # ticker = tools.tickers[record]
+        # root_ticker_info = ticker.info
+        # symbol_obj = MarketSymbol.objects.get(symbol=record)
         #
-        #         # Stock basic info
-        #         save_stock(symbol_obj, root_ticker_info)
-        #         # Stock risk metrics
-        #         save_stock_risk_metrics(symbol_obj, root_ticker_info)
-        #         # Stock dividends
-        #         save_stock_dividends(symbol_obj, root_ticker_info)
-        #         # Stock price
-        #         save_stock_price(symbol_obj, root_ticker_info)
-        #         # Stock valuation
-        #         save_stock_valuation(symbol_obj, root_ticker_info)
-        #         # Stock target
-        #         save_stock_target(symbol_obj, root_ticker_info)
-        #         # Stock performance
-        #         save_stock_performance(symbol_obj, root_ticker_info)
-        #         # Stock share
-        #         save_stock_share(symbol_obj, root_ticker_info)
-        #         # Stock financial
-        #         save_stock_financial(symbol_obj, root_ticker_info)
-        #         # Company officers
-        #         save_company_officers(symbol_obj, root_ticker_info.get('companyOfficers', []))
-        #
-        #         self.logger.info(f"Success: fetch {root_symbol} info")
-        #     except Exception as e:
-        #         self.logger.error(f"Error: fetch {root_symbol} info - got Error:{e}")
-        #         result.append({'symbol': root_symbol, 'error': str(e)})
-        # return result
+        # # Stock basic info
+        # save_stock(symbol_obj, root_ticker_info)
+        # # Stock risk metrics
+        # save_stock_risk_metrics(symbol_obj, root_ticker_info)
+        # # Stock dividends
+        # save_stock_dividends(symbol_obj, root_ticker_info)
+        # # Stock price
+        # save_stock_price(symbol_obj, root_ticker_info)
+        # # Stock valuation
+        # save_stock_valuation(symbol_obj, root_ticker_info)
+        # # Stock target
+        # save_stock_target(symbol_obj, root_ticker_info)
+        # # Stock performance
+        # save_stock_performance(symbol_obj, root_ticker_info)
+        # # Stock share
+        # save_stock_share(symbol_obj, root_ticker_info)
+        # # Stock financial
+        # save_stock_financial(symbol_obj, root_ticker_info)
+        # # Company officers
+        # save_company_officers(symbol_obj, root_ticker_info.get('companyOfficers', []))
 
-
-    def fetching_alphav_company_overview(self, symbol) -> tuple:
-        fd = FundamentalData(key=self.API_KEY, output_format='pandas')
-        data, _ = fd.get_company_overview(symbol)
-        self.engine.csv(self.config.FOLDER_Infos / "company_overview.csv").save_df(data)
-        return data
-
-    def showing_symbol_info_single(self, symbol: str):
-        ticker = yf.Ticker(symbol.upper())
-
-        # get all stock info
-        print(f"info: {ticker.info}")
-
-        # get historical market data
-        hist = ticker.history(period="1mo")
-
-        # show meta-information about the treading (requires treading() to be called first)
-        print(f"meta data: {ticker.history_metadata}")
-
-        # show actions (dividends, splits, capital gains)
-        print(f"actions: {ticker.actions}")
-        print(f"dividends: {ticker.dividends}")
-        print(f"splits: {ticker.splits}")
-        print(f"capital gains: {ticker.capital_gains}")  # only for mutual funds & etfs
-
-        # show share count
-        df = ticker.get_shares_full(start="2022-01-01", end=None)
-        print(df)
