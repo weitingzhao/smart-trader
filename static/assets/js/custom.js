@@ -458,7 +458,6 @@ function showFileView(fileName) {
         });
 }
 
-
 // Celery Task
 function call_celery_task(task, task_name) {
     fetch(`celery_task/${task}`)
@@ -479,8 +478,19 @@ function call_celery_task(task, task_name) {
         });
 }
 
-//Cerlery Task Log
-function show_log(log) {
-    const logContainer = document.getElementById('celery_log');
-    logContainer.innerHTML = log;
+//Cerlery Retry Task
+function retryTask(taskId) {
+    fetch(`tasks/retry/${taskId}`)
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            console.error('Failed to retry task:', taskId, response);
+            alert(`Failed to retry task: ${taskId}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`Failed to retry task: ${taskId}`);
+    });
 }

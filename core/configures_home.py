@@ -104,7 +104,35 @@ class Config:
         "password": ""
     }
 
-    def __init__(self, name: str = __name__, need_info = True, need_error = True) -> None:
+    def initial_log(self, need_info = True, need_error = True):
+        """Return a logger instance by name
+        Creates a file handler to log messages with level WARNING and above
+        Creates a stream handler to log messages with level INFO and above
+
+        Parameters:
+        name (str): Pass __name__ for module level logger
+        """
+        self.logger.setLevel(logging.INFO)
+
+        if need_info :
+            info_handler = logging.StreamHandler()
+            info_handler.setLevel(logging.INFO)
+            info_handler.setFormatter(
+                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s'))
+            self.logger.addHandler(info_handler)
+
+        if need_error:
+            error_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
+            error_handler.setLevel(logging.WARNING)
+            error_handler.setFormatter(
+                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
+            )
+            self.logger.addHandler(error_handler)
+
+
+    def __init__(self,
+                 name: str = __name__, logger : logging.Logger = None,
+                 need_info=True, need_error=True) -> None:
         self.__name__ = name
         self.FILE_user: Path = Path(__file__).parents[1] / "user.json"
 
@@ -169,8 +197,9 @@ class Config:
         # </editor-fold>
 
         # <editor-fold desc="Setup Tools">
-        # Logger
-        self.logger = self.initial_log(self.__name__, need_info=need_info, need_error=need_error)
+        self.logger = logger if logger  else logging.getLogger(name)
+        self.initial_log(need_info=need_info, need_error=need_error)
+
         # Exception custom handler (Set the sys.excepthook)
         sys.excepthook = self._log_unhandled_exception
         # </editor-fold>
@@ -202,31 +231,3 @@ class Config:
         self.logger.critical(
             "Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback)
         )
-
-    def initial_log(self, name: str, need_info = True, need_error = True) -> logging.Logger:
-        """Return a logger instance by name
-        Creates a file handler to log messages with level WARNING and above
-        Creates a stream handler to log messages with level INFO and above
-
-        Parameters:
-        name (str): Pass __name__ for module level logger
-        """
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.INFO)
-
-        if need_info :
-            info_handler = logging.StreamHandler()
-            info_handler.setLevel(logging.INFO)
-            info_handler.setFormatter(
-                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s'))
-            logger.addHandler(info_handler)
-
-        if need_error:
-            error_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
-            error_handler.setLevel(logging.WARNING)
-            error_handler.setFormatter(
-                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
-            )
-            logger.addHandler(error_handler)
-
-        return logger

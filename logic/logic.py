@@ -1,9 +1,10 @@
+import re
 import json
 from abc import ABC, abstractmethod
+import time
 from typing import List
-
-from django_celery_results.models import TaskResult
 from tqdm import tqdm
+from django_celery_results.models import TaskResult
 import logic
 import logging
 from io import StringIO
@@ -13,12 +14,18 @@ import  core.configures_home as core
 
 class Logic:
 
-    def __init__(self, name: str = __name__):
+    def __init__(self,
+                 name: str = __name__,
+                 logger: logging.Logger = None,
+                 need_progress: bool = False):
 
         # Tier 1. Config.
-        self.config = core.Config(name)
-        self.logger: logging.Logger = self.config.logger
-        self.progress = Progress(self.config)
+        self.config = core.Config(
+            name=name, logger=logger,
+            need_info=not need_progress,
+            need_error=not need_progress)
+        self.progress = Progress(self.config) if need_progress else None
+        self.logger = self.config.logger
 
         # Tier 2. Base on Config init Engine and progress
         self.engine = logic.Engine(self.config, self.progress)
@@ -44,10 +51,7 @@ class Progress:
         # step 1. User & log path
         self.log_file_path = log_file_path
 
-        # step 2. Redefine config logger
-        # Disable info and error handler when progress is enable
-        self.config.initial_log(self.config.__name__, need_info=False, need_error=False)
-        # prepare new handler for logger
+        # step 2  prepare new handler for logger
         self.log_stream = StringIO()
         task_log_handler = logging.StreamHandler(self.log_stream)
         task_log_handler.setLevel(logging.INFO)
@@ -56,8 +60,10 @@ class Progress:
         # assign function for log and notification
         def flush():
             logs = self.log_stream.getvalue()
-            with open(self.log_file_path, 'w') as log_file:
+            with open(self.log_file_path, 'a') as log_file:
                 log_file.write(logs)
+            self.log_stream.truncate(0) # Clear the log stream after flushing
+            self.log_stream.seek(0)
 
         self.log_flush = flush
         return True
@@ -74,10 +80,18 @@ class TqdmLogger(tqdm):
         :type kwargs: Progress
         """
         self.progress : Progress = kwargs.pop("progress", None)
-        self.elapsed = 0 # initialize elapsed attribute
+        self.start_time = time.time()  # initialize start_time attribute
+        self.last_displayed_percent = 0  # initialize last displayed percent
         super().__init__(*args, **kwargs)
 
     def display(self, msg=None, pos=None):
+        self.elapsed = time.time() - self.start_time  # update elapsed attribute
+        current_percent = (self.n / self.total) * 100 if self.total else 0  # calculate current percent
+
+        # if round(current_percent) <= self.last_displayed_percent:
+        #     return
+
+        self.last_displayed_percent = round(current_percent)
         if msg is None:
             msg = self.format_meter(self.n, self.total, self.elapsed)
         if self.progress:
@@ -91,41 +105,59 @@ class TaskBuilder(ABC):
     def __init__(self):
         super().__init__()
 
+    # Step 1.
+    # Simulate for test use only
+    @abstractmethod
+    def _get_init_load_test(self) -> List:
+        """Abstract method that must be implemented in any subclass"""
+        pass
     @abstractmethod
     def _get_init_load(self)->List:
         """Abstract method that must be implemented in any subclass"""
         pass
 
+    # Step 2.
     def _before_fetching(self, records: List) -> any:
         return None
 
+    # Step 3.
     @abstractmethod
     def _fetching_detail(self, record: str, tools: any):
         """Abstract method that must be implemented in any subclass"""
         pass
 
-    def run(self, task_result:TaskResult, meta: dict):
+    # Builder pattern
+    def run(self, meta: dict, task_result:TaskResult, args: str = None, is_test : bool = False):
 
         if not isinstance(meta, dict):
             raise ValueError("task_kwargs must be a dictionary or a JSON string")
 
+        if args:
+            pattern = re.compile(r"(\w+)=['\"]?([^,'\"]+)['\"]?")
+            matches = pattern.findall(args)
+            self.args = {key: value for key, value in matches}
+        else:
+            self.args = {}
+
         def flush_to_task_result():
             meta["initial"] = "false"
-            task_result.result = json.dumps({"exc_type": "Info", "exc_message": meta, "exc_module": "builtins"})
-            task_result.save()
+            if task_result:
+                task_result.result = json.dumps({"exc_type": "Info", "exc_message": meta, "exc_module": "builtins"})
+                task_result.save()
 
-        # Check if initial load is required
+        # Check if initial load is required. if not. means it's failed and try again
         if meta.get("initial", "false") ==  "true":
-            meta["leftover"].extend(self._get_init_load())
+            meta["leftover"].extend(self._get_init_load_test() if is_test else self._get_init_load())
             meta["initial"] = "false"
 
         # Before fetching
         tools = self._before_fetching(meta["leftover"])
 
         # Fetch the data
+        leftover_copy = meta["leftover"][:] # Create a copy of meta["leftover"]
         error_list = []
         i = 0
-        for record in TqdmLogger(meta["leftover"], progress=self.progress):
+        for record in TqdmLogger(leftover_copy, progress=self.progress):
             try:
                 self._fetching_detail(record, tools)
 
@@ -134,16 +166,17 @@ class TaskBuilder(ABC):
                 meta["leftover"].remove(record)
 
                 i = i +1
-                if i % 5 == 0:
+                if i % 50 == 0:
                     flush_to_task_result()
 
-                self.logger.info(f"Success: fetch {record} info")
+                self.logger.info(f"Success : {record}")
             except Exception as e:
-                self.logger.error(f"Error: fetch {record} info - got Error:{e}")
-                error_list.append({"symbol": record, "error": str(e)})
+                self.logger.error(f"Error :  {record}  error: {e}")
+                error_list.append({"Index:": record, "error": str(e)})
 
-            if i % 8 == 0:
-                raise ValueError("Test error")
+            # Simulate real workload
+            # if i % 20 == 0:
+            #     raise ValueError("Test error")
 
         # Flush the task result at last time
         flush_to_task_result()

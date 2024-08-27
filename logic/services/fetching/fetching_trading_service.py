@@ -34,6 +34,7 @@ class FetchingTradingService(BaseService):
             logging_file_path=self.config.FOLDER_Watch / "tradings_fetch_status.json",
             method_to_run=main_process)
 
+
     def fetch_history_by_sector_or_industry(
             self,
             category: str,
@@ -52,6 +53,7 @@ class FetchingTradingService(BaseService):
                     name=f"{category}.{category_name}",
                     symbols=symbols,
                     period=period)
+
 
     def fetch_history_by_mylist(
             self,

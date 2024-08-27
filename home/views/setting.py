@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from logic.logic import Logic
@@ -9,13 +11,41 @@ from apps.tasks import tasks
 instance = Logic()
 
 # Pages -> Accounts
+
+def get_market_summary():
+    queries = [
+        "SELECT COUNT(*) FROM market_stock_hist_bars_min_ts",
+        "SELECT COUNT(*) FROM market_stock_hist_bars_day_ts",
+        "SELECT COUNT(*) FROM market_symbol",
+        "SELECT COUNT(*) FROM market_stock",
+        "SELECT COUNT(*) FROM market_company_officer",
+        "SELECT COUNT(*) FROM market_stock_dividend",
+        "SELECT COUNT(*) FROM market_stock_financial",
+        "SELECT COUNT(*) FROM market_stock_performance",
+        "SELECT COUNT(*) FROM market_stock_price",
+        "SELECT COUNT(*) FROM market_stock_risk_metrics",
+        "SELECT COUNT(*) FROM market_stock_share",
+        "SELECT COUNT(*) FROM market_stock_target",
+        "SELECT COUNT(*) FROM market_stock_valuation"
+    ]
+
+    counts = {}
+    with connection.cursor() as cursor:
+        for query in queries:
+            cursor.execute(query)
+            table_name = query.split(" ")[3]
+            counts[table_name] = cursor.fetchone()[0]
+    return counts
+
+
 def settings(request):
     return render(
         request,
         template_name='pages/account/settings.html',
         context = {
             'parent': 'dashboard',
-            'segment': 'settings'
+            'segment': 'settings',
+            'counts': get_market_summary()
         })
 
 def celery_task(request, task_name):

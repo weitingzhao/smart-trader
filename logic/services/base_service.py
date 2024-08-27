@@ -8,4 +8,3 @@ class BaseService(BaseEngine):
         super().__init__(engine.config)
         self.engine = engine
         self.progress = engine.progress
-

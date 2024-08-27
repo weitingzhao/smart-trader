@@ -1,3 +1,4 @@
+import ast
 import os
 import time
 import json
@@ -71,6 +72,27 @@ def cancel_task(request, task_id):
     time.sleep(1)
     return redirect("tasks")
 
+
+def retry_task(request, task_id):
+    # Retrieve the existing task
+    task_result = TaskResult.objects.get(task_id=task_id)
+
+    # Reset the task status to PENDING
+    task_result.status = 'PENDING'
+    task_result.save()
+
+    # Re-queue the task
+    task = current_app.tasks[task_result.task_name]
+    args_str = task_result.task_args.replace('"', '').replace("'", '"')
+    args = ast.literal_eval(args_str)
+    kwargs = ast.literal_eval(task_result.result)
+    args[0]['data']= kwargs.get('exc_message')[0]
+    task.apply_async(args=[args[0]], task_id=task_id)
+
+    # Task 1-second break for db update, to update the task status
+    time.sleep(1)
+    return redirect("tasks")
+
 def get_celery_all_tasks():
     current_app.loader.import_default_modules()
     tasks = list(sorted(name for name in current_app.tasks if not name.startswith('celery.')))
@@ -82,7 +104,7 @@ def get_celery_all_tasks():
             task["id"] = last_task.task_id
             task["has_result"] = True
             task["status"] = last_task.status
-            task["successfull"] = last_task.status == "SUCCESS" or last_task.status == "STARTED"
+            task["successful"] = last_task.status == "SUCCESS" or last_task.status == "STARTED"
             task["date_created"] = last_task.date_created
             task["date_done"] = last_task.date_done
             task["result"] = last_task.result

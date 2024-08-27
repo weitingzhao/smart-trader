@@ -2,7 +2,7 @@ from logic import Engine
 from .company_info_yahoo import CompanyInfoYahoo
 from .fetching_symbol_service import FetchingSymbolService
 from .fetching_trading_service import FetchingTradingService
-
+from .stock_hist_bars_yahoo import StockHistBarsYahoo
 
 
 class FetchingService:
@@ -12,6 +12,8 @@ class FetchingService:
     def company_info_yahoo(self) -> CompanyInfoYahoo:
         return CompanyInfoYahoo(self.engine)
 
+    def stock_hist_bars_yahoo(self) -> StockHistBarsYahoo:
+        return StockHistBarsYahoo(self.engine)
 
     def history(self) -> FetchingTradingService:
         return FetchingTradingService(self.engine)

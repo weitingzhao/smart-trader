@@ -35,28 +35,30 @@ def get_result_field(result, field: str):
     :param field str: Field to return from result object
     :rtype: str
     """
-    if result is None:
-        return None
-    if result.status == "SUCCESS":
-        result = json.loads(result.result)
-        if result:
-            return result.get(field)
-    if result.status == 'FAILURE' or result.status == 'FAILURE':
-        result = json.loads(result.result)
-        if result:
-            exc_message = result.get('exc_message', None)
-            if exc_message is None or length(exc_message) <= 0:
-                return None
-            return exc_message[0].get(field)
-    elif result.status == 'STARTED':
-        result = result.result.replace("'", '"')
-        result = json.loads(result)
-        exc_message = result.get('exc_message', None)
-        if exc_message is None:
+    try:
+        if result is None:
             return None
-        return exc_message.get(field)
-    return None
-
+        if result.status == "SUCCESS":
+            result = json.loads(result.result)
+            if result:
+                return result.get(field)
+        if result.status == 'FAILURE' or result.status == 'FAILURE':
+            result = json.loads(result.result)
+            if result:
+                exc_message = result.get('exc_message', None)
+                if exc_message is None or length(exc_message) <= 0:
+                    return None
+                return exc_message[0].get(field)
+        elif result.status == 'STARTED':
+            result = result.result.replace("'", '"')
+            result = json.loads(result)
+            exc_message = result.get('exc_message', None)
+            if exc_message is None:
+                return None
+            return exc_message.get(field)
+        return None
+    except Exception as e:
+        return str(e)
 
 
 @register.filter
@@ -71,6 +73,7 @@ def get_result_log_file(result):
 @register.filter
 def get_task_args_field(result, field: str):
     task_args = result.task_args.strip('"')
+    task_args = task_args.replace("\\\\'",'')
     task_args_tuple = ast.literal_eval(task_args)
     task_args_dict = task_args_tuple[0]
     if task_args_dict:

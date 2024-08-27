@@ -1,6 +1,6 @@
 from .market import (
     MarketSymbol,
-    MarketStockHistoricalBars
+    MarketStockHistoricalBarsByMin
 )
 from .market_stock import (
     MarketStock,

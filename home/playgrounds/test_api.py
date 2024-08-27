@@ -31,8 +31,8 @@ def pull_and_save_symbol_history(symbol, start_date, end_date):
             low=bar.low,
             close=bar.close,
             volume=bar.volume,
-            trade_count=bar.trade_count,
-            volume_weighted_average_price=bar.vwap
+            # trade_count=bar.trade_count,
+            # volume_weighted_average_price=bar.vwap
         )
 
 # Example usage

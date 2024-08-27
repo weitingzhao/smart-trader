@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from logic.logic import Logic
 from django.shortcuts import render
 
-from home.models import MarketStockHistoricalBars
+from home.models import MarketStockHistoricalBarsByMin
 
 # Create your views here.
 instance = Logic()
@@ -10,9 +10,9 @@ instance = Logic()
 def stock_screener(request):
     query = request.GET.get('q')
     if query:
-        market_data = MarketStockHistoricalBars.objects.filter(symbol__icontains=query)
+        market_data = MarketStockHistoricalBarsByMin.objects.filter(symbol__icontains=query)
     else:
-        market_data = MarketStockHistoricalBars.objects.all()
+        market_data = MarketStockHistoricalBarsByMin.objects.all()
 
     paginator = Paginator(market_data, 10)  # Show 10 items per page
 

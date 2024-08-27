@@ -15,6 +15,10 @@ assignment_tag = register.assignment_tag if hasattr(register, 'assignment_tag') 
 ## Filter ################
 
 @register.filter
+def intcomma(value):
+    return "{:,}".format(value)
+
+@register.filter
 def clean_text(value):
     res = value.replace('\n', ' ')
     return res

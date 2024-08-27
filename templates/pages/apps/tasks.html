@@ -149,25 +149,31 @@
                           </span>
                         </td>
                         <td class="align-middle text-center">
-                          <span class="text-dark text-xs font-weight-bold">
-                            <input type="text" id="args" name="args">
+                            {% if task.name == 'backend_task' %}
+                              <select class="form-control" id="args" name="args">
+                              </select>
+                            {% else %}
+                            <span class="text-dark text-md font-weight-bold">
+                              <input type="text" id="args" name="args" value="" class="form-control w-100"/>
                           </span>
+                            {% endif %}
                         </td>
 
                         {% if request.user.is_authenticated %}
                         <td class="align-middle text-center">
                           {% if task.status == "STARTED" or task.status == "PROGRESS"%}
-                            <button href="javascript:;" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                            <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                    class="btn text-danger font-weight-bold text-xs">
                               Cancel Task
                             </button>
                           {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
-                              <button href="javascript:;"
-                                      class="text-dark font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                              <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                      class="btn btn-primary font-weight-bold">
                                 Execute
                               </button>
                           {% else %}
-                              <button href="javascript:;" 
-                                      class="text-dark font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                              <button href="javascript:;"  data-toggle="tooltip" data-original-title="Edit user"
+                                      class="btn btn-primary font-weight-bold">
                                 Execute
                               </button>
                           {% endif %}
@@ -207,7 +213,7 @@
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder text-center opacity-7 ps-2">Start TS</th>
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder text-center opacity-7 ps-2">End TS</th>
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder text-center opacity-7 ps-2">Output</th>
-                      <th class="text-uppercase text-dark text-xxs font-weight-bolder text-center opacity-7 ps-2">Logs</th>
+                      <th class="text-uppercase text-dark text-xxs font-weight-bolder text-center opacity-7 ps-2">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -217,7 +223,7 @@
                         <td>
                           <div class="d-flex px-2">
                             <div class="my-auto">
-                              <h6 class="mb-0 text-sm">
+                              <h6 class="mb-0 text-sm mb-0">
                                 {{result.id}} - {{result.task_name}}
                               </h6>
                               <p class="text-xs text-dark mb-0">
@@ -227,7 +233,7 @@
                           </div>
                         </td>
 
-                        <td class="align-middle">
+                        <td>
                           <p class="text-sm mb-0">
                                {% if result.status == 'REVOKED' %}
                                     {{result|get_task_args_field:"task_name"}}
@@ -237,7 +243,7 @@
                           </p>
                         </td>
 
-                        <td class="align-middle">
+                        <td>
                           <p class="text-sm text-center mb-0
                             {% if result.status == 'SUCCESS' %} text-success
                             {% elif result.status == 'FAILURE' %} text-danger
@@ -247,15 +253,15 @@
                           </p>
                         </td>
                         
-                        <td class="align-middle">
+                        <td>
                           <p class="text-sm text-center mb-0">{{result.date_created|date_format}}</p>
                         </td>
                         
-                        <td class="align-middle">
+                        <td>
                           <p class="text-sm text-center mb-0">{{result.date_done|date_format}}</p>
                         </td>      
                         
-                        <td class="">
+                        <td>
                             <p class="text-sm text-center mb-0">
                                 {% if result.status == 'REVOKED' %}
                                    {{result|get_result_field:"exc_message"}}
@@ -264,12 +270,14 @@
                                {% endif %}
                             </p>
                         </td>
-                        <td class="">
-                          <p class="text-sm text-center mb-0">
-                              <a href="#" class="text-xs text-danger" onclick="showFileView('{{result|get_result_log_file}}')">View LOG</a>
-                          </p>
-                        </td>                                               
-
+                      
+                        <td class="text-center">
+                        <button class="btn btn-xs btn-dark text-xs" onclick="showFileView('{{result|get_result_log_file}}')">View Log</button>
+                        {% if result.status == 'FAILURE' %}
+                            <button class="btn btn-xs btn-primary text-xs" onclick="retryTask('{{ result.task_id }}')">Retry</button>
+                        {% endif %}
+                        </td>
+                      
                       </tr>
                     {% endfor %}
 
@@ -282,6 +290,47 @@
       </div>
 
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scriptSelect = document.querySelector('select[name="backend_tasks"]');
+    const argsSelect = document.getElementById('args');
 
+    function updateArgsOptions() {
+        const selectedScript = scriptSelect.value;
+        argsSelect.innerHTML = ''; // Clear existing options
+
+        if (selectedScript === 'fetching-stock-hist-bars') {
+            const option1 = document.createElement('option');
+            option1.value = "append=True,delta=2,period='5d',interval='1d'";
+            option1.text = "append -> daily interval for 5d period";
+            const option2 = document.createElement('option');
+            option2.value = "append=True,delta=2,period='1d',interval='1m'";
+            option2.text = "append -> min interval for 1d period";
+            const option3 = document.createElement('option');
+            option3.value = "period='5d',interval='1d'";
+            option3.text = "init -> daily interval for max period";
+            const option4 = document.createElement('option');
+            option4.value = "period='5d',interval='1m'";
+            option4.text = "init -> min interval for max period";
+
+            argsSelect.appendChild(option2);
+            argsSelect.appendChild(option1);
+
+            argsSelect.appendChild(option4);
+            argsSelect.appendChild(option3);
+        } else {
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.text = "None";
+            argsSelect.appendChild(defaultOption);
+        }
+    }
+
+    scriptSelect.addEventListener('change', updateArgsOptions);
+
+    // Initial load
+    updateArgsOptions();
+});
+</script>
 {% endblock content %}
 <!-- MAIN Content END -->
