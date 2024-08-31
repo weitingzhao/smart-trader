@@ -48,14 +48,15 @@ def settings(request):
             'counts': get_market_summary()
         })
 
-def celery_task(request, task_name):
+def celery_task(request, task_name, args):
     if request.method != 'GET':
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
     try:
         feedback = tasks.backend_task.delay({
             'user_id': request.user.id,
-            'task_name': task_name
+            'task_name': task_name,
+            'args': args,
         })
         return JsonResponse({
             'success': True,

@@ -12,9 +12,10 @@ urlpatterns = [
     path('tasks_logs', views.main.get_task_log, name='get_task_log'),
 
     # Menu: Research
-    path('stock_screener/', views.research.stock_screener, name='stock screener'),
+    path('stock_screener/', views.research.stock_screener, name='stock_screener'),
     path('stock/quote/<str:symbol>', views.main.stock_quote, name="stock_quote"),
 
+    path('api/stock_data', views.main.get_stock_data, name='get_stock_data'),
 
     # Test Phase 2.
     path('billing/', views.play_ground.billing, name='billing'),

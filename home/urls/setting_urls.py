@@ -8,5 +8,5 @@ urlpatterns = [
     path('', views.setting.settings, name="settings"),
 
     # Dashboard -> Settings -> Data -> Fundamentals
-    path('celery_task/<str:task_name>', views.setting.celery_task, name="celery_task"),
+    path('celery_task/<str:task_name>/<str:args>', views.setting.celery_task, name="celery_task"),
 ]

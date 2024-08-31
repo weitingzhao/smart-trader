@@ -16,12 +16,12 @@ function getCookie(name) {
 
 let currentIndex = -1;
 
-function fetchAutoReminder(event) {
+function symbolSearchAutoReminder(event, reminder) {
 
-    const resultsContainer = document.getElementById('auto_reminder_results');
+    const resultsContainer = document.getElementById(reminder);
     const query = event.target.value;
     if (query.length === 0) {
-        document.getElementById('auto_reminder_results').innerHTML = '';
+        document.getElementById(reminder).innerHTML = '';
         resultsContainer.innerHTML = '';
         resultsContainer.style.display = 'none';
         return;
@@ -63,23 +63,23 @@ function fetchAutoReminder(event) {
     currentIndex = -1;
 }
 
-function handleKeyEvents(event) {
+function symbolSearchKeyDown(event, reminder) {
     if (event.key === 'ArrowDown') {
-        navigateResults(1);
+        navigateResults(1, reminder);
     } else if (event.key === 'ArrowUp') {
-        navigateResults(-1);
+        navigateResults(-1, reminder);
     } else if (event.key === 'Enter') {
-        selectResult();
+        selectResult(reminder);
     }
 }
 
-function navigateResults(direction) {
-    const results = document.querySelectorAll('#auto_reminder_results .mb-2 .dropdown-item');
+function navigateResults(direction, reminder) {
+    const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
     console.log('Results:', results.length);
     if (results.length === 0) return;
 
     currentIndex = (currentIndex + direction + results.length) % results.length;
-    highlightResult();
+    highlightResult(reminder);
 
     const selectedResult = results[currentIndex];
     const resultsContainer = document.getElementById('auto_reminder_results');
@@ -95,8 +95,8 @@ function navigateResults(direction) {
     }
 }
 
-function highlightResult() {
-    const results = document.querySelectorAll('#auto_reminder_results .mb-2 .dropdown-item');
+function highlightResult(reminder) {
+    const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
     results.forEach((result, index) => {
         if (index === currentIndex) {
             result.classList.add('bg-dark');
@@ -108,8 +108,8 @@ function highlightResult() {
     });
 }
 
-function selectResult() {
-    const results = document.querySelectorAll('#auto_reminder_results .mb-2 .dropdown-item');
+function selectResult(reminder) {
+    const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
     if (currentIndex >= 0 && currentIndex < results.length) {
         console.log('Open Index:', currentIndex);
         const selectedResult = results[currentIndex];
@@ -118,16 +118,16 @@ function selectResult() {
     }
 }
 
-document.getElementById('header_search').addEventListener('input', fetchAutoReminder);
-document.getElementById('header_search').addEventListener('keydown', handleKeyEvents);
-document.getElementById('header_search').addEventListener('blur', function() {
-  setTimeout(function() {
-    document.getElementById('auto_reminder_results').style.display = 'none';
-  }, 200); // Delay to allow click events on results
-});
-document.getElementById('header_search').addEventListener('focus', function() {
-  document.getElementById('auto_reminder_results').style.display = 'block';
-});
+function symbolSearchBlur(reminder) {
+    setTimeout(function () {
+        document.getElementById(reminder).style.display = 'none';
+    }, 200); // Delay to allow click events on results
+}
+
+function symbolFocus(reminder) {
+    document.getElementById(reminder).style.display = 'block';
+}
+
 
 // Create a container for the toasts if it doesn't exist
 let toastContainer = document.getElementById('toast-container');
@@ -459,8 +459,9 @@ function showFileView(fileName) {
 }
 
 // Celery Task
-function call_celery_task(task, task_name) {
-    fetch(`celery_task/${task}`)
+function call_celery_task(task, task_name, args) {
+    console.log(args)
+    fetch(`celery_task/${task}/${args}`)
         .then(response => response.json())
         .then(data => {
             const currentTime = new Date().toLocaleTimeString();

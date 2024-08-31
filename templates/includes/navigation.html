@@ -1,4 +1,4 @@
-{% load static replace_value %}
+{% load static home_filter %}
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
@@ -44,12 +44,16 @@
     </div>
     <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
       <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-        <div class="input-group">
-          <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-            <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-            <ul id="auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
-        </div>
+          <div class="input-group" style="border-right: 1px solid lightgray;">
+              <span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span>
+              <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
+                     data-bs-toggle="dropdown" aria-expanded="false"
+                     oninput="symbolSearchAutoReminder(event, 'auto_reminder_results')"
+                     onkeydown="symbolSearchKeyDown(event, 'auto_reminder_results')"
+                     onblur="symbolSearchBlur('auto_reminder_results')"
+                     onfocus="symbolFocus('auto_reminder_results')">
+              <ul id="auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
+          </div>
       </div>
       <ul class="navbar-nav  justify-content-end">
         {% if request.user.is_authenticated %}

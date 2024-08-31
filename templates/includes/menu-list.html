@@ -47,10 +47,10 @@
   {% endif %}
 
 <!-- Portfolio -->
-{%check_menu_permission request.user False True False as perm_Portfolio%}
+{%check_menu_permission request.user True True False as perm_Portfolio%}
 {% if perm_Portfolio %}
   <li class="nav-item">
-    <a data-bs-toggle="collapse" href="#portfolioPanel" class="nav-link {% if 'dashboard' in parent %}active{% endif %}" aria-controls="portfolioPanel" role="button" aria-expanded="false">
+    <a data-bs-toggle="collapse" href="#portfolioPanel" class="nav-link {% if 'portfolio' in parent %}active{% endif %}" aria-controls="portfolioPanel" role="button" aria-expanded="false">
       <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
         <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <title>shop </title>
@@ -68,18 +68,12 @@
       </div>
       <span class="nav-link-text ms-1">Portfolio</span>
     </a>
-    <div class="collapse {% if 'dashboard' in parent %}show{% endif %} " id="portfolioPanel">
+    <div class="collapse {% if 'portfolio' in parent %}show{% endif %} " id="portfolioPanel">
       <ul class="nav ms-4 ps-3">
         <li class="nav-item {% if 'my portfolio' in segment %}active{% endif %}">
-          <a class="nav-link {% if 'my portfolio' in segment %}active{% endif %}" href="{% url 'index' %}">
+          <a class="nav-link {% if 'my portfolio' in segment %}active{% endif %}" href="{% url 'portfolio_list' %}">
             <span class="sidenav-mini-icon"> P </span>
             <span class="sidenav-normal"> My Portfolio </span>
-          </a>
-        </li>
-        <li class="nav-item {% if 'holding' in segment %}active{% endif %}">
-          <a class="nav-link {% if 'holding' in segment %}active{% endif %}" href="{% url 'index' %}">
-            <span class="sidenav-mini-icon"> H </span>
-            <span class="sidenav-normal"> Holding </span>
           </a>
         </li>
       </ul>
@@ -111,12 +105,6 @@
     </a>
     <div class="collapse {% if 'research' in parent %}show{% endif %} " id="researchPanel">
       <ul class="nav ms-4 ps-3">
-          <li class="nav-item {% if 'stock charts' in segment %}active{% endif %}">
-              <a class="nav-link {% if 'stock charts' in segment %}active{% endif %}" href="/stock_charts/" target="_self">
-                <span class="sidenav-mini-icon"> C </span>
-                <span class="sidenav-normal"> Stock Charts </span>
-              </a>
-            </li>
           <li class="nav-item {% if 'stock screener' in segment %}active{% endif %}">
           <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="/stock_screener/" target="_self">
             <span class="sidenav-mini-icon"> S </span>

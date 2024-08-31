@@ -89,10 +89,10 @@ class StockHistBarsYahoo(BaseService, TaskBuilder):
 
                 if len(history) <= 0:
                     # Update MarketSymbol to set is_delisted_on_day or is_delisted_on_min to True
-                    if self._use_day_table(interval):
-                        MarketSymbol.objects.filter(symbol=record).update(is_delisted_on_day=True)
-                    else:
-                        MarketSymbol.objects.filter(symbol=record).update(is_delisted_on_min=True)
+                    # if self._use_day_table(interval):
+                    #     MarketSymbol.objects.filter(symbol=record).update(is_delisted_on_day=True)
+                    # else:
+                    #     MarketSymbol.objects.filter(symbol=record).update(is_delisted_on_min=True)
                     return
 
                 records = []
@@ -140,6 +140,9 @@ class StockHistBarsYahoo(BaseService, TaskBuilder):
             save_to_timeseries_db(history)
         else:
             history = ticker.history(period=period, interval=interval)
+            # If the history is empty and is appended mode,try to get the history with the max period for lucky
+            if is_append and len(history) <= 0:
+                history = ticker.history(period='max', interval=interval)
             save_to_timeseries_db(history)
 
     def Clean_non_daily_record_in_day_ts(self):

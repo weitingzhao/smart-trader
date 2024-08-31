@@ -1,0 +1,11 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+  <h1>{{ portfolio.name }}</h1>
+  <ul>
+    {% for item in items %}
+      <li>{{ item.symbol }}: {{ item.quantity }} shares at ${{ item.average_price }} each</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'add_portfolio_item' portfolio.pk %}">Add Item</a>
+{% endblock %}

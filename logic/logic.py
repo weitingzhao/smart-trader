@@ -88,8 +88,8 @@ class TqdmLogger(tqdm):
         self.elapsed = time.time() - self.start_time  # update elapsed attribute
         current_percent = (self.n / self.total) * 100 if self.total else 0  # calculate current percent
 
-        # if round(current_percent) <= self.last_displayed_percent:
-        #     return
+        if round(current_percent) <= self.last_displayed_percent:
+            return
 
         self.last_displayed_percent = round(current_percent)
         if msg is None:
@@ -169,7 +169,7 @@ class TaskBuilder(ABC):
                 if i % 50 == 0:
                     flush_to_task_result()
 
-                self.logger.info(f"Success : {record}")
+                # self.logger.info(f"Success : {record}")
             except Exception as e:
                 self.logger.error(f"Error :  {record}  error: {e}")
                 error_list.append({"Index:": record, "error": str(e)})
