@@ -1,0 +1,138 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="page-header min-height-300 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+          <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+          <div class="row gx-4">
+            <div class="col-auto">
+              <div class="avatar avatar-xl position-relative">
+                <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+              </div>
+            </div>
+            <div class="col-auto my-auto">
+              <div class="h-100">
+                <h5 class="mb-1">
+                   bb
+                </h5>
+                <p class="mb-0 font-weight-bold text-sm">
+                  aa
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+              <div class="nav-wrapper position-relative end-0">
+                <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                  <li class="nav-item" role="tab" >
+                    <a id="chart_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="{% url 'add_portfolio' %}" aria-selected="true" >
+                      <span class="ms-1">Add Portfolio</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <!-- Card header -->
+                    <div class="card-header pb-0">
+                        <p>
+                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn">
+                                My Portfolio
+                            </button>
+                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn">
+                                My Holdings
+                            </button>
+                        </p>
+                    </div>
+                    <div class="card-body px-0 pb-0">
+                    <div class="table-responsive">
+                      <table class="table table-flush table-hover" id="products-list">
+                        <thead class="thead-light">
+                          <tr>
+                            <th>Portfolio Name</th>
+                            <th>Symbols</th>
+                            <th>Cost Basis</th>
+                            <th>Market Value</th>
+                            <th>Day Change</th>
+                            <th>Unrealized Gain/Loss</th>
+                            <th>Realized Gain/Loss</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for portfolio in portfolios %}
+                          <tr>
+                            <td>
+                            <a href="{% url 'portfolio_detail' portfolio.pk %}" class="text-default text-decoration-none">{{ portfolio.name }}</a>
+                            </td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td>
+                              <span class="badge badge-danger badge-sm">Out of Stock</span>
+                            </td>
+                            <td class="text-sm">--</td>
+                          </tr>
+                        {% endfor %}
+
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th>Portfolio Name</th>
+                            <th>Symbols</th>
+                            <th>Cost Basis</th>
+                            <th>Market Value</th>
+                            <th>Day Change</th>
+                            <th>Unrealized Gain/Loss</th>
+                            <th>Realized Gain/Loss</th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        {% include 'includes/footer.html' %}
+    </div>
+
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
+  <script>
+    if (document.getElementById('products-list')) {
+      const dataTableSearch = new simpleDatatables.DataTable("#products-list", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+
+      document.querySelectorAll(".export").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          var type = el.dataset.type;
+
+          var data = {
+            type: type,
+            filename: "soft-ui-" + type,
+          };
+
+          if (type === "csv") {
+            data.columnDelimiter = "|";
+          }
+
+          dataTableSearch.export(data);
+        });
+      });
+    };
+  </script>
+
+{% endblock extra_js %}

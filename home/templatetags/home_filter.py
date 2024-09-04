@@ -1,3 +1,5 @@
+import json
+
 from django import template
 import random
 import string
@@ -10,9 +12,33 @@ def replace_value(value, arg):
     return value.replace(arg, ' ').title()
 
 @register.filter
+def to_json(value):
+    """Converts a JSON string to a JSON object"""
+    try:
+        return json.loads(value)
+    except (ValueError, TypeError):
+        return {}
+
+@register.simple_tag
+def round_by_digits(value, digits, template :str = None):
+    """Rounds the value to the given number of digits"""
+    if value is None:
+        return ""
+    try:
+        value = float(value)
+        digits = int(digits)
+        rounded_value = round(value, digits)
+        rounded_str = f"{rounded_value:.{digits}f}"
+        if template:
+            return template.format(rounded_str)
+        return rounded_str
+    except (ValueError, TypeError):
+        return value
+
+@register.filter
 def get_stock_field(result, field: str):
     """
-    Returns a field from the content of the result attibute in result
+    Returns a field from the content of the result attribute in result
     """
     try:
         if result is None:

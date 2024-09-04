@@ -14,10 +14,19 @@ function getCookie(name) {
     return cookieValue;
 }
 
+////////////////////////////////Symbol Reminder/////////////////////////////////////
 let currentIndex = -1;
+let currentPortfolioIndex = -1;
+document.addEventListener('DOMContentLoaded', function() {
+    // Retrieve the value of the hidden input element
+    const hiddenInput = document.getElementById('currentPortfolioIndex');
+    if (hiddenInput) {
+        currentPortfolioIndex = hiddenInput.value;
+    }
+});
+
 
 function symbolSearchAutoReminder(event, reminder) {
-
     const resultsContainer = document.getElementById(reminder);
     const query = event.target.value;
     if (query.length === 0) {
@@ -47,12 +56,12 @@ function symbolSearchAutoReminder(event, reminder) {
               `;
                 linkitem.addEventListener('click', () => {
                     currentIndex = index;
-                    selectResult();
+                    selectResult(reminder);
                 });
                 linkitem.addEventListener('mouseover', () => {
                     // console.log('mouseover:', currentIndex);
                     currentIndex = index;
-                    highlightResult();
+                    highlightResult(reminder);
                 });
                 listItem.appendChild(linkitem);
                 resultsContainer.appendChild(listItem);
@@ -75,7 +84,7 @@ function symbolSearchKeyDown(event, reminder) {
 
 function navigateResults(direction, reminder) {
     const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
-    console.log('Results:', results.length);
+    console.log('Results:', results.length+" currentPortfolioIndex=> "+currentPortfolioIndex);
     if (results.length === 0) return;
 
     currentIndex = (currentIndex + direction + results.length) % results.length;
@@ -109,14 +118,44 @@ function highlightResult(reminder) {
 }
 
 function selectResult(reminder) {
-    const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
-    if (currentIndex >= 0 && currentIndex < results.length) {
-        console.log('Open Index:', currentIndex);
-        const selectedResult = results[currentIndex];
-        const symbol = selectedResult.getAttribute('data-symbol');
+    const symbol = getSelectResult(reminder)
+    if (reminder === 'auto_reminder_results') {
         window.location.href = `/stock/quote/${symbol}`;
+    }else if (reminder === 'symbol_auto_reminder_results') {
+        // Send AJAX request to add portfolio item
+        fetch(`/portfolio/${currentPortfolioIndex}/add_item/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ symbol: symbol })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the UI to reflect the added item
+                alert('Item added to portfolio successfully!');
+                // Optionally, you can refresh the portfolio list or update the UI dynamically
+            } else {
+                alert('Failed to add item to portfolio.');
+            }
+        })
+        .catch(error => {
+            console.error('Error adding item to portfolio:', error);
+            alert('An error occurred while adding the item to the portfolio.');
+        });
     }
 }
+
+function getSelectResult(reminder){
+    const results = document.querySelectorAll(`#${reminder} .mb-2 .dropdown-item`);
+    if (currentIndex >= 0 && currentIndex < results.length) {
+        const selectedResult = results[currentIndex];
+        return selectedResult.getAttribute('data-symbol');
+    }
+}
+
 
 function symbolSearchBlur(reminder) {
     setTimeout(function () {
@@ -129,6 +168,7 @@ function symbolFocus(reminder) {
 }
 
 
+////////////////////////////////Notification/////////////////////////////////////
 // Create a container for the toasts if it doesn't exist
 let toastContainer = document.getElementById('toast-container');
 if (!toastContainer) {
@@ -138,7 +178,6 @@ if (!toastContainer) {
     document.body.appendChild(toastContainer);
 }
 
-//Notification
 function showNotification(level, title, content, timeAgo = 'just now') {
     // Create the toast container
     const toast = document.createElement('div');
@@ -225,10 +264,6 @@ function showNotification(level, title, content, timeAgo = 'just now') {
         toast.remove();
     });
 }
-//showNotification('success', 'Soft UI Dashboard', 'Hello, world! This is a notification message.', '11 mins ago');
-// showNotification('info', 'Soft UI Dashboard', 'Hello, world! This is an info message.', '11 mins ago');
-// showNotification('warning', 'Soft UI Dashboard', 'Hello, world! This is a warning message.', '11 mins ago');
-// showNotification('danger', 'Soft UI Dashboard', 'Hello, world! This is a danger message.', '11 mins ago');
 
 document.addEventListener('DOMContentLoaded', function() {
     const notificationButton = document.getElementById('notificationButton');
@@ -458,7 +493,7 @@ function showFileView(fileName) {
         });
 }
 
-// Celery Task
+////////////////////////////////Celery Task/////////////////////////////////////
 function call_celery_task(task, task_name, args) {
     console.log(args)
     fetch(`celery_task/${task}/${args}`)
@@ -479,7 +514,6 @@ function call_celery_task(task, task_name, args) {
         });
 }
 
-//Cerlery Retry Task
 function retryTask(taskId) {
     fetch(`tasks/retry/${taskId}`)
     .then(response => {
@@ -494,4 +528,13 @@ function retryTask(taskId) {
         console.error('Error:', error);
         alert(`Failed to retry task: ${taskId}`);
     });
+}
+
+////////////////////////////////Format Date/////////////////////////////////////
+function formatToDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }

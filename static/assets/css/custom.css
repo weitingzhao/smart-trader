@@ -17,6 +17,7 @@
     color: #8c0404; /* Replace with the actual info color value */
 }
 
+
 #auto_reminder_results {
     position: absolute;
     z-index: 1000;

@@ -1,23 +1,126 @@
+import json
+
+import pandas as pd
+from django.db import connection
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
-from home.forms.portfolio import PortfolioForm, PortfolioItemForm
+from home.forms.portfolio import PortfolioForm
+from home.models import MarketSymbol
 from home.models.portfolio import Portfolio, PortfolioItem, Transaction
 
 
-def portfolio_list(request):
+def get_portfolios(request):
     # user_id = request.user
     user_id = 2 # for testing user
     portfolios = Portfolio.objects.filter(user=user_id)
-    return render(request, 'pages/portfolio/portfolio_list.html', {
+    return render(request, 'pages/portfolio/portfolios.html', {
         'parent': 'portfolio',
         'segment': 'my portfolio',
         'portfolios': portfolios
     })
 
+
+def get_stock_stock_hist_bars(is_day, symbols:list[str], row_num:int):
+    table_name = 'day' if is_day else 'min'
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"""
+SELECT
+    mk.symbol,
+    mk.name as symbol_name,
+    sub.date,
+    main_start.open,
+    main_end.close,
+    sub.volume,
+    sub.*
+FROM
+    market_symbol mk
+    LEFT JOIN LATERAL(
+        SELECT
+            symbol,
+            ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY MAX(DATE(time)) DESC) AS row_num,
+            MAX(DATE(time)) AS max_date,
+            DATE(time) AS date,
+            MIN(time) AS start_min,
+            MAX(time) AS end_min,
+            SUM(volume) AS volume
+        FROM
+            market_stock_hist_bars_{table_name}_ts
+        WHERE
+            symbol = mk.symbol            
+        GROUP BY
+            symbol, DATE(time)
+    ) sub ON sub.symbol = mk.symbol
+    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_start 
+        ON main_start.symbol = sub.symbol AND main_start.time = sub.start_min
+    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_end 
+        ON main_end.symbol = sub.symbol AND main_end.time = sub.end_min
+WHERE
+    sub.row_num = {row_num} AND mk.symbol IN ('{"', '".join(symbols)}')
+            """)
+        latest_rows = cursor.fetchall()
+
+        # Convert the fetched rows into a list of dictionaries
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in latest_rows]
+
 def portfolio_detail(request, pk):
     portfolio = get_object_or_404(Portfolio, pk=pk)
     items = PortfolioItem.objects.filter(portfolio=portfolio)
-    return render(request, 'pages/portfolio/portfolio_detail.html', {'portfolio': portfolio, 'items': items})
+
+    # Extract symbols from portfolio items
+    symbols = [item.symbol.symbol for item in items]
+
+    # get current time previous day benchmark
+    benchmark = get_stock_stock_hist_bars(True, symbols, 2)
+
+    # current time is base on current time is stock market open hour or close hour
+    # if is close hour.
+    #   a. if day data is not available, need use min data.
+    #       I.  if min data is not available, need use api, directly pull.
+    #       II. if min data is available, need use min data.
+    #   b. if day data is available, need use day data.
+    latest_bar = get_stock_stock_hist_bars(True, symbols, 1)
+
+    # Convert the fetched rows into pandas DataFrames
+    benchmark_df = pd.DataFrame(benchmark)
+    latest_bar_df = pd.DataFrame(latest_bar)
+
+    # Merge the DataFrames on the 'symbol' column
+    merged_df = pd.merge(latest_bar_df, benchmark_df, on='symbol', suffixes=('', '_bk'))
+    # Calculate the change as the difference between latest_bar.close and benchmark.close
+    merged_df['chg'] = merged_df['close'] - merged_df['close_bk']
+    # Calculate the change percent
+    merged_df['chg_pct'] = ((merged_df['chg'] / merged_df['close_bk']) * 100).round(2)
+
+    # Add a new column 'trend' based on the 'change' column
+    merged_df['trend'] = merged_df['chg'].apply(
+        lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-")
+    )
+    # Format the change values
+    merged_df['chg'] = merged_df['chg'].apply(
+        lambda x: f"+{round(x, 2)}" if x > 0 else (f"-{abs(round(x, 2))}" if x < 0 else round(x, 2))
+    )
+
+    # Convert PortfolioItem queryset to DataFrame
+    items_df = pd.DataFrame(list(items.values()))
+    # Merge items DataFrame with merged_df on 'symbol'
+    final_df = pd.merge(items_df, merged_df, left_on='symbol_id', right_on='symbol')
+    # Calculate market value
+    final_df['market_value'] = final_df['quantity'] * final_df['close']
+
+    # Convert the DataFrame to JSON
+    final_json = final_df.to_json(orient='records')
+    context = {
+        'parent': 'portfolio',
+        'segment': 'my portfolio',
+        'portfolio': portfolio,
+        'portfolio_items': final_json,
+    }
+    return render(request,
+                  template_name='pages/portfolio/portfolio_detail.html',
+                  context= context)
 
 def add_portfolio(request):
     if request.method == 'POST':
@@ -34,19 +137,98 @@ def add_portfolio(request):
 def add_portfolio_item(request, pk):
     portfolio = get_object_or_404(Portfolio, pk=pk)
     if request.method == 'POST':
-        form = PortfolioItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.portfolio = portfolio
-            item.save()
-            return redirect('portfolio_detail', pk=pk)
+        try:
+            data = json.loads(request.body)
+            symbol = data.get('symbol')
+
+            if not symbol:
+                return JsonResponse({'success': False, 'error': 'symbol is missing'}, status=400)
+
+            market_symbol = MarketSymbol.objects.filter(symbol=symbol).first()
+            if not market_symbol:
+                return JsonResponse({'success': False, 'error': 'Symbol not found in database'}, status=404)
+
+            # Check if the PortfolioItem already exists
+            item, created = PortfolioItem.objects.update_or_create(
+                portfolio=portfolio,
+                symbol=market_symbol,
+                defaults={'symbol': market_symbol}
+            )
+
+            if created:
+                message = 'Item added successfully'
+            else:
+                message = 'Item updated successfully'
+
+            return JsonResponse({'success': True, 'message': message})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     else:
-        form = PortfolioItemForm()
-    return render(request, 'pages/portfolio/add_portfolio_item.html', {'form': form, 'portfolio': portfolio})
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 def transaction_history(request, pk):
     item = get_object_or_404(PortfolioItem, pk=pk)
     transactions = Transaction.objects.filter(portfolio_item=item)
     return render(request, 'pages/portfolio/transaction_history.html', {'item': item, 'transactions': transactions})
 
+def add_transaction(request):
+    if request.method == 'POST':
+        symbol = request.POST.get('symbol')
+        quantity = request.POST.get('quantity')
+        type = request.POST.get('type')
+        price = request.POST.get('price')
+        date = request.POST.get('date')
+        commission = request.POST.get('commission', None)
+        notes = request.POST.get('notes',None)
 
+        if commission == '':
+            commission = None
+
+        try:
+            portfolio_item = PortfolioItem.objects.get(symbol__symbol=symbol)
+            Transaction.objects.create(
+                portfolio_item=portfolio_item,
+                transaction_type=type,
+                quantity=quantity,
+                price=price,
+                date=date,
+                commission=commission,
+                notes=notes
+            )
+
+            # Recalculate total quantity and average price
+            transactions = Transaction.objects.filter(portfolio_item=portfolio_item)
+            total_quantity = sum(t.quantity if t.transaction_type == 'buy' else -t.quantity for t in transactions)
+            total_cost = sum(t.quantity * t.price if t.transaction_type == 'buy' else -t.quantity * t.price for t in transactions)
+            average_price = total_cost / total_quantity if total_quantity != 0 else 0
+
+            # Update the portfolio item
+            portfolio_item.quantity = total_quantity
+            portfolio_item.average_price = average_price
+            portfolio_item.save()
+
+            return JsonResponse({'success': True})
+        except PortfolioItem.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Portfolio item not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def delete_transaction(request, transaction_id):
+    if request.method == 'DELETE':
+        # Logic to delete the basket
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+def get_transaction_history(request, portfolio_id, portfolio_item_id):
+    try:
+        portfolio = get_object_or_404(Portfolio, pk=portfolio_id)
+        portfolio_item = get_object_or_404(PortfolioItem, pk=portfolio_item_id, portfolio=portfolio)
+        transactions = Transaction.objects.filter(portfolio_item=portfolio_item).values('date', 'transaction_type', 'quantity', 'price')
+        transactions_list = list(transactions)
+        return JsonResponse({'transactions': transactions_list})
+    except Portfolio.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Portfolio not found'}, status=404)
+    except PortfolioItem.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Portfolio item not found'}, status=404)
