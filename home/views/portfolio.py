@@ -1,19 +1,21 @@
 import json
-
 import pandas as pd
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-
-from home.forms.portfolio import PortfolioForm
 from home.models import MarketSymbol
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
 from home.models.portfolio import Portfolio, PortfolioItem, Transaction
+
+
 
 
 def get_portfolios(request):
     # user_id = request.user
     user_id = 2 # for testing user
     portfolios = Portfolio.objects.filter(user=user_id)
+
     return render(request, 'pages/portfolio/portfolios.html', {
         'parent': 'portfolio',
         'segment': 'my portfolio',
@@ -21,7 +23,7 @@ def get_portfolios(request):
     })
 
 
-def get_stock_stock_hist_bars(is_day, symbols:list[str], row_num:int):
+def get_stock_hist_bars(is_day, symbols:list[str], row_num:int):
     table_name = 'day' if is_day else 'min'
 
     with connection.cursor() as cursor:
@@ -72,46 +74,69 @@ def portfolio_detail(request, pk):
     # Extract symbols from portfolio items
     symbols = [item.symbol.symbol for item in items]
 
-    # get current time previous day benchmark
-    benchmark = get_stock_stock_hist_bars(True, symbols, 2)
+    if len(symbols) > 0:
+        # get current time previous day benchmark
+        benchmark = get_stock_hist_bars(True, symbols, 2)
 
-    # current time is base on current time is stock market open hour or close hour
-    # if is close hour.
-    #   a. if day data is not available, need use min data.
-    #       I.  if min data is not available, need use api, directly pull.
-    #       II. if min data is available, need use min data.
-    #   b. if day data is available, need use day data.
-    latest_bar = get_stock_stock_hist_bars(True, symbols, 1)
+        # current time is base on current time is stock market open hour or close hour
+        # if is close hour.
+        #   a. if day data is not available, need use min data.
+        #       I.  if min data is not available, need use api, directly pull.
+        #       II. if min data is available, need use min data.
+        #   b. if day data is available, need use day data.
+        latest_bar = get_stock_hist_bars(True, symbols, 1)
 
-    # Convert the fetched rows into pandas DataFrames
-    benchmark_df = pd.DataFrame(benchmark)
-    latest_bar_df = pd.DataFrame(latest_bar)
+        # Convert the fetched rows into pandas DataFrames
+        benchmark_df = pd.DataFrame(benchmark)
+        latest_bar_df = pd.DataFrame(latest_bar)
+        # Convert PortfolioItem queryset to DataFrame
+        items_df = pd.DataFrame(list(items.values()))
 
-    # Merge the DataFrames on the 'symbol' column
-    merged_df = pd.merge(latest_bar_df, benchmark_df, on='symbol', suffixes=('', '_bk'))
-    # Calculate the change as the difference between latest_bar.close and benchmark.close
-    merged_df['chg'] = merged_df['close'] - merged_df['close_bk']
-    # Calculate the change percent
-    merged_df['chg_pct'] = ((merged_df['chg'] / merged_df['close_bk']) * 100).round(2)
+        # Step 2. Calculate dataframes
+        # Merge the DataFrames on the 'symbol' column
+        merged_df = pd.merge(latest_bar_df, benchmark_df, on='symbol', suffixes=('', '_bk'))
+        # Merge items DataFrame with merged_df on 'symbol'
+        final_df = pd.merge(items_df, merged_df, left_on='symbol_id', right_on='symbol')
 
-    # Add a new column 'trend' based on the 'change' column
-    merged_df['trend'] = merged_df['chg'].apply(
-        lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-")
-    )
-    # Format the change values
-    merged_df['chg'] = merged_df['chg'].apply(
-        lambda x: f"+{round(x, 2)}" if x > 0 else (f"-{abs(round(x, 2))}" if x < 0 else round(x, 2))
-    )
+        # Step 3. Calculate the total cost & market value
+        final_df['total_cost'] = final_df['average_price'] * final_df['quantity']
+        final_df['market_value'] = final_df['quantity'] * final_df['close']
 
-    # Convert PortfolioItem queryset to DataFrame
-    items_df = pd.DataFrame(list(items.values()))
-    # Merge items DataFrame with merged_df on 'symbol'
-    final_df = pd.merge(items_df, merged_df, left_on='symbol_id', right_on='symbol')
-    # Calculate market value
-    final_df['market_value'] = final_df['quantity'] * final_df['close']
+        # Step 4. Calculate the change since last biz day
+        # Calculate the change as the difference between latest_bar.close and benchmark.close
+        final_df['chg'] = final_df['close'] - final_df['close_bk']
+        # Calculate change in position
+        final_df['chg_position'] = final_df['quantity'] * final_df['chg']
+        # Calculate the change percent
+        final_df['chg_pct'] = ((final_df['chg'] / final_df['close_bk']) * 100).round(2)
+        # Add a new column 'trend' based on the 'change' column
+        final_df['trend'] = final_df['chg'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
 
-    # Convert the DataFrame to JSON
-    final_json = final_df.to_json(orient='records')
+        # Step 6. Calculate the total cost & change
+        # Calculate total change in value
+        final_df['total_chg_position'] = final_df['market_value'] - final_df['total_cost']
+        # Calculate total change percentage
+        final_df['total_chg_pct'] = ((final_df['total_chg_position'] / final_df['total_cost']) * 100).round(2)
+        # Calculate total change trand
+        final_df['total_trend'] = final_df['total_chg_position'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
+
+
+
+        def format(x):
+            if pd.isna(x):
+                return '-'
+            return f"+{round(x, 2)}" if x > 0 else (f"-{abs(round(x, 2))}" if x < 0 else round(x, 2))
+        # Format the change & change values
+        final_df['chg_position'] = final_df['chg_position'].apply(format)
+        final_df['chg'] = final_df['chg'].apply(format)
+        final_df['total_chg_position'] = final_df['total_chg_position'].apply(format)
+        final_df['total_chg_pct'] = final_df['total_chg_pct'].apply(format)
+
+        # Convert the DataFrame to JSON
+        final_json = final_df.to_json(orient='records')
+    else:
+        final_json = []
+
     context = {
         'parent': 'portfolio',
         'segment': 'my portfolio',
@@ -122,17 +147,26 @@ def portfolio_detail(request, pk):
                   template_name='pages/portfolio/portfolio_detail.html',
                   context= context)
 
+
+@csrf_exempt
 def add_portfolio(request):
     if request.method == 'POST':
-        form = PortfolioForm(request.POST)
-        if form.is_valid():
-            portfolio = form.save(commit=False)
-            portfolio.user = request.user
-            portfolio.save()
-            return redirect('portfolio_list')
-    else:
-        form = PortfolioForm()
-    return render(request, 'pages/portfolio/add_portfolio.html', {'form': form})
+        try:
+            data = json.loads(request.body)
+            portfolio_name = data.get('name')
+
+            if not portfolio_name:
+                return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
+
+            # user = request.user
+            user = User.objects.get(pk=2)
+
+            portfolio = Portfolio.objects.create(name=portfolio_name, user=user)
+            return JsonResponse({'success': True, 'portfolio_id': portfolio.pk})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
 
 def add_portfolio_item(request, pk):
     portfolio = get_object_or_404(Portfolio, pk=pk)

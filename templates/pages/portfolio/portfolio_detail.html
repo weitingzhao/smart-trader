@@ -83,7 +83,7 @@
                                                onkeydown="symbolSearchKeyDown(event, 'symbol_auto_reminder_results')"
                                                onblur="symbolSearchBlur('symbol_auto_reminder_results')"
                                                onfocus="symbolFocus('symbol_auto_reminder_results')">
-                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.id }}"/>
+                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.portfolio_id }}"/>
                                         <ul id="symbol_auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
                                     </div>
                                 </div>
@@ -101,55 +101,67 @@
                       </div>
                     <div class="card-body px-0 pb-0">
                         <div class="table-responsive">
-                          <table class="table table-flush table-hover" id="summary-list">
-                            <thead class="thead-light">
-                              <tr>
-                                <th>Symbol</th>
-                                <th>Last Price</th>
-                                <th>Change</th>
-                                <th>Chg %</th>
-                                <th>Shares</th>
-                                <th>Day Range</th>
-                                <th>52-Wk Range</th>
-                                <th>Day Chart</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                            {% for item in portfolio_items|to_json%}
-                              <tr>
-                                <td>
-                                    <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
-                                        <b>{{ item.symbol }}</b>
-                                    </a>
-                                </td>
-                                  <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.close 2 '$ {0}'%}</b></td>
-                                  <td class="text-sm mb-0 {% if item.trend == 'UP' %}text-success{% elif item.trend == 'DOWN' %}text-danger{% else %}text-dark{% endif %}"><b>{%round_by_digits item.chg 2 '$ {0}'%}</b></td>
-                                <td class="text-sm mb-0 {% if item.trend == 'UP' %}text-success{% elif item.trend == 'DOWN' %}text-danger{% else %}text-dark{% endif %}"><b>{%round_by_digits item.chg_pct 2 '{0} %'%}</b></td>
-                                <td class="text-sm mb-0">0111</td>
-                                <td class="text-sm">0</td>
-                                <td>
-                                  <span class="badge badge-danger badge-sm">Out of Stock</span>
-                                </td>
-                                <td class="text-sm"></td>
-                              </tr>
-                            {% endfor %}
-
-                            </tbody>
-                            <tfoot>
-                              <tr>
-                                <th>Symbol</th>
-                                <th>Last Price</th>
-                                <th>Change</th>
-                                <th>Chg %</th>
-                                <th>Shares</th>
-                                <th>Day Range</th>
-                                <th>52-Wk Range</th>
-                                <th>Day Chart</th>
-                              </tr>
-                            </tfoot>
-                          </table>
+                            <table class="table table-flush table-hover text-end" id="summary-list">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Change</th>
+                                    <th>Day Chg<br/>%</th>
+                                    <th>Day<br/>Chg</th>
+                                    <th>Shares</th>
+                                    <th>Cost /<br/>Share</th>
+                                    <th>Last<br/>Price</th>
+                                    <th>Market<br/>Value</th>
+                                    <th>Total <br/>Chg %</th>
+                                    <th>Total <br/>Chg</th>
+                                    <th>52-Wk Range</th>
+                                    <th>Day Range</th>
+                                    <th>Day Chart</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in portfolio_items|to_json%}
+                                <tr>
+                                    <td class="text-start">
+                                        <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
+                                            <b>{{ item.symbol }}</b>
+                                        </a>
+                                    </td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg 2 '{0}'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_pct 2 '{0}%'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_position 2 '{0}'%}</b></td>
+                                    <td class="text-md mb-0 text-dark">{%round_by_digits item.quantity 0 '{0}' False%}</td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.close 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_pct 2 '{0}%'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_position 2 '{0}'%}</b></td>
+                                    <td class="text-md">0</td>
+                                    <td class="text-md">0</td>
+                                    <td class="text-sm"></td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Change</th>
+                                    <th>Day Chg<br/>%</th>
+                                    <th>Day<br/>Chg</th>
+                                    <th>Shares</th>
+                                    <th>Cost /<br/>Share</th>
+                                    <th>Last<br/>Price</th>
+                                    <th>Market<br/>Value</th>
+                                    <th>Total <br/>Chg %</th>
+                                    <th>Total <br/>Chg</th>
+                                    <th>52-Wk Range</th>
+                                    <th>Day Range</th>
+                                    <th>Day Chart</th>
+                                </tr>
+                                </tfoot>
+                            </table>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
             <div id="holdings_panel" class="col-12">
@@ -177,7 +189,7 @@
                                                onkeydown="symbolSearchKeyDown(event, 'symbol_auto_reminder_results')"
                                                onblur="symbolSearchBlur('symbol_auto_reminder_results')"
                                                onfocus="symbolFocus('symbol_auto_reminder_results')">
-                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.id }}"/>
+                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.portfolio_id }}"/>
                                         <ul id="symbol_auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
                                     </div>
                                 </div>
@@ -204,7 +216,6 @@
                                 <th>Last Price</th>
                                 <th>Average Cost / Share</th>
                                 <th>Total Cost</th>
-                                <th>Market Value</th>
                                 <th>Total Dividend Income</th>
                               </tr>
                             </thead>
@@ -229,7 +240,6 @@
                                     <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.quantity 0 '{0}'%}</b></td>
                                     <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.close 2 '$ {0}'%}</b></td>
                                     <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '$ {0}'%}</b></td>
-                                    <td class="text-sm mb-0 text-dark"></td>
                                     <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '$ {0}'%}</b></td>
                                     <td class="text-sm">
                                         <a href="javascript:;" data-bs-toggle="tooltip" data-bs-original-title="Preview product">
@@ -247,15 +257,15 @@
                                     <td colspan="8">
                                         <!-- Add Transaction Button -->
                                         <div class="row mt-4">
-                                            <button id="addTransactionButton-{{ item.id }}" type="button" class="btn bg-gradient-info btn-sm w-15 mb-3 toast-btn" onclick="toggleAddTransactionForm({{ item.id }})">
+                                            <button id="addTransactionButton-{{ item.portfolio_item_id }}" type="button" class="btn bg-gradient-info btn-sm w-15 mb-3 toast-btn" onclick="toggleAddTransactionForm({{ item.portfolio_item_id }})">
                                                 +&nbsp; Add a Transaction
                                             </button>
                                         </div>
 
                                         <div class="details-content">
-                                            <div id="addTransactionForm-{{ item.id }}" style="display: none; position: relative;">
-                                                <button type="button" class="btn-close bg-primary" onclick="hideAddTransactionForm({{ item.id }})" style="position: absolute; top: 10px; right: 10px;">&times;</button>
-                                                <form id="addTransactionFormContent-{{ item.id }}" onsubmit="submitTransaction(event, '{{ item.symbol }}')" data-portfolio-id="{{ portfolio.id }}" data-portfolio-item-id="{{ item.id }}">
+                                            <div id="addTransactionForm-{{ item.portfolio_item_id }}" style="display: none; position: relative;">
+                                                <button type="button" class="btn-close bg-primary" onclick="hideAddTransactionForm({{ item.portfolio_item_id }})" style="position: absolute; top: 10px; right: 10px;">&times;</button>
+                                                <form id="addTransactionFormContent-{{ item.portfolio_item_id }}" onsubmit="submitTransaction(event, '{{ item.symbol }}')" data-portfolio-id="{{ portfolio.portfolio_id }}" data-portfolio-item-id="{{ item.portfolio_item_id }}">
                                                     <!-- Form fields for adding a transaction -->
                                                     <div class="row mt-3">
                                                         <div class="col-3">
@@ -303,7 +313,7 @@
                                             </div>
 
                                             <!-- Existing Transactions -->
-                                            <div id="transactions-{{item.id}}">
+                                            <div id="transactions-{{item.portfolio_item_id}}">
                                                 <!-- Transactions will be loaded here -->
                                             </div>
 
@@ -321,7 +331,6 @@
                                 <th>Last Price</th>
                                 <th>Average Cost / Share</th>
                                 <th>Total Cost</th>
-                                <th>Market Value</th>
                                 <th>Total Dividend Income</th>
                               </tr>
                             </tfoot>

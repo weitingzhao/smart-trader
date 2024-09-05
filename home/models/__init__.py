@@ -14,3 +14,10 @@ from .market_stock import (
     MarketStockFinancial,
     MarketCompanyOfficer
 )
+
+from .portfolio import (
+    Portfolio,
+    PortfolioItem,
+    Transaction,
+    PortfolioPerformance
+)

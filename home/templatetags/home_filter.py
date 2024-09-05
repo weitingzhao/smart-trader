@@ -20,20 +20,22 @@ def to_json(value):
         return {}
 
 @register.simple_tag
-def round_by_digits(value, digits, template :str = None):
+def round_by_digits(value, digits, template :str, need_plus=True):
     """Rounds the value to the given number of digits"""
     if value is None:
-        return ""
+        return '-'
     try:
         value = float(value)
         digits = int(digits)
         rounded_value = round(value, digits)
-        rounded_str = f"{rounded_value:.{digits}f}"
+        rounded_str = f"{rounded_value:,.{digits}f}"
+        if need_plus and value > 0:
+            rounded_str = f"+{rounded_str}"
         if template:
             return template.format(rounded_str)
         return rounded_str
     except (ValueError, TypeError):
-        return value
+        return '-'
 
 @register.filter
 def get_stock_field(result, field: str):
