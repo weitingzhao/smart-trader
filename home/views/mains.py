@@ -16,6 +16,13 @@ from django.views.decorators.http import require_GET
 # Create your views here.
 instance = Logic()
 
+def index(request):
+    context = {
+        'parent': 'home',
+        'segment': 'index',
+    }
+    return render(request, template_name='pages/index.html', context= context)
+
 @require_GET
 def auto_reminder(request):
     query = request.GET.get('query', '')

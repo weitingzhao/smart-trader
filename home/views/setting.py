@@ -43,8 +43,18 @@ def settings(request):
         request,
         template_name='pages/account/settings.html',
         context = {
-            'parent': 'dashboard',
+            'parent': 'tools',
             'segment': 'settings',
+            'counts': get_market_summary()
+        })
+
+def customize(request):
+    return render(
+        request,
+        template_name='pages/account/customize.html',
+        context = {
+            'parent': 'account',
+            'segment': 'customize',
             'counts': get_market_summary()
         })
 

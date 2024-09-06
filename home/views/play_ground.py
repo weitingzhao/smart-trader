@@ -5,9 +5,6 @@ from django.shortcuts import render
 instance = Logic()
 
 # Pages
-def index(request):
-    return render(request, 'pages/index.html', {'segment': 'index'})
-
 
 def billing(request):
     return render(request, 'pages/billing.html', {'segment': 'billing'})

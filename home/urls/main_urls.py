@@ -5,7 +5,7 @@ from django.urls import path
 urlpatterns = [
 
     # Menu: Dashboard
-    path('', views.play_ground.index, name='index'),
+    path('', views.main.index, name='index'),
 
     # Navigation:  Auto Reminder
     path('auto_reminder/', views.main.auto_reminder, name='auto_reminder'),

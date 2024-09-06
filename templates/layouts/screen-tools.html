@@ -1,0 +1,154 @@
+<!-- Add the Ruler Button beside the Create New Portfolio button -->
+<button type="button" class="btn btn-outline-info w-5 mb-0 toast-btn" data-bs-toggle="modal" data-bs-target="#positionSizingModal">
+    <i class="fas fa-ruler text-lg text-secondary"></i>
+</button>
+<!-- Add the Ruler Button beside the Create New Portfolio button -->
+<button type="button" class="btn btn-outline-info w-5 mb-0 toast-btn" data-bs-toggle="modal" data-bs-target="#positionSizingModal">
+    <i class="fas fa-pencil text-lg text-secondary"></i>
+</button>
+
+
+<!-- Modal for Position Sizing Tools -->
+<div class="modal fade" id="positionSizingModal" tabindex="-1" aria-labelledby="positionSizingModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content  text-xs">
+            <div class="modal-header" style="cursor: move;">
+                <h5 class="modal-title" id="positionSizingModalLabel">Position Sizing Tool</h5>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true" class="text-lg">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add your form or content for position sizing tools here -->
+                <form id="positionSizingForm">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="riskPercentage" class="form-label">% Risk</label>
+                            <input type="number" class="form-control" id="riskPercentage" name="riskPercentage" required>
+                        </div>
+                        <div class="col">
+                            <label for="commission" class="form-label">Commission</label>
+                            <input type="number" class="form-control" id="commission" name="commission" required>
+                        </div>
+                        <div class="col">
+                            <label for="tax" class="form-label">% Tax</label>
+                            <input type="number" class="form-control" id="tax" name="tax" required>
+                        </div>
+                        <div class="col">
+                            <label for="rounding" class="form-label">Rounding</label>
+                            <input type="number" class="form-control" id="rounding" name="rounding" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="entryPrice" class="form-label">Entry Price</label>
+                            <input type="number" class="form-control" id="entryPrice" name="entryPrice" required>
+                        </div>
+                        <div class="col">
+                            <label for="exitPrice" class="form-label">Exit Price</label>
+                            <input type="number" class="form-control" id="exitPrice" name="exitPrice" required>
+                        </div>
+                        <div class="col">
+                            <label for="capital" class="form-label">Capital</label>
+                            <input type="number" class="form-control" id="capital" name="capital" required>
+                        </div>
+                    </div>
+                </form>
+                <!-- Guide Table -->
+                <table class="table mt-4">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Property</th>
+                            <th>Value</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr>
+                            <td>Total Risk</td>
+                            <td id="totalRiskValue"></td>
+                            <td id="totalRiskPercentage"></td>
+                            <td id="totalRiskStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Risk Per Share</td>
+                            <td id="riskPerShareValue"></td>
+                            <td id="riskPerSharePercentage"></td>
+                            <td id="riskPerShareStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Number of Shares</td>
+                            <td id="numberOfSharesValue"></td>
+                            <td id="numberOfSharesPercentage"></td>
+                            <td id="numberOfSharesStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Rounded Number</td>
+                            <td id="roundedNumberValue"></td>
+                            <td id="roundedNumberPercentage"></td>
+                            <td id="roundedNumberStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Investment</td>
+                            <td id="investmentValue"></td>
+                            <td id="investmentPercentage"></td>
+                            <td id="investmentStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Breakeven Price</td>
+                            <td id="breakevenPriceValue"></td>
+                            <td id="breakevenPricePercentage"></td>
+                            <td id="breakevenPriceStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>ATR</td>
+                            <td id="atrValue"></td>
+                            <td id="atrPercentage"></td>
+                            <td id="atrStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Stop Distance</td>
+                            <td id="stopDistanceValue"></td>
+                            <td id="stopDistancePercentage"></td>
+                            <td id="stopDistanceStatus"></td>
+                        </tr>
+                        <tr>
+                            <td>Liquidity</td>
+                            <td id="liquidityValue"></td>
+                            <td id="liquidityPercentage"></td>
+                            <td id="liquidityStatus"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    ////////////////////////////////Position Sizing/////////////////////////////////////
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make the modal draggable
+        $('#positionSizingModal').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').draggable({
+                handle: ".modal-header"
+            });
+        });
+    
+        const positionSizingForm = document.getElementById('positionSizingForm');
+        positionSizingForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const capital = parseFloat(document.getElementById('capital').value);
+            const riskPercentage = parseFloat(document.getElementById('riskPercentage').value);
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value);
+
+            const riskAmount = capital * (riskPercentage / 100);
+            const positionSize = riskAmount / Math.abs(entryPrice - stopLossPrice);
+
+            alert(`Position Size: ${positionSize.toFixed(2)} shares`);
+        });
+    });
+</script>

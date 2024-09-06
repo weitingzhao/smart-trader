@@ -6,6 +6,8 @@ urlpatterns = [
 
     # Dashboard -> Settings
     path('', views.setting.settings, name="settings"),
+    # Dashboard -> Customize
+    path('customize/', views.setting.customize, name='customize'),
 
     # Dashboard -> Settings -> Data -> Fundamentals
     path('celery_task/<str:task_name>/<str:args>', views.setting.celery_task, name="celery_task"),

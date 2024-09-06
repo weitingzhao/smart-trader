@@ -95,10 +95,16 @@ def paginator_number(cl, i):
 
 @register.simple_tag
 def check_menu_permission(user, anonymous:bool, authenticated:bool, superuser: bool):
+    # Step 1. Admin user no need access anonymous menu
+    if user is not None and anonymous and user.is_superuser and superuser is False:
+        return False
+    # Step 2. Check if user is authenticated
     if user is None or anonymous:
         return True
+    # Step 3. Check if user is authenticated
     elif user.is_authenticated and not user.is_superuser and user.is_authenticated == authenticated:
         return True
+    # Step 4. Check if user is superuser
     elif user.is_superuser and user.is_superuser == superuser:
         return True
     return False
