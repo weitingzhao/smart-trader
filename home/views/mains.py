@@ -4,10 +4,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from pandas.core.indexes import interval
-
-from home.models import MarketStock, MarketSymbol
-from home.models.market import MarketStockHistoricalBarsByDay
+from apps.common.models import  MarketSymbol, MarketStockHistoricalBarsByDay
 from logic.logic import Logic
 from django.shortcuts import render
 from django.views.decorators.http import require_GET

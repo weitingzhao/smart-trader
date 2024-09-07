@@ -29,6 +29,10 @@ handler404 = 'home.views.accounts.error_404'
 handler500 = 'home.views.accounts.error_500'
 
 urlpatterns = [
+
+    # API
+    path("api/", include("apps.api.urls")),
+
     # Main
     path('', include('home.urls')),
 

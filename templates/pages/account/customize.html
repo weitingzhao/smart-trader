@@ -84,6 +84,54 @@
                         <h5>Position Sizing</h5>
                       </div>
                       <div class="card-body pt-0">
+                        <form id="position_sizing_form" method="post" action="{% url 'customize_position_sizing' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_capital" class="form-label">Capital</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.capital.errors %}is-invalid{% endif %}" id="id_capital" name="capital" value="{{ position_sizing_form.capital.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.capital.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_risk" class="form-label">Risk</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.risk.errors %}is-invalid{% endif %}" id="id_risk" name="risk" value="{{ position_sizing_form.risk.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.risk.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_rounding" class="form-label">Rounding</label>
+                                    <input type="number" class="form-control {% if position_sizing_form.rounding.errors %}is-invalid{% endif %}" id="id_rounding" name="rounding" value="{{ position_sizing_form.rounding.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.rounding.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_commission" class="form-label">Commission</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.commission.errors %}is-invalid{% endif %}" id="id_commission" name="commission" value="{{ position_sizing_form.commission.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.commission.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_tax" class="form-label">Tax</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.tax.errors %}is-invalid{% endif %}" id="id_tax" name="tax" value="{{ position_sizing_form.tax.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.tax.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                                </div>
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="reset" class="btn btn-secondary w-100">Reset</button>
+                                </div>
+                            </div>
+                        </form>
                       </div>
                   </div>
 
@@ -600,7 +648,19 @@
 <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
 <script src="{% static 'assets/js/plugins/countup.min.js' %}"></script>
 <script>
+    {% if messages %}
+        const currentTime = new Date().toLocaleTimeString();
+        {% for message in messages %}
+            console.log('{{ message }}');
+            showNotification(
+                {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %},
+                '{{ message.extra_tags }}',  // Replace with the actual task name if needed
+                '{{ message.message }}',
+                currentTime);
+            {#showNotification('error', task_name, data.error, currentTime);#}
 
+        {% endfor %}
+    {% endif %}
 </script>
 
 {% endblock extra_js %}

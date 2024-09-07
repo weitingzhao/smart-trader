@@ -22,9 +22,6 @@ class MarketSymbol(models.Model):
         return f"{self.symbol} - {self.name}"
 
 
-
-
-
 class MarketStockHistoricalBarsByMin(TimescaleModel):
     symbol = models.CharField(max_length=10, null=False, blank=False, default="NaN")
     open = models.FloatField()

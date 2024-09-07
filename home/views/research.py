@@ -1,8 +1,7 @@
 from django.core.paginator import Paginator
 from logic.logic import Logic
 from django.shortcuts import render
-
-from home.models import MarketStockHistoricalBarsByMin
+from apps.common.models import *
 
 # Create your views here.
 instance = Logic()

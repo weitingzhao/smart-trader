@@ -47,7 +47,6 @@
   {% block extra_js %}{% endblock extra_js %}
 
   <script src="{% static "assets/js/dark-theme.js" %}"></script>
-  <script src="{% static "assets/js/custom.js" %}"></script>
   <script>
     if ('{{ request.user.profile.dark_mode }}' === 'True') {
       document.addEventListener('DOMContentLoaded', function() {

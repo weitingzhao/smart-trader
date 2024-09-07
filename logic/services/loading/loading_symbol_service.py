@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from home.models import MarketSymbol
+from apps.common.models import *
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from whoosh.qparser import MultifieldParser, WildcardPlugin, OrGroup

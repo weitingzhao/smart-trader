@@ -117,6 +117,12 @@
                                 <span class="sidenav-normal"> Settings </span>
                             </a>
                         </li>
+                        <li class="nav-item {% if 'api' in segment %}active{% endif %}">
+                            <a class="nav-link {% if 'api' in segment %}active{% endif %}" href="/api/lookup" target="_blank">
+                                <span class="sidenav-mini-icon"> A </span>
+                                <span class="sidenav-normal"> API </span>
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>

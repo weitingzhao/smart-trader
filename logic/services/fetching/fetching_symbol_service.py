@@ -1,6 +1,6 @@
 import pandas as pd
 import yfinance as yf
-from home.models import *
+from apps.common.models import *
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from alpha_vantage.fundamentaldata import FundamentalData

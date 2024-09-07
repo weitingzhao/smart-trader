@@ -1,12 +1,10 @@
 import json
 import pandas as pd
-from django.db import connection
 from django.http import JsonResponse
-from home.models import MarketSymbol
+from apps.common.models import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-from home.models.portfolio import Portfolio, PortfolioItem, Transaction
 
 
 

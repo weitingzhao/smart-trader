@@ -7,7 +7,7 @@ urlpatterns = [
 
     # Admin
     path('accounts/', include('home.urls.accounts_urls')),
-    path('settings/', include('home.urls.setting_urls')),
+    path('tools/', include('home.urls.setting_urls')),
 
     # Portfolio
     path('portfolio/', include('home.urls.portfolio_urls')),

@@ -1,6 +1,10 @@
+from email.policy import default
+
+from celery.app import default_app
+from django.contrib.auth.models import User
 from django.db import models
 
-from home.models import MarketSymbol
+from .market import MarketSymbol
 
 
 class Portfolio(models.Model):
@@ -62,3 +66,18 @@ class PortfolioPerformance(models.Model):
     def __str__(self):
         return f"Performance for {self.portfolio.name}"
 
+
+
+class PositionSizing(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    capital = models.DecimalField(max_digits=15, decimal_places=2, default=10000)
+    risk = models.DecimalField(max_digits=5, decimal_places=2, default=0.5)
+    rounding = models.IntegerField(null=True, default=2)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = 'position_sizing'
+
+    def __str__(self):
+        return f"Position Sizing for {self.user.username}"

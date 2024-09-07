@@ -1,9 +1,8 @@
 import yfinance as yf
 from typing import List
 from logic import Engine
-from home.models import *
+from apps.common.models import *
 from datetime import datetime, timezone
-from home.models import MarketSymbol
 from logic.logic import TaskBuilder
 from logic.services import BaseService
 

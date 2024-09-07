@@ -9,11 +9,12 @@
 
 
 <!-- Modal for Position Sizing Tools -->
-<div class="modal fade" id="positionSizingModal" tabindex="-1" aria-labelledby="positionSizingModalLabel" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog">
+<div class="modal fade" id="positionSizingModal" tabindex="100" aria-labelledby="positionSizingModalLabel"
+     aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false" role="dialog">
+    <div class="modal-dialog" style="max-width: 450px; ">
         <div class="modal-content  text-xs">
             <div class="modal-header" style="cursor: move;">
-                <h5 class="modal-title" id="positionSizingModalLabel">Position Sizing Tool</h5>
+                <h6 class="modal-title" id="positionSizingModalLabel">Position Sizing Tool</h6>
                 <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true" class="text-lg">&times;</span>
                 </button>
@@ -132,10 +133,10 @@
         // Make the modal draggable
         $('#positionSizingModal').on('shown.bs.modal', function () {
             $(this).find('.modal-dialog').draggable({
-                handle: ".modal-header"
+                handle: ".modal-header",
             });
         });
-    
+
         const positionSizingForm = document.getElementById('positionSizingForm');
         positionSizingForm.addEventListener('submit', function (event) {
             event.preventDefault();

@@ -13,7 +13,6 @@ register = template.Library()
 assignment_tag = register.assignment_tag if hasattr(register, 'assignment_tag') else register.simple_tag
 
 ## Filter ################
-
 @register.filter
 def intcomma(value):
     return "{:,}".format(value)

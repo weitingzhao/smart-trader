@@ -1,8 +1,9 @@
 from datetime import datetime
-
-from django.db import connection
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from home.forms.portfolio import PositionSizingForm
+from apps.common.models import *
 from logic.logic import Logic
 from apps.notifications.signals import notify
 from apps.tasks import tasks
@@ -48,16 +49,6 @@ def settings(request):
             'counts': get_market_summary()
         })
 
-def customize(request):
-    return render(
-        request,
-        template_name='pages/account/customize.html',
-        context = {
-            'parent': 'account',
-            'segment': 'customize',
-            'counts': get_market_summary()
-        })
-
 def celery_task(request, task_name, args):
     if request.method != 'GET':
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
@@ -79,4 +70,57 @@ def celery_task(request, task_name, args):
 
 def my_handler(sender, instance, created, **kwargs):
     notify.send(instance, verb='was saved')
+
+
+def customize(request):
+    try:
+        position_sizing = PositionSizing.objects.get(user=request.user)
+        form = PositionSizingForm(instance=position_sizing)
+    except PositionSizing.DoesNotExist:
+        form = PositionSizingForm()
+
+    return render(
+        request,
+        template_name='pages/account/customize.html',
+        context = {
+            'parent': 'account',
+            'segment': 'customize',
+            'position_sizing_form': form,
+            'messages': messages.get_messages(request),
+        })
+
+def customize_position_sizing(request):
+    if request.method == 'POST':
+        form = PositionSizingForm(request.POST)
+        if form.is_valid():
+            position_sizing, created = PositionSizing.objects.update_or_create(
+                user=request.user,
+                defaults=form.cleaned_data
+            )
+            if created:
+                messages.success(request, 'Position Sizing created successfully.', extra_tags='position sizing')
+            else:
+                messages.success(request, 'Position Sizing updated successfully.', extra_tags='position sizing')
+        else:
+            messages.error(request, f'Position Sizing form is invalid.', extra_tags='position sizing')
+            return render(
+                request,
+                template_name='pages/account/customize.html',
+                context={
+                    'parent': 'account',
+                    'segment': 'customize',
+                    'position_sizing_form': form,
+                })
+    else:
+        messages.error(request, "method not supported", extra_tags='position sizing')
+
+    return redirect('customize')
+
+def lookup(request):
+    if request.method == 'GET':
+        lookups = UtilitiesLookup.objects.all().values('category', 'type', 'key', 'value')
+        return JsonResponse(list(lookups), safe=False)
+
+def lookup_page(request):
+    return render(request, 'pages/tools/lookup.html')
 

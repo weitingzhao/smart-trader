@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom Apps
+    'apps.common',
+    'apps.api',
     'home',
     'apps.tasks',
     'apps.file_manager',
@@ -261,6 +263,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 ########################################

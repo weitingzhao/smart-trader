@@ -1,5 +1,5 @@
 from django.db import models
-from home.models.market import MarketSymbol
+from .market import MarketSymbol
 
 class MarketStock(models.Model):
     symbol = models.OneToOneField(

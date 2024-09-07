@@ -1,10 +1,9 @@
 import yfinance as yf
 from typing import List
 from django.db import connection
-from home.models.market import MarketStockHistoricalBarsByDay, MarketSymbol
+from apps.common.models import *
 from logic.logic import TaskBuilder
 from logic.services import BaseService
-from home.models import MarketStockHistoricalBarsByMin
 
 
 class StockHistBarsYahoo(BaseService, TaskBuilder):

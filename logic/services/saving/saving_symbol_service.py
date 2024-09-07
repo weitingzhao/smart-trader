@@ -1,5 +1,5 @@
 from pathlib import Path
-from home.models import MarketSymbol
+from apps.common.models import *
 from logic.engine import Engine
 from logic.services.base_service import BaseService
 from whoosh.index import create_in
