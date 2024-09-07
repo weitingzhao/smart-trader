@@ -50,7 +50,7 @@
         <div class="collapse {% if 'research' in parent %}show{% endif %} " id="researchPanel">
           <ul class="nav ms-4 ps-3">
               <li class="nav-item {% if 'stock screener' in segment %}active{% endif %}">
-              <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="/stock_screener/" target="_self">
+              <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="{% url 'stock_screener' %}" target="_self">
                 <span class="sidenav-mini-icon"> K </span>
                 <span class="sidenav-normal"> Stock Screener </span>
               </a>
@@ -103,18 +103,18 @@
             </a>
             <div class="collapse {% if 'tools' in parent %}show{% endif %} " id="toolsPanel">
                 <ul class="nav ms-4 ps-3">
-                    <li class="nav-item {% if 'tasks' in segment %}active{% endif %}">
-                        <a class="nav-link {% if 'tasks' in segment %}active{% endif %}" href="{% url 'tasks' %}">
-                            <span class="sidenav-mini-icon"> T </span>
-                            <span class="sidenav-normal"> Tasks </span>
-                        </a>
-                    </li>
                     {%check_menu_permission request.user False False True as sub_perm_settings%}
                     {% if sub_perm_settings %}
                         <li class="nav-item {% if 'settings' in segment %}active{% endif %}">
                             <a class="nav-link {% if 'settings' in segment %}active{% endif %}" href="{% url 'settings' %}">
                                 <span class="sidenav-mini-icon text-xs"> S </span>
                                 <span class="sidenav-normal"> Settings </span>
+                            </a>
+                        </li>
+                        <li class="nav-item {% if 'tasks' in segment %}active{% endif %}">
+                            <a class="nav-link {% if 'tasks' in segment %}active{% endif %}" href="{% url 'tasks' %}">
+                                <span class="sidenav-mini-icon"> T </span>
+                                <span class="sidenav-normal"> Tasks </span>
                             </a>
                         </li>
                         <li class="nav-item {% if 'api' in segment %}active{% endif %}">
