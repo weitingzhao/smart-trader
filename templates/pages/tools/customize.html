@@ -378,7 +378,7 @@
                           <div class="my-auto ms-3">
                             <div class="h-100">
                               <h5 class="mb-0">Slack</h5>
-                              <a class="text-sm text-body" href="javascript:;">Show less <i class="fas fa-chevron-up text-xs ms-1" aria-hidden="true"></i></a>
+                              <a class="text-sm text-body" href="javascript:">Show less <i class="fas fa-chevron-up text-xs ms-1" aria-hidden="true"></i></a>
                             </div>
                           </div>
                           <p class="text-sm text-secondary ms-auto me-3 my-auto">Enabled</p>
@@ -586,7 +586,7 @@
                           </div>
                           <span class="badge badge-success badge-sm my-auto ms-auto me-3">Active</span>
                           <p class="text-secondary text-sm my-auto me-3">EU</p>
-                          <a href="javascript:;" class="text-primary text-sm icon-move-right my-auto">See more
+                          <a href="javascript:" class="text-primary text-sm icon-move-right my-auto">See more
                             <i class="fas fa-arrow-right text-xs ms-1" aria-hidden="true"></i>
                           </a>
                         </div>
@@ -597,7 +597,7 @@
                           </div>
                           <p class="my-auto ms-3">Chrome on macOS</p>
                           <p class="text-secondary text-sm ms-auto my-auto me-3">US</p>
-                          <a href="javascript:;" class="text-primary text-sm icon-move-right my-auto">See more
+                          <a href="javascript:" class="text-primary text-sm icon-move-right my-auto">See more
                             <i class="fas fa-arrow-right text-xs ms-1" aria-hidden="true"></i>
                           </a>
                         </div>
@@ -608,7 +608,7 @@
                           </div>
                           <p class="my-auto ms-3">Safari on iPhone</p>
                           <p class="text-secondary text-sm ms-auto my-auto me-3">US</p>
-                          <a href="javascript:;" class="text-primary text-sm icon-move-right my-auto">See more
+                          <a href="javascript:" class="text-primary text-sm icon-move-right my-auto">See more
                             <i class="fas fa-arrow-right text-xs ms-1" aria-hidden="true"></i>
                           </a>
                         </div>
@@ -656,7 +656,7 @@
                 {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %},
                 '{{ message.extra_tags }}',  // Replace with the actual task name if needed
                 '{{ message.message }}',
-                currentTime);
+                currentTime)
             {#showNotification('error', task_name, data.error, currentTime);#}
 
         {% endfor %}

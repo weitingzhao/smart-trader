@@ -6,6 +6,8 @@ from pathlib import Path
 from datetime import datetime
 from argparse import ArgumentParser
 from concurrent.futures import Future
+
+from logic.researchs.treading.patterns import pattern
 from logic.service import Service
 from logic.researchs.base_research import BaseResearch
 from typing import Tuple, Callable, List, Optional

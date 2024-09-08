@@ -1,4 +1,9 @@
 from datetime import datetime
+
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.authtoken.models import Token
+from django.conf import settings  as django_settings
+import requests
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -121,6 +126,30 @@ def lookup(request):
         lookups = UtilitiesLookup.objects.all().values('category', 'type', 'key', 'value')
         return JsonResponse(list(lookups), safe=False)
 
-def lookup_page(request):
-    return render(request, 'pages/tools/lookup.html')
 
+
+def lookup_page(request):
+    # Ensure the user has a token
+    token, created = Token.objects.get_or_create(user=request.user)
+
+    categories = []
+    if token:
+        api_url = f'{django_settings.API_BASE_URL}/api/lookup'
+        response = requests.get(api_url, headers={'Authorization': f'Token {token.key}'})
+        if response.status_code == 200:
+            categories = response.json()
+
+
+    return render(
+        request,
+        template_name='pages/tools/lookup.html',
+        context={
+            'parent': 'tools',
+            'segment': 'lookup',
+            'categories': categories,
+        })
+
+def get_lookup_types_by_category(reqeust):
+    category = reqeust.GET.get('category')
+    types = UtilitiesLookup.objects.filter(category=category).values_list('type', flat=True).distinct()
+    return JsonResponse({'types': list(types)})

@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'django_quill',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_spectacular',
     'django_api_gen',
 ]
@@ -257,6 +258,7 @@ API_GENERATOR = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
@@ -267,6 +269,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
 ########################################
 
 MESSAGE_TAGS = {

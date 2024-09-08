@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+
 from logic.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *

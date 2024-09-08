@@ -7,23 +7,23 @@
     if (document.getElementsByClassName('main-content')[0]) {
       var mainpanel = document.querySelector('.main-content');
       var ps = new PerfectScrollbar(mainpanel);
-    };
+    }
 
     if (document.getElementsByClassName('sidenav')[0]) {
       var sidebar = document.querySelector('.sidenav');
       var ps1 = new PerfectScrollbar(sidebar);
-    };
+    }
 
     if (document.getElementsByClassName('navbar-collapse')[0]) {
       var fixedplugin = document.querySelector('.navbar:not(.navbar-expand-lg) .navbar-collapse');
       var ps2 = new PerfectScrollbar(fixedplugin);
-    };
+    }
 
     if (document.getElementsByClassName('fixed-plugin')[0]) {
       var fixedplugin = document.querySelector('.fixed-plugin');
       var ps3 = new PerfectScrollbar(fixedplugin);
-    };
-  };
+    }
+  }
 })();
 
 // Verify navbar blur on scroll
@@ -395,7 +395,7 @@ function navbarFixed(el) {
     navbarBlurOnScroll('navbarBlur');
     el.removeAttribute("checked");
   }
-};
+}
 
 // Set Navbar Minimized
 function navbarMinimize(el) {
@@ -516,7 +516,7 @@ function debounce(func, wait, immediate) {
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
-};
+}
 
 // Tabs navigation
 
@@ -1039,7 +1039,7 @@ function darkMode(el) {
     }
     el.removeAttribute("checked");
   }
-};
+}
 var soft = {
   initFullCalendar: function() {
     document.addEventListener('DOMContentLoaded', function() {

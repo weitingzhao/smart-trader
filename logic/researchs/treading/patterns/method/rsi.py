@@ -1,9 +1,8 @@
 from argparse import ArgumentParser
-from ta.momentum import RSIIndicator
 from mplfinance import make_addplot
 from pandas import Series
 
-from src import Config
+from core.configures_home import Config
 
 
 # To be added to src/setting/user.json

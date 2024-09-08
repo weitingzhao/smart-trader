@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime, timedelta
 from .abstract_loader import AbstractLoader
-
+from .. import loader
 
 logger = logging.getLogger(__name__)
 

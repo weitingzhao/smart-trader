@@ -10,7 +10,7 @@ import matplotlib.ticker as ticker
 from argparse import ArgumentParser
 
 from logic.research import Research
-from static.utilities.utils import Utils
+from logic.utilities.utils import Utils
 from logic.visualizes import BaseChart
 from matplotlib.collections import LineCollection
 

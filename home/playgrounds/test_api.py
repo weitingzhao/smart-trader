@@ -1,8 +1,7 @@
 from alpaca.data import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
-from static.models import MarketStockHistoricalBars
-
+from apps.common.models import MarketStockHistoricalBarsByDay
 
 # Initialize Alpaca API client
 API_KEY = "PK1QV6ECTTX0TOWJ74N4"
@@ -23,7 +22,7 @@ def pull_and_save_symbol_history(symbol, start_date, end_date):
 
     # Iterate over the bars and save to the database
     for bar in bars[symbol]:
-        MarketStockHistoricalBars.objects.create(
+        MarketStockHistoricalBarsByDay.objects.create(
             symbol=symbol,
             time=bar.timestamp,
             open=bar.open,

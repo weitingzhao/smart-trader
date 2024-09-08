@@ -39217,7 +39217,7 @@
               var n = t.inertias.getKey(e);
               if (n) {
                 n.dispose();
-                continue
+
               }
             }
         }, e.prototype.swiping = function(t, e) {

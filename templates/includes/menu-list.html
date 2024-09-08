@@ -117,8 +117,14 @@
                                 <span class="sidenav-normal"> Tasks </span>
                             </a>
                         </li>
+{#                        <li class="nav-item {% if 'lookup' in segment %}active{% endif %}">#}
+{#                            <a class="nav-link {% if 'lookup' in segment %}active{% endif %}" href="{% url "lookup" %}">#}
+{#                                <span class="sidenav-mini-icon"> L </span>#}
+{#                                <span class="sidenav-normal"> Lookup </span>#}
+{#                            </a>#}
+{#                        </li>#}
                         <li class="nav-item {% if 'api' in segment %}active{% endif %}">
-                            <a class="nav-link {% if 'api' in segment %}active{% endif %}" href="/api/lookup" target="_blank">
+                            <a class="nav-link {% if 'api' in segment %}active{% endif %}" href="/api" target="_blank">
                                 <span class="sidenav-mini-icon"> A </span>
                                 <span class="sidenav-normal"> API </span>
                             </a>

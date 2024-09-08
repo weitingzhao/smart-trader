@@ -15,6 +15,5 @@ urlpatterns = [
     path('customize/position_sizing', views.tools.customize_position_sizing, name='customize_position_sizing'),
 
     # Tools -> Lookup
-    path('lookup/', views.tools.lookup_page, name='lookup_api'),
-
+    path('lookup/', views.tools.lookup_page, name='lookup'),
 ]
