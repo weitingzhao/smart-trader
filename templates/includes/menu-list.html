@@ -43,18 +43,24 @@
       <li class="nav-item">
         <a data-bs-toggle="collapse" href="#researchPanel" class="nav-link {% if 'research' in parent %}active{% endif %}" aria-controls="researchPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-flask-vial fs-7 {% if 'stock screener' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'stock screener' in segment or 'stock charts' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
           <span class="nav-link-text ms-1">Research</span>
         </a>
         <div class="collapse {% if 'research' in parent %}show{% endif %} " id="researchPanel">
           <ul class="nav ms-4 ps-3">
               <li class="nav-item {% if 'stock screener' in segment %}active{% endif %}">
-              <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="{% url 'stock_screener' %}" target="_self">
-                <span class="sidenav-mini-icon"> K </span>
-                <span class="sidenav-normal"> Stock Screener </span>
-              </a>
-            </li>
+                  <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="{% url 'stock_screener' %}" target="_self">
+                      <span class="sidenav-mini-icon"> K </span>
+                      <span class="sidenav-normal"> Stock Screener </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'stock charts' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'stock charts' in segment %}active{% endif %}" href="{% url 'stock_charts' %}" target="_self">
+                      <span class="sidenav-mini-icon"> C </span>
+                      <span class="sidenav-normal"> Stock Charts </span>
+                  </a>
+              </li>
           </ul>
         </div>
       </li>

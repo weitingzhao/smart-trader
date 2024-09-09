@@ -36,3 +36,27 @@
     cursor: pointer; /* Show hand cursor on hover */
 }
 
+.dropdown-toggle::after {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.dropdown-toggle {
+    position: relative;
+    padding-right: 30px; /* Adjust padding to make space for the icon */
+}
+.dropdown-name {
+    text-transform: none; /* Ensure text is displayed normally */
+    text-align: left; /* Align text to the left */
+    font-weight: normal; /* Make the text not bold */
+}
+.selected-option-display {
+    text-align: left; /* Align text to the left */
+}
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%; /* Adjust as needed */
+}

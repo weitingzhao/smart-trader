@@ -9,6 +9,8 @@ urlpatterns = [
 
     # Menu: Research
     path('stock/screener/', views.research.stock_screener, name='stock_screener'),
+    path('stock/charts/', views.research.stock_charts, name='stock_charts'),
+
 
     path('stock/quote/<str:symbol>', views.research.stock_quote, name="stock_quote"),
 
