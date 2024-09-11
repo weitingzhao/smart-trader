@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from apps.common.models import *
 from urllib.parse import quote
 
 

@@ -558,7 +558,7 @@
 
     // Fetch stock data and render Plotly chart
     async function fetchStockData(symbol, interval) {
-        const response = await fetch(`/api/stock_data?symbol=${symbol}&interval=${interval}`);
+        const response = await fetch(`/research/api/stock_data?symbol=${symbol}&interval=${interval}`);
         return await response.json();
     }
 

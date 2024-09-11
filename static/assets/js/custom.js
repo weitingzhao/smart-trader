@@ -120,7 +120,7 @@ function highlightResult(reminder) {
 function selectResult(reminder) {
     const symbol = getSelectResult(reminder)
     if (reminder === 'auto_reminder_results') {
-        window.location.href = `/stock/quote/${symbol}`;
+        window.location.href = `/research/stock/quote/${symbol}`;
     }else if (reminder === 'symbol_auto_reminder_results') {
         // Send AJAX request to add portfolio item
         fetch(`/portfolio/${currentPortfolioIndex}/add_item/`, {

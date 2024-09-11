@@ -8,12 +8,12 @@ urlpatterns = [
     path('', views.main.index, name='index'),
     # Auto Reminder & Task Logs
     path('auto_reminder/', views.main.auto_reminder, name='auto_reminder'),
-    path('tasks_logs', views.main.get_task_log, name='get_task_log'),
+    path('tasks_logs/', views.main.get_task_log, name='get_task_log'),
 
 
     ########## Component ####################
     # Component 1. Research
-    path('research', include('home.urls.research_urls')),
+    path('research/', include('home.urls.research_urls')),
 
     # Component 2. Portfolio
     path('portfolio/', include('home.urls.portfolio_urls')),
