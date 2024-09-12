@@ -119,6 +119,7 @@
                             <div class="dropdown" id="dropdown_Performance_Signal"></div>
                         </div>
                         <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_%25%20Change"></div>
                         </div>
                         <div class="col-lg-2 col-md-4">
 
@@ -300,7 +301,11 @@
                 this.classList.add('active');
             });
         });
+
+        {#document.getElementById('performance-tab').click();#}
     });
+
+
 
     renderDropdown(category='General', type='Exchange', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Price', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
@@ -314,6 +319,7 @@
 
     renderDropdown(category='Performance', type='Signal', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
 
+    renderSlider('Performance', '%25%20Change', -100, 100, 1, [-100, 100]);
 
 </script>
 {% endblock extra_js %}

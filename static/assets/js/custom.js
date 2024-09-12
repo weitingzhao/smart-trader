@@ -540,6 +540,62 @@ function formatToDate(dateString) {
 }
 
 ////////////////////////////////Dropdown Exchange/////////////////////////
+async function selectDropdown(dropdown, value, allow_multiple) {
+    const items = dropdown.querySelectorAll('li');
+    items.forEach(item => {
+        const a = item.querySelector('a');
+        const checkMark = item.querySelector('span');
+        const checkbox = item.querySelector('input[type="checkbox"]');
+
+        // Clear previous highlights and checkmarks
+        item.style.backgroundColor = '';
+        if (checkMark) {
+            checkMark.remove();
+        }
+
+        // console.log('textContent=>'+a.textContent.trim()+" value=>"+ value);
+        if (a.textContent.trim() === value) {
+            item.style.backgroundColor = '#f0f0f0'; // Highlight color
+            if (allow_multiple) {
+                checkbox.checked = true;
+            }else {
+                const newCheckMark = document.createElement('span');
+                newCheckMark.textContent = ' ✓';
+                newCheckMark.classList.add('ms-auto'); // Align right
+                a.appendChild(newCheckMark);
+            }
+        }
+    });
+
+    // Store the selected value in the dropdown element
+    if (allow_multiple) {
+        const selectedValues = Array.from(items)
+            .filter(item => item.querySelector('input[type="checkbox"]').checked)
+            .map(item => item.querySelector('a').textContent.trim());
+        dropdown.selectedValue = selectedValues.join(', ');
+    } else {
+        dropdown.selectedValue = value;
+    }
+
+    const dropdownName = dropdown.querySelector('.dropdown-name');
+    const selectedOptionDisplay = dropdown.querySelector('.selected-option-display');
+    selectedOptionDisplay.textContent = dropdown.selectedValue;
+
+
+    if (dropdown.selectedValue === '' || dropdown.selectedValue == null) {
+        selectedOptionDisplay.style.display = 'none';
+        dropdownName.classList.remove("text-lg");
+        dropdownName.classList.remove("text-xxs");
+        dropdownName.classList.add("text-lg");
+    } else {
+        selectedOptionDisplay.style.display = 'block';
+        dropdownName.classList.remove("text-lg");
+        dropdownName.classList.remove("text-xxs");
+        dropdownName.classList.add("text-xxs");
+    }
+    // console.log("=============>"+dropdown.selectedValue)
+}
+
 async function renderDropdown(
     category, type,
     allow_multiple= false,
@@ -562,17 +618,19 @@ async function renderDropdown(
     // Create the anchor element
     const anchor = document.createElement('a');
     anchor.href = 'javascript:;';
-    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100';
+    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100 p-1';
     anchor.style.height = '50px';
     anchor.setAttribute('data-bs-toggle', 'dropdown');
     anchor.id = anchor_id;
 
     // Create the dropdown name  & selected option display element
     const dropdownName = document.createElement('div');
-    dropdownName.className = 'dropdown-name text-lg';
+    dropdownName.className = 'dropdown-name text-lg text-truncate';
+    dropdownName.style.padding = '0px 0px 0px 5px';
     dropdownName.textContent = decodedType;
     const selectedOptionDisplay = document.createElement('div');
-    selectedOptionDisplay.className = 'selected-option-display';
+    selectedOptionDisplay.className = 'selected-option-display text-truncate';
+    selectedOptionDisplay.style.padding = '5px 0px 0px 5px';
 
     // Append dropdownName and selectedOptionDisplay to the anchor
     anchor.appendChild(dropdownName);
@@ -668,59 +726,99 @@ async function renderDropdown(
     }
 }
 
-async function selectDropdown(dropdown, value, allow_multiple) {
-    const items = dropdown.querySelectorAll('li');
-    items.forEach(item => {
-        const a = item.querySelector('a');
-        const checkMark = item.querySelector('span');
-        const checkbox = item.querySelector('input[type="checkbox"]');
+////////////////////////////////Sliders/////////////////////////
+async function renderSlider(
+    category, type,
+    min = 0,
+    max = 100,
+    step = 1,
+    start = [min, max]
+) {
+    const slider = document.getElementById(`slider_${category}_${type}`);
+    if (!slider) {
+        console.error(`Slider element with id "slider_${category}_${type}" not found.`);
+        return;
+    }
 
-        // Clear previous highlights and checkmarks
-        item.style.backgroundColor = '';
-        if (checkMark) {
-            checkMark.remove();
-        }
+    // Clear existing content
+    slider.innerHTML = "";
 
-        // console.log('textContent=>'+a.textContent.trim()+" value=>"+ value);
-        if (a.textContent.trim() === value) {
-            item.style.backgroundColor = '#f0f0f0'; // Highlight color
-            if (allow_multiple) {
-                checkbox.checked = true;
-            }else {
-                const newCheckMark = document.createElement('span');
-                newCheckMark.textContent = ' ✓';
-                newCheckMark.classList.add('ms-auto'); // Align right
-                a.appendChild(newCheckMark);
+    // Decode the type to replace %20 with space
+    const decodedType = decodeURIComponent(type);
+    const anchor_id = `navbar_${category}_${type}`;
+
+    // Create the anchor element
+    const anchor = document.createElement('div');
+    anchor.className = 'btn bg-gradient-light w-100 mb-0 p-1';
+    anchor.style.height = '50px';
+    anchor.id = anchor_id;
+
+    // Create the slider element
+    const sliderName = document.createElement('div');
+    sliderName.className = 'text-xxs text-start fw-normal text-truncate';
+    sliderName.textContent = decodedType;
+    sliderName.style.padding = '0px 0px 0px 5px';
+    sliderName.style.textTransform = 'none';
+    const sliderResult = document.createElement('div');
+    sliderResult.className = 'text-xxs text-start fw-bold text-truncate'; // Align left and bold
+    sliderResult.style.textTransform = 'none';
+    sliderResult.style.padding = '0px 0px 5px 5px';
+    const sliderDisplay = document.createElement('div');
+    sliderDisplay.style.padding = '0px 10px 0px 5px';
+
+    // Append the slider to the container
+    anchor.appendChild(sliderName);
+    anchor.appendChild(sliderResult);
+    anchor.appendChild(sliderDisplay);
+    slider.appendChild(anchor);
+
+    // Initialize the NoUiSlider
+    noUiSlider.create(sliderDisplay, {
+        start: start,
+        connect: true,
+        range: {
+            'min': min,
+            'max': max
+        },
+        step: step,
+        tooltips: [false, false], // Disable tooltips by default
+        format: {
+            to: function (value) {
+                return Math.round(value);
+            },
+            from: function (value) {
+                return Number(value);
             }
         }
     });
 
-    // Store the selected value in the dropdown element
-    if (allow_multiple) {
-        const selectedValues = Array.from(items)
-            .filter(item => item.querySelector('input[type="checkbox"]').checked)
-            .map(item => item.querySelector('a').textContent.trim());
-        dropdown.selectedValue = selectedValues.join(', ');
-    } else {
-        dropdown.selectedValue = value;
-    }
+    // Show tooltips when dragging
+    sliderDisplay.noUiSlider.on('start', function () {
+        sliderDisplay.noUiSlider.updateOptions({
+            tooltips: [true, true]
+        });
+    });
 
-    const dropdownName = dropdown.querySelector('.dropdown-name');
-    const selectedOptionDisplay = dropdown.querySelector('.selected-option-display');
-    selectedOptionDisplay.textContent = dropdown.selectedValue;
-    selectedOptionDisplay.classList.add('text-truncate'); // Add class for text truncation
+    // Hide tooltips when dragging stops
+    sliderDisplay.noUiSlider.on('end', function () {
+        sliderDisplay.noUiSlider.updateOptions({
+            tooltips: [false, false]
+        });
+    });
 
-
-    if (dropdown.selectedValue === '' || dropdown.selectedValue == null) {
-        selectedOptionDisplay.style.display = 'none';
-        dropdownName.classList.remove("text-lg");
-        dropdownName.classList.remove("text-xxs");
-        dropdownName.classList.add("text-lg");
-    } else {
-        selectedOptionDisplay.style.display = 'block';
-        dropdownName.classList.remove("text-lg");
-        dropdownName.classList.remove("text-xxs");
-        dropdownName.classList.add("text-xxs");
-    }
-    // console.log("=============>"+dropdown.selectedValue)
+    // Add event listener to update the selected value
+    sliderDisplay.noUiSlider.on('update', function (values, handle) {
+        if (min < values[0] && max > values[1]){
+            sliderResult.textContent = `Between ${values[0]}% and ${values[0]}%`;
+        }else if (min < values[0]) {
+            sliderResult.textContent = `At least ${values[0]}%`;
+        }else if (max > values[1]) {
+            sliderResult.textContent = `At most ${values[1]}%`;
+        }else{
+            sliderResult.textContent = 'All';
+        }
+    });
 }
+
+
+
