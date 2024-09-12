@@ -618,7 +618,7 @@ async function renderDropdown(
     // Create the anchor element
     const anchor = document.createElement('a');
     anchor.href = 'javascript:;';
-    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100 p-1';
+    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100 mb-3 p-1';
     anchor.style.height = '50px';
     anchor.setAttribute('data-bs-toggle', 'dropdown');
     anchor.id = anchor_id;

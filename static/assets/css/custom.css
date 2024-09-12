@@ -60,3 +60,10 @@
     text-overflow: ellipsis;
     max-width: 100%; /* Adjust as needed */
 }
+
+/* Custom CSS for noUiSlider tooltips */
+.noUi-tooltip {
+    font-size: 10px; /* Adjust the font size */
+    padding: 2px 5px; /* Adjust the padding */
+    border-radius: 3px; /* Adjust the border radius */
+}

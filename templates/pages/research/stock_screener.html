@@ -113,7 +113,7 @@
                     </div>
                 </div>
                 <!-- Performance panel content -->
-                <div class="card-body p-3 d-none" id="performance-panel">
+                <div class="card-body p-3" id="performance-panel">
                     <div class="row mb-0">
                         <div class="col-lg-2 col-md-4">
                             <div class="dropdown" id="dropdown_Performance_Signal"></div>
@@ -122,13 +122,80 @@
                             <div id="slider_Performance_%25%20Change"></div>
                         </div>
                         <div class="col-lg-2 col-md-4">
-
+                            <div id="slider_Performance_%25%20Change%20From%20Open"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_1%20Week%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_2%20Week%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_1%20Month%20Performance"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_3%20Month%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_6%20Month%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_12%20Month%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_2%20Year%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_5%20Year%20Performance"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_10%20Year%20Performance"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_Smart%20Relative%20Strength"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_Performance_Historical%20Relative%20Strength"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_Historical%20Relative%20Strength"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_Performance_Mansfield%20Direction"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div id="slider_Performance_Beta"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_Performance_Price%20VS%20SMA"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
                         </div>
                         <div class="col-lg-2 col-md-4">
                         </div>
                         <div class="col-lg-2 col-md-4">
                         </div>
                         <div class="col-lg-2 col-md-4">
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-6 col-md-4">
                         </div>
                     </div>
                 </div>
@@ -302,11 +369,11 @@
             });
         });
 
-        {#document.getElementById('performance-tab').click();#}
+        document.getElementById('performance-tab').click();
     });
 
 
-
+    {# General#}
     renderDropdown(category='General', type='Exchange', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Price', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
     renderDropdown(category='General', type='Average%20Volume', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
@@ -317,9 +384,29 @@
     renderDropdown(category='General', type='Index', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='GICS%20Sector', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
 
+    {#Performance#}
     renderDropdown(category='Performance', type='Signal', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
-
     renderSlider('Performance', '%25%20Change', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '%25%20Change%20From%20Open', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '1%20Week%20Performance', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '2%20Week%20Performance', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '1%20Month%20Performance', -100, 100, 1, [-100, 100]);
+
+    renderSlider('Performance', '3%20Month%20Performance', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '6%20Month%20Performance', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '12%20Month%20Performance', -100, 100, 1, [-100, 100]);
+    renderSlider('Performance', '2%20Year%20Performance', -100, 200, 1, [-100, 200]);
+    renderSlider('Performance', '5%20Year%20Performance', -100, 300, 1, [-100, 300]);
+    renderSlider('Performance', '10%20Year%20Performance', -100, 400, 1, [-100, 400]);
+
+    renderSlider('Performance', 'Smart%20Relative%20Strength', 0, 100, 1, [0, 100]);
+    renderDropdown(category='Performance', type='Historical%20Relative%20Strength', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+    renderSlider('Performance', 'Historical%20Relative%20Strength', -10, 10, 1, [-10, 10]);
+    renderDropdown(category='Performance', type='Mansfield%20Direction', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+    renderSlider('Performance', 'Beta', -4, 4, 1, [-4, 4]);
+    renderDropdown(category='Performance', type='Price%20VS%20SMA', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+
+
 
 </script>
 {% endblock extra_js %}
