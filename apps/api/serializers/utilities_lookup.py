@@ -35,3 +35,4 @@ class UtilitiesLookupTypeSerializer(serializers.Serializer):
 class UtilitiesLookupSerializer(serializers.Serializer):
     key = serializers.CharField()
     value = serializers.CharField()
+    order = serializers.IntegerField()

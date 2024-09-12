@@ -3,23 +3,19 @@
 
 {% block content %}
     <div class="container-fluid mt-4">
-        <div class="row align-items-center">
-            <div class="col-lg-2 col-sm-4">
-                <div class="nav-wrapper position-relative end-0">
-                    <ul class="nav nav-pills nav-fill p-1" role="tablist">
-                        <li class="nav-item">
-                            <a id="data-tab" class="nav-link mb-0 px-0 py-1 text-sm active" data-bs-toggle="tab" href="{% url 'settings' %}" role="tab" aria-selected="true">
-                                Main Chart
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="other-tab" class="nav-link mb-0 px-0 py-1 text-sm" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
-                                Secondary Chart
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <div class="col-lg-2 col-sm-4 nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1" role="tablist">
+                <li class="nav-item">
+                    <a id="data-tab" class="nav-link mb-0 px-0 py-1 text-xs active" data-bs-toggle="tab" href="{% url 'settings' %}" role="tab" aria-selected="true">
+                        Main Chart
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a id="other-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                        Secondary Chart
+                    </a>
+                </li>
+            </ul>
         </div>
         <div class="row mt-4">
             <div class="col-lg-7">
@@ -228,26 +224,25 @@
 
 {% endblock content %}
 {% block extra_js %}
-  <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
-<script>
-    if (document.getElementById('stock-charts-option')) {
-        var stock_charts_option = document.getElementById('stock-charts-option');
-        const example = new Choices(stock_charts_option, {
-            delimiter: ',',
-            editItems: true,
-            maxItemCount: 50,
-            removeItemButton: true,
-            addItems: true,
-            
-            allowHTML: true,
-        });
-    }
+    <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
+    <script>
+        if (document.getElementById('stock-charts-option')) {
+            var stock_charts_option = document.getElementById('stock-charts-option');
+            const example = new Choices(stock_charts_option, {
+                delimiter: ',',
+                editItems: true,
+                maxItemCount: 50,
+                removeItemButton: true,
+                addItems: true,
 
-renderDropdown(category='Main%20Chart', type='Timeframe', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Daily');
-renderDropdown(category='Main%20Chart', type='Type', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Bars');
-renderDropdown(category='Main%20Chart', type='Period', allow_multiple=false, need_all=false, need_none=false, value='', default_value='4 Months');
-renderDropdown(category='Main%20Chart', type='Lines', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Full');
+                allowHTML: true,
+            });
+        }
+
+        renderDropdown(category='Main%20Chart', type='Timeframe', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Daily');
+        renderDropdown(category='Main%20Chart', type='Type', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Bars');
+        renderDropdown(category='Main%20Chart', type='Period', allow_multiple=false, need_all=false, need_none=false, value='', default_value='4 Months');
+        renderDropdown(category='Main%20Chart', type='Lines', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Full');
 
 </script>
-
 {% endblock extra_js %}

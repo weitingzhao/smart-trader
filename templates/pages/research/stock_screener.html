@@ -2,10 +2,204 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
+<div class="container-fluid mt-4">
+    <div class="row align-items-center">
+        <div class="col-lg-8 col-sm-4 nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1" role="tablist">
+            <li class="nav-item">
+                <a id="general-tab" class="nav-link mb-0 px-0 py-1 text-xs active" data-bs-toggle="tab" href="#" role="tab" aria-selected="true">
+                    General
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="performance-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="#" role="tab" aria-selected="false">
+                    Performance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="ta-indicators-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="#" role="tab" aria-selected="false">
+                    TA Indicators
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="support-resistance-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="#" role="tab" aria-selected="false">
+                    Support/Resistance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="dividend-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Dividend
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="valuation-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Valuation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="growth-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Growth
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="profitability-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Profitability
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="health-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Health
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="analysts-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Analysts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="other-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Other
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="custom-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Custom
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="chart-settings-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="" role="tab" aria-selected="false">
+                    Chart Settings
+                </a>
+            </li>
+        </ul>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-10">
+            <div class="card h-100">
+                <!-- General panel content -->
+                <div class="card-body p-3" id="general-panel">
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Exchange"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Price"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Average%20Volume"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Market%20Cap"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Outstanding%20Shares%20and%20Float"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Type"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_Index"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_General_GICS%20Sector"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Performance panel content -->
+                <div class="card-body p-3 d-none" id="performance-panel">
+                    <div class="row mb-0">
+                        <div class="col-lg-2 col-md-4">
+                            <div class="dropdown" id="dropdown_Performance_Signal"></div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                        </div>
+                    </div>
+                </div>
+                <!-- TA Indicators panel content -->
+                <div class="card-body p-3 d-none" id="ta-indicators-panel">
+                    Ta Indicators
+                </div>
+                <!-- Support/Resistance panel content -->
+                <div class="card-body p-3 d-none" id="support-resistance-panel">
+                    Support/Resistance
+                </div>
+                <!--  Dividend panel content -->
+                <div class="card-body p-3 d-none" id="dividend-panel">
+                    Dividend
+                </div>
+                <!--  Valuation panel content -->
+                <div class="card-body p-3 d-none" id="valuation-panel">
+                    Valuation
+                </div>
+                <!--  Growth panel content -->
+                <div class="card-body p-3 d-none" id="growth-panel">
+                    Growth
+                </div>
+                <!--  Profitability panel content -->
+                <div class="card-body p-3 d-none" id="profitability-panel">
+                    Profitability
+                </div>
+                <!-- Health panel content -->
+                <div class="card-body p-3 d-none" id="health-panel">
+                    Health
+                </div>
+                <!-- Analysts panel content -->
+                <div class="card-body p-3 d-none" id="analysts-panel">
+                    Analysts
+                </div>
+                <!-- Other panel content -->
+                <div class="card-body p-3 d-none" id="other-panel">
+                    Other
+                </div>
+                <!-- Custom panel content -->
+                <div class="card-body p-3 d-none" id="custom-panel">
+                    Custom
+                </div>
+                <!-- Chart Settings panel content -->
+                <div class="card-body p-3 d-none" id="chart-settings-panel">
+                    Chart Settings
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-2 mt-lg-0 mt-4">
+            <div class="card">
+                <div class="card-body p-3">
+                      <select class="form-control" data-trigger name="stock-charts-option" id="stock-charts-option" placeholder="option" multiple>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                        <option value="3">Option 3</option>
+                        <option value="4">Option 4</option>
+                        <option value="5">Option 5</option>
+                        <option value="6">Option 6</option>
+                        <option value="7">Option 7</option>
+                        <option value="8">Option 8</option>
+                        <option value="9">Option 9</option>
+                        <option value="10">Option 10</option>
+                      </select>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
         <div class="card-header pb-0">
           <h6>Market Stock Historical Bars</h6>
           <form method="get" action="">
@@ -48,7 +242,7 @@
           </div>
         </div>
       </div>
-      <div class="pagination">
+            <div class="pagination">
         <span class="step-links">
             {% if page_obj.has_previous %}
                 <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
@@ -65,12 +259,61 @@
             {% endif %}
         </span>
       </div>
+            {% include "includes/../includes/footer.html" %}
+        </div>
     </div>
-  </div>
-  <div class="row">
-
-    {% include "includes/../includes/footer.html" %}
-    
-  </div>
 </div>
-  {% endblock content %}
+{% endblock content %}
+{% block extra_js %}
+<script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
+<script>
+    if (document.getElementById('stock-charts-option')) {
+        var stock_charts_option = document.getElementById('stock-charts-option');
+        const example = new Choices(stock_charts_option, {
+            delimiter: ',',
+            editItems: true,
+            maxItemCount: 50,
+            removeItemButton: true,
+            addItems: true,
+
+            allowHTML: true,
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.nav-link');
+        const panels = document.querySelectorAll('.card-body');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                const targetPanelId = this.id.replace('-tab', '-panel');
+
+                panels.forEach(panel => {
+                    if (panel.id === targetPanelId) {
+                        panel.classList.remove('d-none');
+                    } else {
+                        panel.classList.add('d-none');
+                    }
+                });
+
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+
+    renderDropdown(category='General', type='Exchange', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+    renderDropdown(category='General', type='Price', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+    renderDropdown(category='General', type='Average%20Volume', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+    renderDropdown(category='General', type='Market%20Cap', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+
+    renderDropdown(category='General', type='Outstanding%20Shares%20and%20Float', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+    renderDropdown(category='General', type='Type', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+    renderDropdown(category='General', type='Index', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
+    renderDropdown(category='General', type='GICS%20Sector', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+
+    renderDropdown(category='Performance', type='Signal', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+
+
+</script>
+{% endblock extra_js %}

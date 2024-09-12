@@ -1,15 +1,14 @@
 from django.db import models
 
 
-class RefundedChoices(models.TextChoices):
-    YES = 'YES', 'Yes'
-    NO = 'NO', 'No'
-
-
-class CurrencyChoices(models.TextChoices):
-    USD = 'USD', 'USD'
-    EUR = 'EUR', 'EUR'
-
+# class RefundedChoices(models.TextChoices):
+#     YES = 'YES', 'Yes'
+#     NO = 'NO', 'No'
+#
+#
+# class CurrencyChoices(models.TextChoices):
+#     USD = 'USD', 'USD'
+#     EUR = 'EUR', 'EUR'
 
 # class Sales(models.Model):
 # 	ID = models.AutoField(primary_key=True)
@@ -26,6 +25,7 @@ class CurrencyChoices(models.TextChoices):
 class UtilitiesLookup(models.Model):
     category = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
+    order = models.IntegerField(null=True, blank=True)
     key = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
 

@@ -1,12 +1,8 @@
 import matplotlib
-
-from logic.services.loading.loader.trading_csv_loader import logger
-
 matplotlib.use('Agg')
 
 import calendar
-from functools import partial
-from matplotlib.dates import MonthLocator, num2date, DayLocator, DateFormatter
+from django.contrib.staticfiles import finders
 from matplotlib.ticker import MaxNLocator, FuncFormatter
 from datetime import datetime, timedelta
 import mplfinance as mpf
@@ -44,7 +40,12 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         # Create an image with the text "No Data Found"
         img = Image.new('RGB', (width, height), color=(255, 255, 255))
         d = ImageDraw.Draw(img)
-        font = ImageFont.load_default()
+
+        # Load a truetype font with a larger size
+        font_path = finders.find('assets/fonts/dejavu-sans-bold.ttf')  # Use finders to locate the font file
+        font_size = 24  # Set the desired font size
+        font = ImageFont.truetype(font_path, font_size)
+
         text = "No Symbol Found"
         text_bbox = d.textbbox((0, 0), text, font=font)
         text_width = text_bbox[2] - text_bbox[0]
@@ -265,6 +266,35 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         def volume_formatter(x, pos):
             return f'{x / 1000:.0f}k'
         ax_volume.yaxis.set_major_formatter(FuncFormatter(volume_formatter))
+
+        max_ticks = int(elements / 2)  # Adjust factor as needed
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=max_ticks))
+        ax.xaxis.grid(True, linestyle='-', color='#888888', linewidth=0.5)
+        ax_volume.xaxis.set_major_locator(MaxNLocator(nbins=max_ticks))
+        ax_volume.xaxis.grid(True, linestyle='-', color='#888888', linewidth=0.5)
+
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=12))  # Adjust nbins to control spacing
+        ax.yaxis.grid(True, linestyle='-', color='#888888', linewidth=0.5)
+        ax_volume.yaxis.set_major_locator(MaxNLocator(nbins=5))  # Adjust nbins to control spacing
+        ax_volume.yaxis.grid(True, linestyle='-', color='#888888', linewidth=0.5)
+
+        def custom_date_formatter(x, pos, date_min):
+            print(f"x={x}, pos={pos}")
+            index = int(x)
+            if(index < 0 or index >= len(date_min)):
+                return ''
+            date = date_min[index]
+            last_day_of_month = calendar.monthrange(date.year, date.month)[1]
+            if date.day == last_day_of_month:
+                return date.strftime('%b')
+            elif date.day == 1:
+                if date.month == 1:
+                    return date.strftime('%Y')
+                else:
+                    return date.strftime('%b')
+            else:
+                return date.strftime('%d')
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: custom_date_formatter(x,pos, date_min=df.index)))
 
         # Step 6. Add symbol and symbol name to the figure
         # symbol_name = MarketSymbol.objects.get(symbol=symbol).name
