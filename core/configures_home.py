@@ -144,7 +144,10 @@ class Config:
                 self.DB_CONN.update(dct["DB_CONN"])
             self.__dict__.update(dct)
 
-        self.ROOT = Path(self.__dict__.get("ROOT", self.FILE_user.parents[1] / "data"))
+        if len(self.FILE_user.parents) > 1:
+            self.ROOT = Path(self.__dict__.get("ROOT", self.FILE_user.parents[1] / "data"))
+        else:
+            self.ROOT = Path(self.__dict__.get("ROOT", self.FILE_user.parents[0] / "data"))
 
         # <editor-fold desc="Declare file & folder">
         # data structure
