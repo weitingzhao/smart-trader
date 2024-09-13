@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 
 class UtilitiesLookupViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = UtilitiesLookupCategorySerializer
 
     def get_queryset(self):

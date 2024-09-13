@@ -618,7 +618,7 @@ async function renderDropdown(
     // Create the anchor element
     const anchor = document.createElement('a');
     anchor.href = 'javascript:;';
-    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100 mb-3 p-1';
+    anchor.className = 'btn bg-gradient-light dropdown-toggle w-100 p-1';
     anchor.style.height = '50px';
     anchor.setAttribute('data-bs-toggle', 'dropdown');
     anchor.id = anchor_id;
@@ -687,18 +687,20 @@ async function renderDropdown(
             flexContainer.style.alignItems = 'center';
 
             const a = document.createElement('a');
-            a.className = 'dropdown-item';
-            a.classList.add('ms-auto'); // Align right
+            a.className = 'dropdown-item ms-auto p-2';
             a.href = 'javascript:;';
             a.textContent = item.value;
 
             if (allow_multiple) {
+                const emptySpan = document.createElement('b');
+                emptySpan.innerHTML = '&nbsp;&nbsp;'; // Add an empty space
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'me-2';
                 checkbox.addEventListener('change', () => {
                     selectDropdown(dropdown, null, allow_multiple);
                 });
+                flexContainer.appendChild(emptySpan);
                 flexContainer.appendChild(checkbox);
             } else {
                 a.addEventListener('click', () => {
@@ -749,7 +751,7 @@ async function renderSlider(
 
     // Create the anchor element
     const anchor = document.createElement('div');
-    anchor.className = 'btn bg-gradient-light w-100 mb-0 p-1';
+    anchor.className = 'btn bg-gradient-light w-100 p-1';
     anchor.style.height = '50px';
     anchor.id = anchor_id;
 
