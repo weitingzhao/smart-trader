@@ -540,7 +540,8 @@ function formatToDate(dateString) {
 }
 
 ////////////////////////////////Dropdown Exchange/////////////////////////
-async function selectDropdown(dropdown, value, allow_multiple) {
+async function selectDropdown(dropdown, key, allow_multiple) {
+    // console.log("key=>"+key);
     const items = dropdown.querySelectorAll('li');
     items.forEach(item => {
         const a = item.querySelector('a');
@@ -554,7 +555,7 @@ async function selectDropdown(dropdown, value, allow_multiple) {
         }
 
         // console.log('textContent=>'+a.textContent.trim()+" value=>"+ value);
-        if (a.textContent.trim() === value) {
+        if (a.key === key) {
             item.style.backgroundColor = '#f0f0f0'; // Highlight color
             if (allow_multiple) {
                 checkbox.checked = true;
@@ -569,12 +570,23 @@ async function selectDropdown(dropdown, value, allow_multiple) {
 
     // Store the selected value in the dropdown element
     if (allow_multiple) {
+        const selectedKeys = Array.from(items)
+            .filter(item => item.querySelector('input[type="checkbox"]').checked)
+            .map(item => item.querySelector('a').key);
         const selectedValues = Array.from(items)
             .filter(item => item.querySelector('input[type="checkbox"]').checked)
             .map(item => item.querySelector('a').textContent.trim());
+
+        dropdown.selectedKey = selectedKeys.join(', ');
         dropdown.selectedValue = selectedValues.join(', ');
+
+        // console.log("==Select key=>["+dropdown.selectedKey+"] Value=>["+selectedValues+"]")
     } else {
-        dropdown.selectedValue = value;
+        const selectedItem = Array.from(items).find(item => item.querySelector('a').key === key);
+        if (selectedItem) {
+            dropdown.selectedKey = key;
+            dropdown.selectedValue = selectedItem.querySelector('a').textContent.trim();
+        }
     }
 
     const dropdownName = dropdown.querySelector('.dropdown-name');
@@ -593,7 +605,7 @@ async function selectDropdown(dropdown, value, allow_multiple) {
         dropdownName.classList.remove("text-xxs");
         dropdownName.classList.add("text-xxs");
     }
-    // console.log("=============>"+dropdown.selectedValue)
+    // console.log("==Dropdown Select key=>["+dropdown.selectedKey+"] Value=>["+dropdown.selectedValue+"]")
 }
 
 async function renderDropdown(
@@ -601,8 +613,9 @@ async function renderDropdown(
     allow_multiple= false,
     need_all= true,
     need_none= true,
-    value=null,
-    default_value = null
+    key=null,
+    default_key = null,
+    data_style = null
 ){
     const dropdown = document.getElementById(`dropdown_${category}_${type}`);
     if (!dropdown) {
@@ -611,6 +624,7 @@ async function renderDropdown(
     }
     // Clear existing content
     dropdown.innerHTML = '';
+    dropdown.data_style = data_style;
     // Decode the type to replace %20 with space
     const decodedType = decodeURIComponent(type);
     const anchor_id = `navbar_dropdown_menu_${category}_${type}`;
@@ -650,7 +664,7 @@ async function renderDropdown(
             allLink.href = 'javascript:;';
             allLink.textContent = 'All';
             allLink.addEventListener('click', () => {
-                selectDropdown(dropdown, "All", allow_multiple);
+                selectDropdown(dropdown, "ALL", allow_multiple);
             });
             allOption.appendChild(allLink);
             ul.appendChild(allOption);
@@ -664,7 +678,7 @@ async function renderDropdown(
             noneLink.href = 'javascript:;';
             noneLink.textContent = 'None';
             noneLink.addEventListener('click', () => {
-                selectDropdown(dropdown, "", allow_multiple);
+                selectDropdown(dropdown, "NONE", allow_multiple);
             });
             noneOption.appendChild(noneLink);
             ul.appendChild(noneOption);
@@ -690,6 +704,7 @@ async function renderDropdown(
             a.className = 'dropdown-item ms-auto p-2';
             a.href = 'javascript:;';
             a.textContent = item.value;
+            a.key = item.key;
 
             if (allow_multiple) {
                 const emptySpan = document.createElement('b');
@@ -697,14 +712,22 @@ async function renderDropdown(
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'me-2';
+
+                a.addEventListener('click', () => {
+                    checkbox.checked = !checkbox.checked;
+                    selectDropdown(dropdown, null, allow_multiple);
+                    dropdown.dispatchEvent(new Event('change'));
+                });
                 checkbox.addEventListener('change', () => {
                     selectDropdown(dropdown, null, allow_multiple);
                 });
+
                 flexContainer.appendChild(emptySpan);
                 flexContainer.appendChild(checkbox);
             } else {
                 a.addEventListener('click', () => {
-                    selectDropdown(dropdown, item.value, allow_multiple);
+                    selectDropdown(dropdown, item.key, allow_multiple);
+                    dropdown.dispatchEvent(new Event('change'));
                 });
             }
 
@@ -722,9 +745,9 @@ async function renderDropdown(
 
     // Initialize dropdown.selectedValue based on allow_multiple
     if(allow_multiple){
-        (value || default_value).split(',').forEach(item => selectDropdown(dropdown, item, allow_multiple));
+        (key || default_key).split(',').forEach(item => selectDropdown(dropdown, item, allow_multiple));
     }else{
-        selectDropdown(dropdown, value || default_value, allow_multiple);
+        selectDropdown(dropdown, key || default_key, allow_multiple);
     }
 }
 
@@ -744,6 +767,7 @@ async function renderSlider(
 
     // Clear existing content
     slider.innerHTML = "";
+    slider.type = type;
 
     // Decode the type to replace %20 with space
     const decodedType = decodeURIComponent(type);
@@ -806,6 +830,7 @@ async function renderSlider(
         sliderDisplay.noUiSlider.updateOptions({
             tooltips: [false, false]
         });
+        slider.dispatchEvent(new Event('change'));
     });
 
     // Add event listener to update the selected value
@@ -819,6 +844,8 @@ async function renderSlider(
         }else{
             sliderResult.textContent = 'All';
         }
+        slider.values = values;
+        slider.valueContent = sliderResult.textContent;
     });
 }
 
