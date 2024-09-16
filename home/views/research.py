@@ -1,15 +1,65 @@
 from datetime import datetime, timedelta
+from pydoc_data.topics import topics
 
 import pandas as pd
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from logic.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
+from django.db.models import F
+import json
 
 # Create your views here.
 instance = Logic()
+
+@csrf_exempt
+def stock_search(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            selected_options = data.get('selectedOptions', [])
+            views = data.get('views', '')
+            sorted_by = data.get('sortedBy', '')
+            desc = data.get('desc', '')
+            chart_per_line = data.get('chartPerLine', '')
+
+            # Initialize the queryset
+            queryset = MarketSymbol.objects.all().annotate(
+                market_cap=F('stock_valuation__market_cap')
+            )
+
+            # Apply filters based on selected_options
+            for option in selected_options:
+                source = option.get('source')
+                key = option.get('key')
+
+                if source and key:
+                    if source == "dropdown_General_Exchange":
+                        queryset = queryset.filter(market__exact=key)
+                    else:
+                        queryset = queryset.filter(**{source: key})
+
+            # # Process the data as needed
+            # result = {
+            #     "selectedOptions": selected_options,
+            #     "views": views,
+            #     "sortedBy": sorted_by,
+            #     "desc": desc,
+            #     "chartPerLine": chart_per_line
+            # }
+
+            # Get the top 10 results
+            top_results = queryset.values('symbol', 'name', 'market', 'market_cap')[:10]
+
+            return JsonResponse(list(top_results), safe=False, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def stock_screener(request):
     query = request.GET.get('q')

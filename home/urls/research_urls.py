@@ -4,8 +4,7 @@ from django.urls import path
 #all below path with /...
 urlpatterns = [
 
-
-
+    path('stock/search/', views.research.stock_search, name='stock_search'),
 
     # Menu: Research
     path('stock/screener/', views.research.stock_screener, name='stock_screener'),
