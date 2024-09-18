@@ -265,8 +265,8 @@
                                 <div class="d-flex justify-content-between">
                                     <ul class="navbar-nav d-lg-block d-none">
                                         <li class="nav-item">
-                                            <a class="font-weight-bolder ms-lg-0 text-white text-left" href="">
-                                                Showing xxx results
+                                            <a id="total-count" class="font-weight-bolder ms-lg-0 text-white text-left" href="">
+                                                Showing 0 results
                                             </a>
                                         </li>
                                     </ul>
@@ -298,6 +298,7 @@
                                                             <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
                                                               <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
                                                                 <span>Overview Table</span>
+                                                                  <i class="fa fa-gear ms-2"></i>
                                                               </a>
                                                               <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
                                                                 <span>TA Table</span>
@@ -1047,7 +1048,6 @@
         const searchOption = document.getElementById('search-option');
 
         function addOptionToSearchOption(source, key, value, unique_as_source=false) {
-            const searchOption = document.getElementById('search-option');
             const options = searchOption.options;
 
             for (let i = 0; i < options.length; i++) {
@@ -1056,8 +1056,6 @@
                         options[i].source = source;
                         options[i].value = key;
                         options[i].text = value;
-
-                        SearchResult(); // Call SearchResult after adding the option
                         return; // Option already exists, do not add it again
                     }
                 }else {
@@ -1072,17 +1070,16 @@
             option.value = key;
             option.text = value;
             searchOption.appendChild(option);
-            SearchResult();
         }
 
         function removeUnselectedOptions(source, selectedKeys) {
             const options = searchOption.options;
-
             for (let i = options.length - 1; i >= 0; i--) {
                 if (options[i].source === source && !selectedKeys.includes(options[i].value)) {
                     searchOption.remove(i);
                 }
             }
+            {#console.log("count=>"+searchOption.options.length)#}
         }
 
         // Handle dropdown changes
@@ -1102,6 +1099,8 @@
                     addOptionToSearchOption(dropdown.id, dropdown.selectedKey, dropdown.selectedValue);
                 }
                 removeUnselectedOptions(dropdown.id, selectedKeys);
+                
+                SearchResult(page=1, searching=true); // Call SearchResult after adding the option
             });
         });
 
@@ -1109,15 +1108,21 @@
         const sliders = document.querySelectorAll('.slider');
         sliders.forEach(slider => {
             slider.addEventListener('change', function() {
-
-                console.log("sliders=" + slider.id + "]type:["+slider.type+"]=> key:[" + slider.values[0] + "] end:"+slider.values[1]+"]");
-
+                {#console.log("sliders=" + slider.id + "]type:["+slider.type+"]=> key:[" + slider.values[0] + "] end:"+slider.values[1]+"]");#}
                 addOptionToSearchOption(slider, slider.values[0]+"-"+slider.values[1], slider.valueContent, unique_as_source=true);
+                
+                SearchResult(page=1, searching=true); // Call SearchResult after adding the option
             });
         });
     });
 
-    async function SearchResult() {
+    let currentPage = 1;
+    let isSearching = false;
+
+    async function SearchResult(page = 1, searching = true) {
+        isSearching = searching
+        if(!isSearching) return;
+
         const searchOption = document.getElementById('search-option');
         const options = Array.from(searchOption.options);
         const selectedOptions = options.map(option => ({
@@ -1136,7 +1141,8 @@
             views,
             sortedBy,
             desc,
-            chartPerLine
+            chartPerLine,
+            page
         };
 
         try {
@@ -1151,30 +1157,96 @@
 
             if (response.ok) {
                 const result = await response.json();  // Await the json parsing
-                console.log(result)
-                renderSearchResult(result);
-                console.log('response=>', result);
+                {#console.log('response=>', result);#}
+                renderSearchResult(result, page);
+                currentPage++;
+                {#console.log('response=>', result);#}
             } else {
-                console.error('Network response was not ok:', response.status, response.statusText);
+                console.error('Failed to fetch data, Network response was not ok:', response.status, response.statusText);
             }
         } catch (error) {
             console.error('Failed to fetch search results:', error);
         }
     }
 
-    function renderSearchResult(data) {
+    function renderSearchResult(data, page) {
         const searchResult = document.getElementById('search-result');
-        searchResult.innerHTML = ''; // Clear existing results
+        if (page === 1) {
+            searchResult.innerHTML = ''; // Clear existing results only for the first page
+        }
 
-        data.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.textContent = item.name; // Adjust based on your data structure
-            searchResult.appendChild(div);
+        const table = searchResult.querySelector('table');
+        const tbody = table ? table.querySelector('tbody') : document.createElement('tbody');
+
+        data.results.forEach(item => {
+            const tr = document.createElement('tr');
+
+            const tdSymbol = document.createElement('td');
+            tdSymbol.innerHTML = `
+            <div class="d-flex px-2 py-1">
+                <div class="d-flex flex-column justify-content-center">
+                    <h6 class="mb-0 text-xs">${item.symbol}</h6>
+                </div>
+            </div>
+        `;
+            tr.appendChild(tdSymbol);
+
+            const tdName = document.createElement('td');
+            tdName.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.name}</p>`;
+            tr.appendChild(tdName);
+
+            const tdMarket = document.createElement('td');
+            tdMarket.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.market}</p>`;
+            tr.appendChild(tdMarket);
+
+            const tdMarketCap = document.createElement('td');
+            tdMarketCap.className = 'align-middle text-center text-sm';
+            tdMarketCap.innerHTML = `<span class="text-secondary text-xs font-weight-bold">${item.market_cap}</span>`;
+            tr.appendChild(tdMarketCap);
+
+            tbody.appendChild(tr);
         });
+
+        if (!table) {
+            const newTable = document.createElement('table');
+            newTable.className = 'table align-items-center mb-0';
+
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+            <tr>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7">Symbol</th>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Name</th>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Market</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Market Cap</th>
+            </tr>
+        `;
+            newTable.appendChild(thead);
+            newTable.appendChild(tbody);
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            const tableResponsive = document.createElement('div');
+            tableResponsive.className = 'table-responsive';
+            tableResponsive.appendChild(newTable);
+            card.appendChild(tableResponsive);
+
+            searchResult.appendChild(card);
+        }
+
+        // Display the total count of results
+        const totalCountElement = document.getElementById('total-count');
+        if (totalCountElement) {
+            totalCountElement.innerHTML = `Showing <b>${data.total_count}</b> results`;
+        }
     }
 
-
+    window.addEventListener('scroll', debounce(function() {
+        if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 500) {
+            {#console.log('window.scrollY:'+window.scrollY+' => window.innerHeight: '+window.innerHeight+#}
+            {#    ' scrollHeight:'+document.body.scrollHeight+' offsetHeight:'+document.body.offsetHeight);#}
+            SearchResult(page=currentPage, searching=isSearching);
+        }
+    },200));
 
 
     // General

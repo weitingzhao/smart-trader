@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 
 router.register(r'market_symbols', MarketSymbolViewSet, basename='market_symbols')
 router.register(r'lookup', UtilitiesLookupViewSet, basename='lookup')
+router.register(r'filter', UtilitiesFilterViewSet, basename='filter')
 router.register(r'chart', ChartExchangeViewSet, basename='chart')
 
 urlpatterns = [
@@ -28,6 +29,11 @@ urlpatterns = [
 		 UtilitiesLookupViewSet.as_view({'get': 'category'}), name='lookup-category'),
 	path('lookup/<str:category>/<str:type>',
 		 UtilitiesLookupViewSet.as_view({'get': 'type'}), name='lookup-type'),
+
+	# utilities filter
+	path('filter/<str:name>',
+		 UtilitiesFilterViewSet.as_view({'get': 'get_name'}), name='filter-name'),
+
 
 	# Chart
 	path('chart-market/<str:market>',

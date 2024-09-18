@@ -25,11 +25,15 @@ def stock_search(request):
             sorted_by = data.get('sortedBy', '')
             desc = data.get('desc', '')
             chart_per_line = data.get('chartPerLine', '')
+            page = data.get('page', 1)  # Get the page number from the request, default to 1
 
             # Initialize the queryset
             queryset = MarketSymbol.objects.all().annotate(
                 market_cap=F('stock_valuation__market_cap')
             )
+
+            print("page"+str(page))
+
 
             # Apply filters based on selected_options
             for option in selected_options:
@@ -51,10 +55,23 @@ def stock_search(request):
             #     "chartPerLine": chart_per_line
             # }
 
-            # Get the top 10 results
-            top_results = queryset.values('symbol', 'name', 'market', 'market_cap')[:10]
+            # Get the total count of the filtered queryset
+            total_count = queryset.count()
 
-            return JsonResponse(list(top_results), safe=False, status=200)
+            # Convert queryset to a list of dictionaries
+            queryset_values = queryset.values('symbol', 'name', 'market', 'market_cap')
+
+            # Paginate the results
+            paginator = Paginator(queryset_values, 20)  # Show 10 items per page
+            page_obj = paginator.get_page(page)
+
+            # Get the results for the current page
+            top_results = list(page_obj)
+
+            return JsonResponse({
+                'results': top_results,
+                'total_count': total_count
+            }, safe=False, status=200)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:

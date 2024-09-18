@@ -39,7 +39,17 @@ class UtilitiesLookup(models.Model):
             models.UniqueConstraint(fields=['category', 'type', 'key'], name='utilities_lookup_category_type_key_pk'),
         ]
 
-
     def __str__(self):
         return f"{self.category} - {self.type} - {self.key} - {self.value}"
 
+class UtilitiesFilter(models.Model):
+    name = models.CharField(max_length=255)
+    order = models.IntegerField(null=True, blank=True)
+    key = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'utilities_filter'
+
+    def __str__(self):
+        return f"{self.name} - {self.key} - {self.value}"

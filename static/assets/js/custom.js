@@ -849,5 +849,26 @@ async function renderSlider(
     });
 }
 
+////////////////////////////////Filters/////////////////////////
+function drawFilter() {
+    fetch('/api/utilities-filter?names=Tables,Columns,Charts')
+        .then(response => response.json())
+        .then(data => {
+            const viewsDropdown = document.getElementById('views-dropdown');
+            viewsDropdown.innerHTML = ''; // Clear existing dropdown content
 
+            const ul = document.createElement('ul');
+            ul.className = 'dropdown-menu';
+
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'dropdown-item';
+                li.textContent = item.value;
+                ul.appendChild(li);
+            });
+
+            viewsDropdown.appendChild(ul);
+        })
+        .catch(error => console.error('Error fetching filter data:', error));
+}
 
