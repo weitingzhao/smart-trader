@@ -31,9 +31,8 @@ urlpatterns = [
 		 UtilitiesLookupViewSet.as_view({'get': 'type'}), name='lookup-type'),
 
 	# utilities filter
-	path('filter/<str:name>',
-		 UtilitiesFilterViewSet.as_view({'get': 'get_name'}), name='filter-name'),
-
+	path('filter/<str:names>',
+		 UtilitiesFilterViewSet.as_view({'get': 'get_filter_by_names'}), name='filter-name'),
 
 	# Chart
 	path('chart-market/<str:market>',

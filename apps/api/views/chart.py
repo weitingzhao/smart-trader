@@ -36,7 +36,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         return MarketSymbol.objects.all()
 
 
-    def No_Symbol_Found(self, width, height)-> HttpResponse:
+    def No_Symbol_Found(self, symbol, width, height)-> HttpResponse:
         # Create an image with the text "No Data Found"
         img = Image.new('RGB', (width, height), color=(255, 255, 255))
         d = ImageDraw.Draw(img)
@@ -46,7 +46,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         font_size = 24  # Set the desired font size
         font = ImageFont.truetype(font_path, font_size)
 
-        text = "No Symbol Found"
+        text = f"symbol [{symbol}] Not Found"
         text_bbox = d.textbbox((0, 0), text, font=font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
@@ -135,7 +135,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         # Step 1. Fetching Data.
         data = self.fetch_data(symbol, timeframe, elements)
         if len(data) == 0:
-            return self.No_Symbol_Found(width, height)
+            return self.No_Symbol_Found(symbol, width, height)
 
         # Step 2. Prepare dataframe
         df = pd.DataFrame(data)
@@ -144,7 +144,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
 
         # Check if DataFrame is empty after fetching data
         if df.empty:
-            return self.No_Symbol_Found(width, height)
+            return self.No_Symbol_Found(symbol, width, height)
 
         # Step 3. Map chart types
         chart_type_mapping = {

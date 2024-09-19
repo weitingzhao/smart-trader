@@ -18,6 +18,7 @@ class UtilitiesFilterCategorySerializer(serializers.Serializer):
 
 
 class UtilitiesFilterSerializer(serializers.Serializer):
+    name = serializers.CharField()
     key = serializers.CharField()
     value = serializers.CharField()
     order = serializers.IntegerField()

@@ -279,528 +279,11 @@
                             <div class="col-lg-12 collapse navbar-collapse pt-1 pb-1 py-lg-0 d-flex flex-row">
                                 <div class="d-flex justify-content-between">
                                     <!-- Views dropdown -->
-                                    <ul class="navbar-nav navbar-nav-hover mx-auto">
-                                        <li class="nav-item dropdown dropdown-hover mx-2">
-                                            <a role="button" class="nav-link p-0 d-flex justify-content-between cursor-pointer align-items-center" id="views_filter" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <b>Views</b>
-                                                <img src="{% static 'assets/img/down-arrow-white.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-block d-none">
-                                                <img src="{% static 'assets/img/down-arrow-dark.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-none d-block">
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-animation dropdown-sm border-radius-xl p-3 mt-0 mt-lg-0" aria-labelledby="views_filter">
-                                                <div class="row d-none d-lg-flex">
-                                                    <div class="col-12 ps-0 d-flex justify-content-center flex-column">
-                                                        <ul class="list-group">
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
-                                                              <span>Tables</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Overview Table</span>
-                                                                  <i class="fa fa-gear ms-2"></i>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Table</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Table</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignUp">
-                                                              <span>Columns</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignUp">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Technical</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Fundamental</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA - Quality</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownPasswordReset">
-                                                              <span>Charts</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownPasswordReset">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Charts</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>2 Charts</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownLock">
-                                                              <span>Summary</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownLock">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Analyst Ratings</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdown2fa">
-                                                              <span>Custom</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdown2fa">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom Table View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 3 Column View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 2 Column View</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="row d-lg-none">
-                                                  <div class="col-12 d-flex justify-content-center flex-column">
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-0">
-                                                      Sign In
-                                                    </h6>
-                                                    <a href="{% url 'basic_login' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_login' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_login' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Sign Up
-                                                    </h6>
-                                                    <a href="{% url 'basic_register' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_register' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_register' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Reset Password
-                                                    </h6>
-                                                    <a href="{% url 'basic_reset' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_reset' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_reset' %}" class="dropdown-item border-radius-md">
-                                                      Illustation
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Lock
-                                                    </h6>
-                                                    <a href="{% url 'basic_lock' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_lock' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_lock' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      2-Step Verification
-                                                    </h6>
-                                                    <a href="{% url 'basic_verification' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_verification' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_verification' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Error
-                                                    </h6>
-                                                    <a href="{% url 'error_404' %}" class="dropdown-item border-radius-md">
-                                                      404
-                                                    </a>
-                                                    <a href="{% url 'error_500' %}" class="dropdown-item border-radius-md">
-                                                      500
-                                                    </a>
-                                          </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    <ul id="filter_group_views"></ul>
                                     <!-- Sort by dropdown -->
-                                    <ul class="navbar-nav navbar-nav-hover mx-auto">
-                                        <li class="nav-item dropdown dropdown-hover mx-2">
-                                            <a role="button" class="nav-link p-0 d-flex justify-content-between cursor-pointer align-items-center" id="sorted_by_filter" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <b>Sorted by:</b>
-                                                <img src="{% static 'assets/img/down-arrow-white.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-block d-none">
-                                                <img src="{% static 'assets/img/down-arrow-dark.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-none d-block">
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-animation dropdown-sm border-radius-xl p-3 mt-0 mt-lg-0" aria-labelledby="sorted_by_filter">
-                                                <div class="row d-none d-lg-flex">
-                                                    <div class="col-12 ps-0 d-flex justify-content-center flex-column">
-                                                        <ul class="list-group">
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
-                                                              <span>General</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Symbol</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Name</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>GiCS Sector</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
-                                                              <span>Volume</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Volume</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Volume (Pre-market)</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Volume(After-hours)</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownPasswordReset">
-                                                              <span>ChartMill Ratings</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownPasswordReset">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>ChartMill Setup Rating</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>ChartMill Technical Rating</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownLock">
-                                                              <span>Performance</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownLock">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>% Change (Pre-market)</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>% Change (After-hours)</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Change (Pre-market)</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Change (After-Hours)</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                              <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdown2fa">
-                                                                <span>Volatility</span>
-                                                                  <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                              </a>
-                                                              <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdown2fa">
-                                                                  <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                      <span>Average True Range(14)</span>
-                                                                  </a>
-                                                                  <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                      <span>Average True Range(20) as percentage</span>
-                                                                  </a>
-                                                                  <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                      <span>Average True Range Increase</span>
-                                                                  </a>
-                                                            </div>
-                                                          </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="row d-lg-none">
-                                                  <div class="col-12 d-flex justify-content-center flex-column">
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-0">
-                                                      Sign In
-                                                    </h6>
-                                                    <a href="{% url 'basic_login' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_login' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_login' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Sign Up
-                                                    </h6>
-                                                    <a href="{% url 'basic_register' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_register' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_register' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Reset Password
-                                                    </h6>
-                                                    <a href="{% url 'basic_reset' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_reset' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_reset' %}" class="dropdown-item border-radius-md">
-                                                      Illustation
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Lock
-                                                    </h6>
-                                                    <a href="{% url 'basic_lock' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_lock' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_lock' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      2-Step Verification
-                                                    </h6>
-                                                    <a href="{% url 'basic_verification' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_verification' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_verification' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Error
-                                                    </h6>
-                                                    <a href="{% url 'error_404' %}" class="dropdown-item border-radius-md">
-                                                      404
-                                                    </a>
-                                                    <a href="{% url 'error_500' %}" class="dropdown-item border-radius-md">
-                                                      500
-                                                    </a>
-                                          </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    <ul id="filter_group_secondary_views"></ul>
                                     <!-- Order by dropdown -->
-                                    <ul class="navbar-nav navbar-nav-hover mx-auto">
-                                        <li class="nav-item dropdown dropdown-hover mx-2">
-                                            <a role="button" class="nav-link p-0 d-flex justify-content-between cursor-pointer align-items-center" id="desc_filter" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <b>DESC:</b>
-                                                <img src="{% static 'assets/img/down-arrow-white.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-block d-none">
-                                                <img src="{% static 'assets/img/down-arrow-dark.svg' %}" alt="down-arrow" class="arrow ms-1 d-lg-none d-block">
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-animation dropdown-sm border-radius-xl p-3 mt-0 mt-lg-0" aria-labelledby="desc_filter">
-                                                <div class="row d-none d-lg-flex">
-                                                    <div class="col-12 ps-0 d-flex justify-content-center flex-column">
-                                                        <ul class="list-group">
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
-                                                              <span>Tables</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Overview Table</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Table</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Table</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignUp">
-                                                              <span>Columns</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignUp">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Technical</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Fundamental</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA - Quality</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownPasswordReset">
-                                                              <span>Charts</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownPasswordReset">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Charts</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>2 Charts</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownLock">
-                                                              <span>Summary</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownLock">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Analyst Ratings</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                          <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdown2fa">
-                                                              <span>Custom</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
-                                                            </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdown2fa">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom Table View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 3 Column View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 2 Column View</span>
-                                                              </a>
-                                                            </div>
-                                                          </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="row d-lg-none">
-                                                  <div class="col-12 d-flex justify-content-center flex-column">
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-0">
-                                                      Sign In
-                                                    </h6>
-                                                    <a href="{% url 'basic_login' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_login' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_login' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Sign Up
-                                                    </h6>
-                                                    <a href="{% url 'basic_register' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_register' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_register' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Reset Password
-                                                    </h6>
-                                                    <a href="{% url 'basic_reset' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_reset' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_reset' %}" class="dropdown-item border-radius-md">
-                                                      Illustation
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Lock
-                                                    </h6>
-                                                    <a href="{% url 'basic_lock' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_lock' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_lock' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      2-Step Verification
-                                                    </h6>
-                                                    <a href="{% url 'basic_verification' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_verification' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_verification' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Error
-                                                    </h6>
-                                                    <a href="{% url 'error_404' %}" class="dropdown-item border-radius-md">
-                                                      404
-                                                    </a>
-                                                    <a href="{% url 'error_500' %}" class="dropdown-item border-radius-md">
-                                                      500
-                                                    </a>
-                                          </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    <ul  id="filter_group_sorted_by"></ul>
                                 </div>
                             </div>
                         </nav>
@@ -822,162 +305,32 @@
                                                     <div class="col-12 ps-0 d-flex justify-content-center flex-column">
                                                         <ul class="list-group">
                                                           <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
-                                                              <span>Tables</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
+                                                            <a class="dropdown-item border-radius-xl ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignIn">
+                                                              <span>1</span>
                                                             </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignIn">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Overview Table</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Table</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Table</span>
-                                                              </a>
-                                                            </div>
                                                           </li>
                                                           <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignUp">
-                                                              <span>Columns</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
+                                                            <a class="dropdown-item border-radius-xs ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownSignUp">
+                                                              <span>2</span>
                                                             </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownSignUp">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Technical</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Fundamental</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA - Quality</span>
-                                                              </a>
-                                                            </div>
                                                           </li>
                                                           <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownPasswordReset">
-                                                              <span>Charts</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
+                                                            <a class="dropdown-item border-radius-xs ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownPasswordReset">
+                                                              <span>3</span>
                                                             </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownPasswordReset">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Charts</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>2 Charts</span>
-                                                              </a>
-                                                            </div>
                                                           </li>
                                                           <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownLock">
-                                                              <span>Summary</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
+                                                            <a class="dropdown-item border-radius-xs ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdownLock">
+                                                              <span>4</span>
                                                             </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdownLock">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>TA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>FA Report</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Analyst Ratings</span>
-                                                              </a>
-                                                            </div>
                                                           </li>
                                                           <li class="nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0">
-                                                            <a class="dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdown2fa">
-                                                              <span>Custom</span>
-                                                              <img src="{% static 'assets/img/down-arrow.svg' %}" alt="down-arrow" class="arrow">
+                                                            <a class="dropdown-item border-radius-xs ps-3 d-flex align-items-center justify-content-between mb-1" id="dropdown2fa">
+                                                              <span>5</span>
                                                             </a>
-                                                            <div class="dropdown-menu mt-0 py-3 px-2" aria-labelledby="dropdown2fa">
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom Table View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 3 Column View</span>
-                                                              </a>
-                                                              <a class="dropdown-item ps-3 border-radius-md mb-1" href="">
-                                                                <span>Create Custom 2 Column View</span>
-                                                              </a>
-                                                            </div>
                                                           </li>
                                                         </ul>
                                                     </div>
-                                                </div>
-                                                <div class="row d-lg-none">
-                                                  <div class="col-12 d-flex justify-content-center flex-column">
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center px-0">
-                                                      Sign In
-                                                    </h6>
-                                                    <a href="{% url 'basic_login' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_login' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_login' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Sign Up
-                                                    </h6>
-                                                    <a href="{% url 'basic_register' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_register' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_register' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Reset Password
-                                                    </h6>
-                                                    <a href="{% url 'basic_reset' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_reset' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_reset' %}" class="dropdown-item border-radius-md">
-                                                      Illustation
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Lock
-                                                    </h6>
-                                                    <a href="{% url 'basic_lock' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_lock' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_lock' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      2-Step Verification
-                                                    </h6>
-                                                    <a href="{% url 'basic_verification' %}" class="dropdown-item border-radius-md">
-                                                      Basic
-                                                    </a>
-                                                    <a href="{% url 'cover_verification' %}" class="dropdown-item border-radius-md">
-                                                      Cover
-                                                    </a>
-                                                    <a href="{% url 'illustration_verification' %}" class="dropdown-item border-radius-md">
-                                                      Illustration
-                                                    </a>
-                                                    <h6 class="dropdown-header text-dark font-weight-bolder d-flex align-items-center mt-3 px-0">
-                                                      Error
-                                                    </h6>
-                                                    <a href="{% url 'error_404' %}" class="dropdown-item border-radius-md">
-                                                      404
-                                                    </a>
-                                                    <a href="{% url 'error_500' %}" class="dropdown-item border-radius-md">
-                                                      500
-                                                    </a>
-                                          </div>
                                                 </div>
                                             </div>
                                         </li>
@@ -1131,20 +484,20 @@
             value: option.text
         }));
 
-        const views = document.querySelector('#views_filter b').textContent;
-        const sortedBy = document.querySelector('#sorted_by_filter b').textContent;
-        const desc = document.querySelector('#desc_filter b').textContent;
-        const chartPerLine = document.querySelector('#per_line_filter b').textContent;
+        const views = document.getElementById('filter_group_views');
+        const viewsFilter = views.filter;
+        const viewsValue = views.value;
+
+        const sortedBy = document.getElementById('filter_group_sorted_by');
 
         const payload = {
             selectedOptions,
-            views,
+            "views-filter": viewsFilter,
+            "views-value": viewsValue,
             sortedBy,
-            desc,
-            chartPerLine,
             page
         };
-
+        {#console.log("payload=>", payload);#}
         try {
             const response = await fetch(`/research/stock/search/`, {
                 method: 'POST',
@@ -1158,7 +511,7 @@
             if (response.ok) {
                 const result = await response.json();  // Await the json parsing
                 {#console.log('response=>', result);#}
-                renderSearchResult(result, page);
+                renderSearchResult(result, page, viewsFilter);
                 currentPage++;
                 {#console.log('response=>', result);#}
             } else {
@@ -1169,7 +522,7 @@
         }
     }
 
-    function renderSearchResult(data, page) {
+    function renderSearchResult(data, page, viewsFilter) {
         const searchResult = document.getElementById('search-result');
         if (page === 1) {
             searchResult.innerHTML = ''; // Clear existing results only for the first page
@@ -1181,28 +534,46 @@
         data.results.forEach(item => {
             const tr = document.createElement('tr');
 
-            const tdSymbol = document.createElement('td');
-            tdSymbol.innerHTML = `
+
+            if (viewsFilter === 'Charts') {
+                const tdChart = document.createElement('td');
+
+                const chartUrl = `/api/chart/${item.symbol}/1800/630/${item.period}/${item.type}/${item.elements}`;
+                {#console.log("chartUrl:"+chartUrl)#}
+                const img = document.createElement('img');
+                img.src = chartUrl;
+                img.alt = 'Chart';
+                img.className = 'img-fluid';
+                tdChart.appendChild(img);
+                tr.appendChild(tdChart);
+
+            } else {
+                const tdSymbol = document.createElement('td');
+                tdSymbol.innerHTML = `
             <div class="d-flex px-2 py-1">
                 <div class="d-flex flex-column justify-content-center">
                     <h6 class="mb-0 text-xs">${item.symbol}</h6>
                 </div>
             </div>
         `;
-            tr.appendChild(tdSymbol);
+                tr.appendChild(tdSymbol);
 
-            const tdName = document.createElement('td');
-            tdName.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.name}</p>`;
-            tr.appendChild(tdName);
+                const tdName = document.createElement('td');
+                tdName.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.name}</p>`;
+                tr.appendChild(tdName);
 
-            const tdMarket = document.createElement('td');
-            tdMarket.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.market}</p>`;
-            tr.appendChild(tdMarket);
+                const tdMarket = document.createElement('td');
+                tdMarket.innerHTML = `<p class="text-xs font-weight-bold mb-0">${item.market}</p>`;
+                tr.appendChild(tdMarket);
 
-            const tdMarketCap = document.createElement('td');
-            tdMarketCap.className = 'align-middle text-center text-sm';
-            tdMarketCap.innerHTML = `<span class="text-secondary text-xs font-weight-bold">${item.market_cap}</span>`;
-            tr.appendChild(tdMarketCap);
+                const tdMarketCap = document.createElement('td');
+                tdMarketCap.className = 'align-middle text-center text-sm';
+                tdMarketCap.innerHTML = `<span class="text-secondary text-xs font-weight-bold">${item.market_cap}</span>`;
+                tr.appendChild(tdMarketCap);
+
+
+            }
+
 
             tbody.appendChild(tr);
         });
@@ -1247,6 +618,11 @@
             SearchResult(page=currentPage, searching=isSearching);
         }
     },200));
+
+    //Draw filter group
+    drawFilterGroup('filter_group_views', 'Views', 'Tables,Columns,Charts,Summary',"Tables","overview","Overview Table");
+    drawFilterGroup('filter_group_secondary_views', 'Secondary Views', 'Tables,Columns,Charts,Summary',"Tables", "overview", "Overview Table");
+    drawFilterGroup('filter_group_sorted_by', 'Sorted By', 'General,Volume','General','symbol',"Symbol");
 
 
     // General

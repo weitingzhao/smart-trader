@@ -850,25 +850,113 @@ async function renderSlider(
 }
 
 ////////////////////////////////Filters/////////////////////////
-function drawFilter() {
-    fetch('/api/utilities-filter?names=Tables,Columns,Charts')
+function drawFilterGroup(element_id, filer_group_name, names, default_filter, default_key, default_value) {
+    const container = document.getElementById(element_id);
+    if (!container) {
+        console.error(`Element with id "${element_id}" not found.`);
+        return;
+    }
+    // Create the HTML structure
+    const ulNavbar = document.createElement('ul');
+    ulNavbar.className = 'navbar-nav navbar-nav-hover mx-auto';
+
+    const liNavItem = document.createElement('li');
+    liNavItem.className = 'nav-item dropdown dropdown-hover mx-2';
+
+    const aNavLink = document.createElement('a');
+    aNavLink.role = 'button';
+    aNavLink.className = 'nav-link p-0 d-flex justify-content-between cursor-pointer align-items-center';
+    aNavLink.id = 'views_filter';
+    aNavLink.setAttribute('data-bs-toggle', 'dropdown');
+    aNavLink.setAttribute('aria-expanded', 'false');
+
+    const divDropdownMenu = document.createElement('div');
+    divDropdownMenu.className = 'dropdown-menu dropdown-menu-animation dropdown-sm border-radius-xl p-3 mt-0 mt-lg-0';
+    divDropdownMenu.setAttribute('aria-labelledby', 'views_filter');
+
+    const divRow = document.createElement('div');
+    divRow.className = 'row d-none d-lg-flex';
+
+    const divCol = document.createElement('div');
+    divCol.className = 'col-12 ps-0 d-flex justify-content-center flex-column';
+
+    const ulListGroup = document.createElement('ul');
+    ulListGroup.className = 'list-group';
+
+    // Append elements
+    divCol.appendChild(ulListGroup);
+    divRow.appendChild(divCol);
+    divDropdownMenu.appendChild(divRow);
+    liNavItem.appendChild(aNavLink);
+    liNavItem.appendChild(divDropdownMenu);
+    ulNavbar.appendChild(liNavItem);
+    container.appendChild(ulNavbar);
+
+    // Call drawFilter to fill data
+    drawFilter(ulListGroup, names, aNavLink, filer_group_name, container);
+
+    // Initialize the selected value
+    drawFilter_NavLink(container, aNavLink, filer_group_name, default_filter, default_key, default_value);
+
+}
+
+function drawFilter(viewsDropdown, names,aNavLink, filter_group_name, container) {
+    fetch(`/api/filter/${names}`)
         .then(response => response.json())
         .then(data => {
-            const viewsDropdown = document.getElementById('views-dropdown');
             viewsDropdown.innerHTML = ''; // Clear existing dropdown content
 
             const ul = document.createElement('ul');
-            ul.className = 'dropdown-menu';
+            ul.className = 'list-group';
 
-            data.forEach(item => {
+            Object.keys(data).forEach(filter => {
+
                 const li = document.createElement('li');
-                li.className = 'dropdown-item';
-                li.textContent = item.value;
+                li.className = 'nav-item dropdown dropdown-hover dropdown-subitem list-group-item border-0 p-0';
+
+                const a = document.createElement('a');
+                a.className = 'dropdown-item border-radius-md ps-3 d-flex align-items-center justify-content-between mb-1';
+                a.id = `dropdown_${filter}`;
+                a.innerHTML = `<span>${filter}</span><img src="/static/assets/img/down-arrow.svg" alt="down-arrow" class="arrow">`;
+
+                const div = document.createElement('div');
+                div.className = 'dropdown-menu mt-0 py-3 px-2';
+                div.setAttribute('aria-labelledby', a.id);
+
+                data[filter].forEach(item => {
+                    // Example sub-items
+                    const subItem = document.createElement('a');
+                    subItem.className = 'dropdown-item ps-3 border-radius-md mb-1';
+                    subItem.href = 'javascript:;';
+                    subItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>${item.value}</span>
+                            <i class="fa fa-gear ms-2"></i>
+                        </div>
+                    `;
+                    subItem.addEventListener('click', () => {
+                        drawFilter_NavLink(container, aNavLink, filter_group_name, filter, item.key, item.value);
+                    });
+                    div.appendChild(subItem);
+                });
+                li.appendChild(a);
+                li.appendChild(div);
                 ul.appendChild(li);
             });
-
             viewsDropdown.appendChild(ul);
         })
         .catch(error => console.error('Error fetching filter data:', error));
+}
+
+function drawFilter_NavLink(container, aNavLink, filer_group_name, filter, key, value) {
+    container.value = key;
+    container.filter = filter;
+    aNavLink.innerHTML = `
+                            <b>${filer_group_name}: ${value}</b>
+                            <img src="/static/assets/img/down-arrow-white.svg" alt="down-arrow" class="arrow ms-1 d-lg-block d-none">
+                            <img src="/static/assets/img/down-arrow-dark.svg" alt="down-arrow" class="arrow ms-1 d-lg-none d-block">
+                        `;
+
+     // console.log(filer_group_name +"=>filter:"+filter+" key:"+key+" value:"+value);
 }
 

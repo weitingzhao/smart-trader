@@ -21,7 +21,8 @@ def stock_search(request):
         try:
             data = json.loads(request.body)
             selected_options = data.get('selectedOptions', [])
-            views = data.get('views', '')
+            views_filter = data.get('views-filter', 'Tables')
+            views_value = data.get('views-value', 'overview')
             sorted_by = data.get('sortedBy', '')
             desc = data.get('desc', '')
             chart_per_line = data.get('chartPerLine', '')
@@ -46,32 +47,40 @@ def stock_search(request):
                     else:
                         queryset = queryset.filter(**{source: key})
 
-            # # Process the data as needed
-            # result = {
-            #     "selectedOptions": selected_options,
-            #     "views": views,
-            #     "sortedBy": sorted_by,
-            #     "desc": desc,
-            #     "chartPerLine": chart_per_line
-            # }
-
             # Get the total count of the filtered queryset
             total_count = queryset.count()
 
-            # Convert queryset to a list of dictionaries
-            queryset_values = queryset.values('symbol', 'name', 'market', 'market_cap')
+            if views_filter == 'Charts':
+                # Construct the URL for the chart image
+                chart_data = []
+                for symbol in queryset.values_list('symbol', flat=True):
+                    chart_data.append({
+                        'symbol': symbol,
+                        'period': 'daily',
+                        'type': 'Candles-Full',
+                        'elements': 80
+                    })
 
-            # Paginate the results
-            paginator = Paginator(queryset_values, 20)  # Show 10 items per page
-            page_obj = paginator.get_page(page)
+                # Paginate the chart URLs
+                paginator = Paginator(chart_data, 20)  # Show 20 items per page
+                page_obj = paginator.get_page(page)
 
-            # Get the results for the current page
-            top_results = list(page_obj)
+                return JsonResponse({
+                    'results': list(page_obj),
+                    'total_count': total_count
+                }, safe=False, status=200)
+            else:
+                # Convert queryset to a list of dictionaries
+                queryset_values = queryset.values('symbol', 'name', 'market', 'market_cap')
 
-            return JsonResponse({
-                'results': top_results,
-                'total_count': total_count
-            }, safe=False, status=200)
+                # Paginate the results
+                paginator = Paginator(queryset_values, 20)  # Show 10 items per page
+                page_obj = paginator.get_page(page)
+
+                return JsonResponse({
+                    'results': list(page_obj),
+                    'total_count': total_count
+                }, safe=False, status=200)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
