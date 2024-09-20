@@ -1,3 +1,6 @@
+import logging
+
+import re
 import yfinance as yf
 from typing import List
 from django.db import connection
@@ -9,13 +12,37 @@ from logic.services import BaseService
 class StockHistBarsYahoo(BaseService, TaskBuilder):
     def __init__(self, engine):
         super().__init__(engine)
+        # Step 2.2 define custom handler for logger to handle yfinance error
+        class FechingExceptionHandler(logging.Handler):
+            def emit(self, record):
+                try:
+                    # Check if the log record is an error and contains the specified message
+                    if record.levelname == 'ERROR':
+                        if (    'No data found, symbol may be delisted' in record.msg or
+                                'possibly delisted; No price data found' in record.msg
+                        ):
+                            # Extract the symbol from the message
+                            symbol = record.msg.split(':')[0].replace('$', '')
+                            # Update the MarketSymbol model to set is_delisted to True
+                            MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
+                            print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
+                except Exception as e:
+                    print(f"Error in yfinance Fetching Exception Handler: {e}")
+
+        db_handler = FechingExceptionHandler()
+        db_handler.setLevel(logging.INFO)
+        # Create and configure logger
+        logger = logging.getLogger('yfinance')
+        # Add the custom handler to the logger
+        logger.addHandler(db_handler)
 
     def _use_day_table(self, interval: str) -> bool:
         return interval == "1d" or interval == "1wk" or interval == "1mo" or interval == "3mo"
 
     #Simluate for test use only
     def _get_init_load_test(self)->List:
-        return ["QETAR"]
+        return ["IVCBW"]
+        # ["BWCAU"]
         # return ["BKSB","BKWO","BLACR"]
         # return ["ABEO", "AAPL", "MSFT"]
 
@@ -30,7 +57,7 @@ class StockHistBarsYahoo(BaseService, TaskBuilder):
         # return symbol by type
         is_append = bool(self.args.get("append",False))
         if is_append:
-            query = f"SELECT  symbol FROM market_symbol WHERE is_delisted_on_{table_name}=FALSE"
+            query = f"SELECT symbol FROM market_symbol WHERE is_delisted=FALSE"
         else:
             query = f"""
                     SELECT symbol FROM market_symbol WHERE symbol NOT IN (
@@ -134,15 +161,20 @@ class StockHistBarsYahoo(BaseService, TaskBuilder):
                 # self.engine.csv("min", f"{period}.csv").save_df(history)
 
         # Step 3. Saving.
-        if start:
-            history = ticker.history(start=start, end=end, interval=interval)
-            save_to_timeseries_db(history)
-        else:
-            history = ticker.history(period=period, interval=interval)
-            # If the history is empty and is appended mode,try to get the history with the max period for lucky
-            if is_append and len(history) <= 0:
-                history = ticker.history(period='max', interval=interval)
-            save_to_timeseries_db(history)
+        try:
+            if start:
+                history = ticker.history(start=start, end=end, interval=interval)
+                save_to_timeseries_db(history)
+            else:
+                history = ticker.history(period=period, interval=interval)
+                # If the history is empty and is appended mode,try to get the history with the max period for lucky
+                if is_append and len(history) <= 0:
+                    history = ticker.history(period='max', interval=interval)
+                save_to_timeseries_db(history)
+        except Exception as e:
+            print(f"Error fetching data got error: {e}")
+            # Optionally, you could return a custom value or re-raise the exception
+            return None
 
     def Clean_non_daily_record_in_day_ts(self):
         with connection.cursor() as cursor:

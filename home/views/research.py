@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-from pydoc_data.topics import topics
-
 import pandas as pd
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -29,7 +27,7 @@ def stock_search(request):
             page = data.get('page', 1)  # Get the page number from the request, default to 1
 
             # Initialize the queryset
-            queryset = MarketSymbol.objects.all().annotate(
+            queryset = MarketSymbol.objects.filter(is_delisted=False).annotate(
                 market_cap=F('stock_valuation__market_cap')
             )
 
@@ -62,7 +60,7 @@ def stock_search(request):
                     })
 
                 # Paginate the chart URLs
-                paginator = Paginator(chart_data, 20)  # Show 20 items per page
+                paginator = Paginator(chart_data, 40)  # Show 20 items per page
                 page_obj = paginator.get_page(page)
 
                 return JsonResponse({
@@ -74,7 +72,7 @@ def stock_search(request):
                 queryset_values = queryset.values('symbol', 'name', 'market', 'market_cap')
 
                 # Paginate the results
-                paginator = Paginator(queryset_values, 20)  # Show 10 items per page
+                paginator = Paginator(queryset_values, 40)  # Show 10 items per page
                 page_obj = paginator.get_page(page)
 
                 return JsonResponse({

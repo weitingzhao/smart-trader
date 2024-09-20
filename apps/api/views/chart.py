@@ -41,7 +41,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         img = Image.new('RGB', (width, height), color=(255, 255, 255))
         d = ImageDraw.Draw(img)
 
-        # Load a truetype font with a larger size
+        # Load a true type font with a larger size
         font_path = finders.find('assets/fonts/dejavu-sans-bold.ttf')  # Use finders to locate the font file
         font_size = 24  # Set the desired font size
         font = ImageFont.truetype(font_path, font_size)
@@ -279,7 +279,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         ax_volume.yaxis.grid(True, linestyle='-', color='#888888', linewidth=0.5)
 
         def custom_date_formatter(x, pos, date_min):
-            print(f"x={x}, pos={pos}")
+            # print(f"x={x}, pos={pos}")
             index = int(x)
             if(index < 0 or index >= len(date_min)):
                 return ''

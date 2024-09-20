@@ -534,7 +534,6 @@
         data.results.forEach(item => {
             const tr = document.createElement('tr');
 
-
             if (viewsFilter === 'Charts') {
                 const tdChart = document.createElement('td');
 
@@ -550,12 +549,23 @@
             } else {
                 const tdSymbol = document.createElement('td');
                 tdSymbol.innerHTML = `
-            <div class="d-flex px-2 py-1">
-                <div class="d-flex flex-column justify-content-center">
-                    <h6 class="mb-0 text-xs">${item.symbol}</h6>
+                <div class="d-flex px-2 py-1">
+                    <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-xs">
+                            <a href="/research/stock/quote/${item.symbol}" class="text-decoration-none text-info" target="_blank"><b>${item.symbol}</b></a>
+                        </h6>
+                    </div>
                 </div>
-            </div>
         `;
+                const anchor = tdSymbol.querySelector('a');
+                anchor.addEventListener('mouseover', function() {
+                    this.classList.remove('text-info');
+                    this.classList.add('text-primary');
+                });
+                anchor.addEventListener('mouseout', function() {
+                    this.classList.remove('text-primary');
+                    this.classList.add('text-info');
+                });
                 tr.appendChild(tdSymbol);
 
                 const tdName = document.createElement('td');
@@ -570,10 +580,7 @@
                 tdMarketCap.className = 'align-middle text-center text-sm';
                 tdMarketCap.innerHTML = `<span class="text-secondary text-xs font-weight-bold">${item.market_cap}</span>`;
                 tr.appendChild(tdMarketCap);
-
-
             }
-
 
             tbody.appendChild(tr);
         });

@@ -11,8 +11,7 @@ class MarketSymbol(models.Model):
     delisting_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20)
     has_company_info = models.BooleanField(default=False)
-    is_delisted_on_day = models.BooleanField(default=False)
-    is_delisted_on_min = models.BooleanField(default=False)
+    is_delisted = models.BooleanField(default=False)
     max_data_period = models.CharField(max_length=10, blank=True)
 
     class Meta:
