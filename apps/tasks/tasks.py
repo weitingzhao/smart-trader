@@ -1,5 +1,4 @@
 import json
-import logging
 import os, time, subprocess
 import datetime
 from os import listdir

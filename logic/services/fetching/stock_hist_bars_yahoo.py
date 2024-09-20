@@ -1,9 +1,6 @@
 import logging
-
-import re
 import yfinance as yf
 from typing import List
-from django.db import connection
 from apps.common.models import *
 from logic.logic import TaskBuilder
 from logic.services import BaseService

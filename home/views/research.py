@@ -10,6 +10,8 @@ from apps.common.models import *
 from django.db.models import F
 import json
 
+from logic.utilities.dates import Dates
+
 # Create your views here.
 instance = Logic()
 
@@ -147,7 +149,6 @@ def stock_quote(request, symbol):
 
 
 def get_stock_data(request):
-    global cutoff_date
     symbol = request.GET.get('symbol')
     interval = request.GET.get('interval', 'daily')
 
@@ -155,14 +156,7 @@ def get_stock_data(request):
     df = pd.DataFrame(list(stock_data))
     df['time'] = pd.to_datetime(df['time'], utc=True)  # Ensure 'time' column is datetime with UTC
 
-    if interval == 'daily':
-        cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(days=16*30)  # Approx 16 months
-    elif interval == 'weekly':
-        cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=7*52)  # 7 years
-    elif interval == 'monthly':
-        cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=16*52)  # 16 years
-
-    cutoff_date = pd.Timestamp(cutoff_date, tz='UTC')  # Ensure cutoff_date is datetime with UTC
+    cutoff_date = Dates.cutoff_date(interval)
 
     # Calculate 50-day and 200-day SMA
     df['SMA_50'] = df['close'].rolling(window=50).mean()

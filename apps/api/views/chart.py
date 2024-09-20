@@ -1,4 +1,7 @@
 import matplotlib
+
+from logic.utilities.dates import Dates
+
 matplotlib.use('Agg')
 
 import calendar
@@ -65,6 +68,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
 
     def fetch_data(self, symbol, interval, elements=None):
         # Base query
+
         query = MarketStockHistoricalBarsByDay.objects.filter(symbol=symbol)
 
         # add 200 since results include SMA_200
@@ -74,16 +78,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         if elements:
             query = query.order_by('-time')[:elements]
         else:
-            # Filter based on interval
-            if interval == 'daily':
-                cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(days=16 * 30)  # Approx 16 months
-            elif interval == 'weekly':
-                cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=7 * 52)  # 7 years
-            elif interval == 'monthly':
-                cutoff_date = datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=16 * 52)  # 16 years
-
-            cutoff_date = pd.Timestamp(cutoff_date, tz='UTC')  # Ensure cutoff_date is datetime with UTC
-            query = query.filter(time__gte=cutoff_date)
+            query = query.filter(time__gte=Dates.cutoff_date(interval))
 
         # Convert query to DataFrame
         stock_data = query.values('time', 'open', 'high', 'low', 'close', 'volume')

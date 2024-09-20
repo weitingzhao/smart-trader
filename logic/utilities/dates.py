@@ -2,6 +2,8 @@ import logging
 import zoneinfo
 from datetime import datetime, timedelta
 
+import pandas as pd
+
 
 class Dates:
     """A class for date related functions in EOD2"""
@@ -42,3 +44,16 @@ class Dates:
 
         self.pandasDt = self.dt.strftime("%Y-%m-%d")
         return True
+
+    @staticmethod
+    def cutoff_date(interval):
+        def get_interval() -> datetime:
+            if interval == 'daily':
+                return datetime.now(tz=pd.Timestamp.now().tz) - timedelta(days=16 * 30)  # Approx 16 months
+            elif interval == 'weekly':
+                return datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=7 * 52)  # 7 years
+            elif interval == 'monthly':
+                return datetime.now(tz=pd.Timestamp.now().tz) - timedelta(weeks=16 * 52)  # 16 years
+
+        cutoff_date = get_interval()
+        return pd.Timestamp(cutoff_date, tz='UTC')  # Ensure cutoff_date is datetime with UTC
