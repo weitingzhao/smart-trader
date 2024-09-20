@@ -227,8 +227,6 @@ DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
 # ### Async Tasks (Celery) Settings ###
 
-CELERY_SCRIPTS_DIR        = os.path.join(BASE_DIR, "tasks_scripts" )
-
 CELERY_LOGS_URL           = "/tasks_logs/"
 CELERY_LOGS_DIR           = os.path.join(BASE_DIR, "tasks_logs"    )
 

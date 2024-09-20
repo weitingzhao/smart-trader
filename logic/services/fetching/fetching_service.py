@@ -1,7 +1,7 @@
 from logic import Engine
 from .company_info_yahoo import CompanyInfoYahoo
-from .fetching_symbol_service import FetchingSymbolService
-from .fetching_trading_service import FetchingTradingService
+from .symbol_service import FetchingSymbolService
+from .trading_service import FetchingTradingService
 from .stock_hist_bars_yahoo import StockHistBarsYahoo
 
 

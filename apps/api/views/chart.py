@@ -1,5 +1,4 @@
 import matplotlib
-
 from logic.utilities.dates import Dates
 
 matplotlib.use('Agg')
@@ -7,7 +6,6 @@ matplotlib.use('Agg')
 import calendar
 from django.contrib.staticfiles import finders
 from matplotlib.ticker import MaxNLocator, FuncFormatter
-from datetime import datetime, timedelta
 import mplfinance as mpf
 import numpy as np
 import pandas as pd
@@ -16,7 +14,6 @@ from django.db.models import Count
 from django.http import HttpResponse
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
-
 from apps.api.serializers.chart import ChartExchangeSerializer, ChartSymbolSerializer
 from apps.common.models import MarketSymbol, MarketStockHistoricalBarsByDay
 

@@ -26,19 +26,11 @@
               </h6>
             </div>
             <div class="card-body px-0 pt-0 pb-2 px-4 mt-3">
-              
-              {% if scripts %}
                 <p>
                   Superusers are able to create/cancel tasks.
                   <br />
                   Ordinary users can only view execution logs and running tasks (no other interactions allowed).
                 </p>
-              {% else %}
-                <p class="text-danger">
-                  No scripts detected - Please update the configuration (CELERY_SCRIPTS_DIR, CELERY_LOGS_DIR)
-                </p>
-              {% endif %}
-            
             </div>
           </div>
         </div>
@@ -57,7 +49,6 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Name</th>
-                      <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Script</th>
                       <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">STATE</th>
                       <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">Script</th>
                       <th class="text-center text-uppercase text-dark text-xxs font-weight-bolder opacity-7">ARGS</th>
@@ -67,124 +58,96 @@
                     </tr>
                   </thead>
                   <tbody>
-
                     <!-- Running Task -->
-                    {% for task in  tasks %}    
-
-                    {% if task.status == "STARTED" or task.status == "PROGRESS"%}
-                    <form action="{% url 'cancel-task' task.id %}" method="post">
-                    {% else %}
-                    <form action="{% url 'run-task' task.name %}" method="post">                      
-                    {% endif %}  
-                        
-                      {% csrf_token %}
-                      <tr>
-                        <td>
-                          <div class="d-flex px-2 py-1">
-                            <div class="mx-3">
-                              <i class="fa fa-file-code-o fa-2x"></i>
-                            </div>
-                            <div class="d-flex flex-column justify-content-center">
-                              <h6 class="mb-0 text-sm">
-                                {{task.name}}
-                              </h6>
-                              <p class="text-xs text-dark mb-0">
-                                Celery Task
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <p class="text-xs font-weight-bold mb-0">
-                            {{ task.script }}
-                          </p>
-                          <div class="text-xs text-dark mb-0" style="width:200px;height:50px;overflow-x: scroll;">
-                            Latest status: {{ task.status }}
-                          </div>                          
-                        </td>
-                        <td class="align-middle text-center text-sm">
-
-                          {% if task.status == "STARTED"%}
-                            <span class="badge bg-warning">INITIAL</span>
-                          {% elif task.status == "PROGRESS"%}
-                            <span class="badge bg-warning">RUNNING</span>
-                          {% elif task.status == "FAILURE" %}
-                            <span class="badge bg-danger">FINISHED</span>
-                          {% elif task.status == "REVOKED" %}
-                          <span class="badge bg-secondary">CANCELLED</span>
-                          {% else %}
-                            <span class="badge bg-success">FINISHED</span>                          
-                          {% endif %}
-                          
-                        </td>
-                        <td class="align-middle text-center">
-                          <span class="text-dark text-xs font-weight-bold">
-                            
-                            {% if task.name == 'execute_script' %}
-                              <select class="form-control" name="script" 
-                              {% if task.status == "STARTED" or task.status == "PROGRESS" or not scripts %}
-                                disabled
-                              {% endif %}
-                              >
-                                {% for item in scripts %}
-                                  <option value="{{item}}" {% if item == task.input %}selected{% endif %}>{{ item }}</option>
-                                {% endfor %}
-                              </select>
-
-                            {% elif task.name == 'backend_task' %}
-                              <select class="form-control" name="backend_tasks"
-                              {% if task.status == "STARTED" or not backend_tasks %}
-                                disabled
-                              {% endif %}
-                              >
-                                {% for item in backend_tasks %}
-                                  <option value="{{item}}" {% if item == task.input %}selected{% endif %}>{{ item }}</option>
-                                {% endfor %}
-                              </select>
-
-                            {% else %}
-                              NA
-                            {% endif %}
-                            
-                          </span>
-                        </td>
-                        <td class="align-middle text-center">
-                            {% if task.name == 'backend_task' %}
-                              <select class="form-control" id="args" name="args">
-                              </select>
-                            {% else %}
-                            <span class="text-dark text-md font-weight-bold">
-                              <input type="text" id="args" name="args" value="" class="form-control w-100"/>
-                          </span>
-                            {% endif %}
-                        </td>
-
-                        {% if request.user.is_authenticated %}
-                        <td class="align-middle text-center">
-                          {% if task.status == "STARTED" or task.status == "PROGRESS"%}
-                            <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
-                                    class="btn text-danger font-weight-bold text-xs">
-                              Cancel Task
-                            </button>
-                          {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
-                              <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
-                                      class="btn btn-primary font-weight-bold">
-                                Execute
-                              </button>
-                          {% else %}
-                              <button href="javascript:;"  data-toggle="tooltip" data-original-title="Edit user"
-                                      class="btn btn-primary font-weight-bold">
-                                Execute
-                              </button>
-                          {% endif %}
-
-                        </td>
+                    {% for task in  tasks %}
+                        {% if task.status == "STARTED" or task.status == "PROGRESS"%}
+                        <form action="{% url 'cancel-task' task.id %}" method="post">
+                        {% else %}
+                        <form action="{% url 'run-task' task.name %}" method="post">
                         {% endif %}
-                      </tr>
+                        {% csrf_token %}
+                        <tr>
+                            <td>
+                              <div class="d-flex px-2 py-1">
+                                <div class="mx-3">
+                                  <i class="fa fa-file-code-o fa-2x"></i>
+                                </div>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">
+                                    {{task.name}}
+                                  </h6>
+                                  <p class="text-xs text-dark mb-0">
+                                    Celery Task
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                {% if task.status == "STARTED"%}
+                                    <span class="badge bg-warning">INITIAL</span>
+                                {% elif task.status == "PROGRESS"%}
+                                    <span class="badge bg-warning">RUNNING</span>
+                                {% elif task.status == "FAILURE" %}
+                                    <span class="badge bg-danger">FINISHED</span>
+                                {% elif task.status == "REVOKED" %}
+                                    <span class="badge bg-secondary">CANCELLED</span>
+                                {% else %}
+                                    <span class="badge bg-success">FINISHED</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle text-center">
+                              <span class="text-dark text-xs font-weight-bold">
+                                {% if task.name == 'fetching_daily_task' %}
+                                  <select class="form-control" name="backend_tasks"
+                                  {% if task.status == "STARTED" or not backend_tasks %}
+                                    disabled
+                                  {% endif %}
+                                  >
+                                    {% for item in backend_tasks %}
+                                      <option value="{{item}}" {% if item == task.input %}selected{% endif %}>{{ item }}</option>
+                                    {% endfor %}
+                                  </select>
 
+                                {% else %}
+                                  NA
+                                {% endif %}
+                              </span>
+                            </td>
+                            <td class="align-middle text-center">
+                                {% if task.name == 'fetching_daily_task' %}
+                                    <select class="form-control" id="args" name="args">
+                                    </select>
+                                {% else %}
+                                    <span class="text-dark text-md font-weight-bold">
+                                        <input type="text" id="args" name="args" value="" class="form-control w-100"/>
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            {% if request.user.is_authenticated %}
+                            <td class="align-middle text-center">
+                              {% if task.status == "STARTED" or task.status == "PROGRESS"%}
+                                <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                        class="btn text-danger font-weight-bold text-xs">
+                                  Cancel Task
+                                </button>
+                              {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
+                                  <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                          class="btn btn-primary font-weight-bold">
+                                    Execute
+                                  </button>
+                              {% else %}
+                                  <button href="javascript:;"  data-toggle="tooltip" data-original-title="Edit user"
+                                          class="btn btn-primary font-weight-bold">
+                                    Execute
+                                  </button>
+                              {% endif %}
+
+                            </td>
+                            {% endif %}
+                        </tr>
                     </form>
                   {% endfor %}
-
                   </tbody>
                 </table>
               </div>

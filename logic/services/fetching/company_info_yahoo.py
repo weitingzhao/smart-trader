@@ -5,11 +5,11 @@ from typing import List
 from logic import Engine
 from apps.common.models import *
 from datetime import datetime, timezone
-from logic.logic import TaskBuilder
+from logic.logic import TaskWorker
 from logic.services import BaseService
 
 
-class CompanyInfoYahoo(BaseService, TaskBuilder):
+class CompanyInfoYahoo(BaseService, TaskWorker):
 
     def __init__(self, engine: Engine):
         super().__init__(engine)

@@ -2,11 +2,11 @@ import logging
 import yfinance as yf
 from typing import List
 from apps.common.models import *
-from logic.logic import TaskBuilder
+from logic.logic import TaskWorker
 from logic.services import BaseService
 
 
-class StockHistBarsYahoo(BaseService, TaskBuilder):
+class StockHistBarsYahoo(BaseService, TaskWorker):
     def __init__(self, engine):
         super().__init__(engine)
         # Step 2.2 define custom handler for logger to handle yfinance error

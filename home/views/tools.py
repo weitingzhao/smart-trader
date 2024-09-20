@@ -1,6 +1,4 @@
 from datetime import datetime
-
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 from django.conf import settings  as django_settings
 import requests
@@ -59,7 +57,7 @@ def celery_task(request, task_name, args):
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
     try:
-        feedback = tasks.backend_task.delay({
+        feedback = tasks.fetching_daily_task.delay({
             'user_id': request.user.id,
             'task_name': task_name,
             'args': args,

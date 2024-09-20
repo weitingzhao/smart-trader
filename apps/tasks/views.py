@@ -4,7 +4,7 @@ import time
 import json
 from django.shortcuts import redirect
 from celery import current_app
-from apps.tasks.tasks import execute_script, get_scripts, backend_task, support_tasks
+from apps.tasks.tasks import get_scripts, fetching_daily_task
 from django_celery_results.models import TaskResult
 from celery.contrib.abortable import AbortableAsyncResult
 from apps.tasks.celery import app
@@ -21,10 +21,9 @@ def index(request):
 
 # @login_required(login_url="/login/")
 def tasks(request):
-    scripts, err_info = get_scripts()
+    support_tasks = get_scripts()
     context = {
-        'cfgError' : err_info,
-        'scripts'  : scripts,
+        'cfgError' : None,
         'backend_tasks': support_tasks,
         'tasks'    : get_celery_all_tasks(),
         'segment'  : 'tasks',
@@ -37,20 +36,19 @@ def tasks(request):
     return HttpResponse(html_template.render(context, request)) 
 
 def run_task(request, task_name):
-    '''
+    """
     Runs a celery task
-    :param request HttpRequest: Request
-    :param task_name str: Name of task to execute
-    :rtype: (HttpResponseRedirect | HttpResponsePermanentRedirect)
-    '''
-    tasks = [execute_script, backend_task]
-    _script = request.POST.get("script")
+    :param request:
+    :param task_name:
+    :return:
+    """
+    tasks = [fetching_daily_task]
     _args   = request.POST.get("args")
     _backend_tasks = request.POST.get("backend_tasks")
     for task in tasks:
         if task.__name__ == task_name:
             task.delay({
-                "script": _script, "args": _args,
+                "args": _args,
                 "user_id": request.user.id,
                 "task_name": _backend_tasks
             })

@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 import pandas as pd
 from django.core.paginator import Paginator
 from django.http import JsonResponse
