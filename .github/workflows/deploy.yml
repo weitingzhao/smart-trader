@@ -1,17 +1,31 @@
 name: Deploy to Ubuntu Server
 
+# Define when the workflow should run
 on:
   push:
     branches:
-      - main
+      - master # Trigger the workflow when code is pushed to the 'main' branch
 
+# Define the jobs to run in the workflow
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Checkout the repository code
     - name: Checkout code
       uses: actions/checkout@v2
+
+    # 2. Set up Python to ensure dependencies are handled if needed
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11.9'
+
+    # 3. Install project dependencies (requirements.txt)
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt        
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
