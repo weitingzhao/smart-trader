@@ -174,3 +174,6 @@ apps/helpers
 celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
+
+#Docker image
+tar_docker/
