@@ -146,9 +146,9 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
                         append()
                 if len(records) > 0:
                     model.objects.bulk_create(records, batch_size=1000)
-                    self.logger.info(
-                        f"saved {len(records)} {record} "
-                        f"from {min_date_in_history} to {date}")
+                    # self.logger.info(
+                    #     f"saved {len(records)} {record} "
+                    #     f"from {min_date_in_history} to {date}")
 
             if self._use_day_table(interval):
                 save_hist_bars_ts(MarketStockHistoricalBarsByDay)

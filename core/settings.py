@@ -131,11 +131,11 @@ if not DEBUG:
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
+DB_NAME     = os.getenv('DB_NAME'     , None)
 DB_USERNAME = os.getenv('DB_USERNAME' , None)
 DB_PASS     = os.getenv('DB_PASS'     , None)
 DB_HOST     = os.getenv('DB_HOST'     , None)
 DB_PORT     = os.getenv('DB_PORT'     , None)
-DB_NAME     = os.getenv('DB_NAME'     , None)
 
 DATABASES = {
     'default': {
@@ -230,8 +230,8 @@ DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 CELERY_LOGS_URL           = "/tasks_logs/"
 CELERY_LOGS_DIR           = os.path.join(BASE_DIR, "tasks_logs"    )
 
-CELERY_BROKER_URL         = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
-CELERY_RESULT_BACKEND     = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
+CELERY_BROKER_URL         = os.getenv('CELERY_BROKER'     , None)
+CELERY_RESULT_BACKEND     = os.getenv('CELERY_BROKER'     , None)
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT    = 4 * 60 * 60 # 2 hours

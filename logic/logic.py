@@ -298,10 +298,10 @@ class TaskBase(ABC):
         try:
             self._worker_run(task_name, logic, task_result, meta, args)
             # Done. sent notification
-            end_log(log_file_name)
+            end_log(log_file_name, is_success=True)
             return meta
         except Exception as e:
             # Error. sent notification
             logic.logger.info(f"run task_id:{self.celery.request.id} Error: {str(e)}")
-            end_log(log_file_name)
+            end_log(log_file_name, is_success=False)
             raise Exception(meta)

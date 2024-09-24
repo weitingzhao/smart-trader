@@ -1,4 +1,4 @@
-FROM python:3.10.4
+FROM python:3.11.9
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -13,9 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Manage Assets & DB 
-RUN python manage.py collectstatic --no-input 
-RUN python manage.py makemigrations
-RUN python manage.py migrate
+#RUN python manage.py collectstatic --no-input
+#RUN python manage.py makemigrations
+#RUN python manage.py migrate
 
 # gunicorn
 EXPOSE 5005

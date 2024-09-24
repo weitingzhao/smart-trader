@@ -1,13 +1,16 @@
-version: "3.8"
 services:
-  appseed-app:
-    container_name: appseed-app
+  smart-trader-app:
+    container_name: smart-trader-app
     restart: always
     build:
       context: .
     networks:
       - db_network
       - web_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.docker
   nginx:
     container_name: nginx
     restart: always
@@ -19,7 +22,7 @@ services:
     networks:
       - web_network
     depends_on:
-      - appseed-app
+      - smart-trader-app
   redis:
     image: redis:7.0.12
     container_name: redis
@@ -36,11 +39,15 @@ services:
       context: .
     networks:
       - db_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.docker
     environment:
       DJANGO_SETTINGS_MODULE: "core.settings"
     command: "celery -A apps.tasks worker -l info -B"
     depends_on:
-      - appseed-app
+      - smart-trader-app
 
 networks:
   db_network:
