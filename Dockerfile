@@ -3,10 +3,7 @@ FROM python:3.11.9
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DB_HOST host.docker.internal
-ENV DB_PORT 5432
-ENV DB_NAME smart_trader
-ENV DB_USER postgres
+ENV DB_HOST 10.0.0.80
 ENV DB_PASSWORD SmTr123!@#
 
 COPY requirements.txt .
