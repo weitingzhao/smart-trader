@@ -14,8 +14,8 @@ COPY . .
 
 # Manage Assets & DB 
 #RUN python manage.py collectstatic --no-input
-#RUN python manage.py makemigrations
-#RUN python manage.py migrate
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 
 # gunicorn
 EXPOSE 5005
