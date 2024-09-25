@@ -3,6 +3,11 @@ FROM python:3.11.9
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DB_HOST host.docker.internal
+ENV DB_PORT 5432
+ENV DB_NAME smart_trader
+ENV DB_USER postgres
+ENV DB_PASSWORD SmTr123!@#
 
 COPY requirements.txt .
 
@@ -14,14 +19,8 @@ COPY . .
 
 # Manage Assets & DB 
 #RUN python manage.py collectstatic --no-input
-#RUN python manage.py makemigrations
-#RUN python manage.py migrate
-
-# Load environment variables from .env.docker and run migrations
-RUN /bin/sh -c "source .env.docker && python manage.py makemigrations"
-# Load environment variables from .env.docker and run migrations
-RUN /bin/sh -c "source .env.docker && python manage.py migrate"
-
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 
 # gunicorn
 EXPOSE 5005
