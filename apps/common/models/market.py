@@ -13,6 +13,8 @@ class MarketSymbol(models.Model):
     has_company_info = models.BooleanField(default=False)
     is_delisted = models.BooleanField(default=False)
     max_data_period = models.CharField(max_length=10, blank=True)
+    min_period_yfinance = models.CharField(max_length=20, blank=True)
+    daily_period_yfinance = models.CharField(max_length=20, blank=True)
 
     class Meta:
         db_table = 'market_symbol'

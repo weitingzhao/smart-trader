@@ -115,19 +115,24 @@ class Config:
         self.logger.setLevel(logging.INFO)
 
         if need_info :
-            info_handler = logging.StreamHandler()
-            info_handler.setLevel(logging.INFO)
-            info_handler.setFormatter(
-                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s'))
-            self.logger.addHandler(info_handler)
+            if not any(handler.name == "Logic: Config [Info]" for handler in self.logger.handlers):
+                info_handler = logging.StreamHandler()
+                info_handler.setLevel(logging.INFO)
+                info_handler.name = "Logic: Config [Info]"
+                info_handler.setFormatter(
+                    logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
+                )
+                self.logger.addHandler(info_handler)
 
         if need_error:
-            error_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
-            error_handler.setLevel(logging.WARNING)
-            error_handler.setFormatter(
-                logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
-            )
-            self.logger.addHandler(error_handler)
+            if not any(handler.name == "Logic: Config [Warning]" for handler in self.logger.handlers):
+                error_handler = logging.FileHandler(self.ROOT_Logs / "error.log")
+                error_handler.setLevel(logging.WARNING)
+                error_handler.name = "Logic: Config [Warning]"
+                error_handler.setFormatter(
+                    logging.Formatter('[%(asctime)s - %(name)s] %(levelname)s: %(message)s')
+                )
+                self.logger.addHandler(error_handler)
 
 
     def __init__(self,

@@ -1,4 +1,4 @@
-import logging
+import logging, re
 import yfinance as yf
 from typing import List
 from apps.common.models import *
@@ -10,7 +10,7 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
     def __init__(self, engine):
         super().__init__(engine)
         # Step 2.2 define custom handler for logger to handle yfinance error
-        class FechingExceptionHandler(logging.Handler):
+        class FetchingExceptionHandler(logging.Handler):
             def emit(self, record):
                 try:
                     # Check if the log record is an error and contains the specified message
@@ -23,22 +23,46 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
                             # Update the MarketSymbol model to set is_delisted to True
                             MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
                             print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
+
+                        if ( 'is invalid, must be one of' in record.msg):
+                            # Regular expression to find the array
+                            # Regular expression to find the symbol, period, and the first element of the array
+                            match = re.search(r"([\w-]+): Period '(\d+\w)' is invalid, must be one of \['(\w+)'", record.msg)
+                            if match:
+                                symbol = match.group(1)
+                                period = match.group(2)
+                                first_element = match.group(3)
+
+                                if period == "5d":
+                                    MarketSymbol.objects.filter(symbol=symbol).update(daily_period_yfinance=first_element)
+                                    print(f"Mark symbol {symbol} daily fetch period change to {first_element}. and use it fetch data next time")
+                                else:
+                                    MarketSymbol.objects.filter(symbol=symbol).update(min_period_yfinance=first_element)
+                                    print(f"Mark symbol {symbol} min fetch period change to {first_element}. and use it fetch data next time")
+
                 except Exception as e:
                     print(f"Error in yfinance Fetching Exception Handler: {e}")
 
-        db_handler = FechingExceptionHandler()
-        db_handler.setLevel(logging.INFO)
-        # Create and configure logger
+        # Get configure logger
         logger = logging.getLogger('yfinance')
+
         # Add the custom handler to the logger
-        logger.addHandler(db_handler)
+        if not any(handler.name == "yfinance: Fetching HistBars Exception [Error]" for handler in logger.handlers):
+            # Add the custom handler to the logger
+            db_handler = FetchingExceptionHandler()
+            db_handler.setLevel(logging.INFO)
+            db_handler.name = "yfinance: Fetching HistBars Exception [Error]"
+            logger.addHandler(db_handler)
 
     def _use_day_table(self, interval: str) -> bool:
         return interval == "1d" or interval == "1wk" or interval == "1mo" or interval == "3mo"
 
     #Simluate for test use only
     def _get_init_load_test(self)->List:
-        return ["IVCBW"]
+        self.symbol_data = None
+        return ["DMYY-U","DMYY-U"]
+        # return ["BKSB", "BKWO", "BLACR"]
+        # return ["IVCBW"]
         # ["BWCAU"]
         # return ["BKSB","BKWO","BLACR"]
         # return ["ABEO", "AAPL", "MSFT"]
@@ -54,10 +78,10 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
         # return symbol by type
         is_append = bool(self.args.get("append",False))
         if is_append:
-            query = f"SELECT symbol FROM market_symbol WHERE is_delisted=FALSE"
+            query = f"SELECT symbol,daily_period_yfinance, min_period_yfinance FROM market_symbol WHERE is_delisted=FALSE"
         else:
             query = f"""
-                    SELECT symbol FROM market_symbol WHERE symbol NOT IN (
+                    SELECT symbol,daily_period_yfinance, min_period_yfinance FROM market_symbol WHERE symbol NOT IN (
                         SELECT symbol FROM ( SELECT symbol
                             FROM market_stock_hist_bars_{table_name}_ts
                             GROUP BY symbol ORDER BY COUNT(*) ASC
@@ -69,6 +93,11 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
             rows = cursor.fetchall()
 
         # Convert the result to a list of symbols
+        if self._use_day_table(interval):
+            self.symbol_data = {row[0]: {"interval": row[1]} for row in rows}
+        else:
+            self.symbol_data = {row[0]: {"interval": row[2]} for row in rows}
+
         return [row[0] for row in rows]
 
 
@@ -86,7 +115,11 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
         # “1d”, “5d”, “1mo”, “3mo”, “6mo”, “1y”, “2y”, “5y”, “10y”, “ytd”, “max”
         period = self.args.get("period", "max") #"1d"
         # “1m”, “2m”, “5m”, “15m”, “30m”, “60m”, “90m”, “1h”, “1d”, “5d”, “1wk”, “1mo”, “3mo”
-        interval = self.args.get("interval", "1m")
+        if self.symbol_data is None:
+            interval = self.args.get("interval", "1m")
+        else:
+            interval = self.symbol_data[record]["interval"]
+
         #If not using period – in the format (yyyy-mm-dd) or datetime.
         start = self.args.get("start", None)
         end = self.args.get("end", None)
@@ -146,9 +179,9 @@ class StockHistBarsYahoo(BaseService, TaskWorker):
                         append()
                 if len(records) > 0:
                     model.objects.bulk_create(records, batch_size=1000)
-                    # self.logger.info(
-                    #     f"saved {len(records)} {record} "
-                    #     f"from {min_date_in_history} to {date}")
+                    self.logger.info(
+                        f"saved {len(records)} {record} "
+                        f"from {min_date_in_history} to {date}")
 
             if self._use_day_table(interval):
                 save_hist_bars_ts(MarketStockHistoricalBarsByDay)

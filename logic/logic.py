@@ -55,10 +55,12 @@ class Progress:
         self.log_file_path = log_file_path
 
         # step 2  prepare new handler for logger
-        self.log_stream = StringIO()
-        task_log_handler = logging.StreamHandler(self.log_stream)
-        task_log_handler.setLevel(logging.INFO)
-        self.logger.addHandler(task_log_handler)
+        if not any(handler.name == "Logic: Progress [Info]" for handler in self.logger.handlers):
+            self.log_stream = StringIO()
+            task_log_handler = logging.StreamHandler(self.log_stream)
+            task_log_handler.setLevel(logging.INFO)
+            task_log_handler.name = "Logic: Progress [Info]"
+            self.logger.addHandler(task_log_handler)
 
         # assign function for log and notification
         def flush():

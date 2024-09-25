@@ -14,7 +14,7 @@ class CompanyInfoYahoo(BaseService, TaskWorker):
     def __init__(self, engine: Engine):
         super().__init__(engine)
         # Step 2.2 define custom handler for logger to handle yfinance error
-        class FechingExceptionHandler(logging.Handler):
+        class FetchingExceptionHandler(logging.Handler):
             def emit(self, record):
                 try:
                     # Check if the log record is an error and contains the specified message
@@ -27,12 +27,16 @@ class CompanyInfoYahoo(BaseService, TaskWorker):
                 except Exception as e:
                     print(f"Error in yfinance Fetching Exception Handler: {e}")
 
-        db_handler = FechingExceptionHandler()
-        db_handler.setLevel(logging.INFO)
-        # Create and configure logger
+        # Get configure logger
         logger = logging.getLogger('yfinance')
+
         # Add the custom handler to the logger
-        logger.addHandler(db_handler)
+        if not any(handler.name == "yfinance: Fetching CompanyInfo Exception [Error]" for handler in logger.handlers):
+            # Add the custom handler to the logger
+            db_handler = FetchingExceptionHandler()
+            db_handler.setLevel(logging.INFO)
+            db_handler.name = "yfinance: Fetching CompanyInfo Exception [Error]"
+            logger.addHandler(db_handler)
 
 
     #Simluate for test use only
