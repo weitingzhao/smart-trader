@@ -17,6 +17,12 @@ COPY . .
 #RUN python manage.py makemigrations
 #RUN python manage.py migrate
 
+# Load environment variables from .env.docker and run migrations
+RUN /bin/sh -c "source .env.docker && python manage.py makemigrations"
+# Load environment variables from .env.docker and run migrations
+RUN /bin/sh -c "source .env.docker && python manage.py migrate"
+
+
 # gunicorn
 EXPOSE 5005
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
