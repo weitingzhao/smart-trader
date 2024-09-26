@@ -1,15 +1,13 @@
-from datetime import datetime
-from rest_framework.authtoken.models import Token
-from django.conf import settings  as django_settings
 import requests
+from logic.logic import Logic
+from apps.common.models import *
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from home.forms.portfolio import PositionSizingForm
-from apps.common.models import *
-from logic.logic import Logic
 from apps.notifications.signals import notify
-from apps.tasks import tasks
+from django.shortcuts import render, redirect
+from rest_framework.authtoken.models import Token
+from django.conf import settings  as django_settings
+from home.forms.portfolio import PositionSizingForm
 
 # Create your views here.
 instance = Logic()
