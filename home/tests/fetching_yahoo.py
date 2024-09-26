@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from logic.logic import Logic
+from logics.logic import Logic
 
 
 class FetchingYahooTestCase(TestCase):

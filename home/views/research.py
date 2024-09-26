@@ -3,13 +3,13 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from logic.logic import Logic
+from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.db.models import F
 import json
 
-from logic.utilities.dates import Dates
+from logics.utilities.dates import Dates
 
 # Create your views here.
 instance = Logic()

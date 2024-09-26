@@ -1,6 +1,6 @@
 from typing import List
 from django_celery_results.models import TaskResult
-from logic.logic import Logic, TaskBase
+from logics.logic import Logic, TaskBase
 from .celery import app
 from celery.contrib.abortable import AbortableTask
 

@@ -1,5 +1,5 @@
 import matplotlib
-from logic.utilities.dates import Dates
+from logics.utilities.dates import Dates
 
 matplotlib.use('Agg')
 

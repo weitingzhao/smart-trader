@@ -1,5 +1,5 @@
 import requests
-from logic.logic import Logic
+from logics.logic import Logic
 from apps.common.models import *
 from django.contrib import messages
 from django.http import JsonResponse
