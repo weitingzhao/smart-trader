@@ -5,33 +5,34 @@ from typing import List
 from logics import Engine
 from apps.common.models import *
 from datetime import datetime, timezone
-from logics.logic import TaskWorker
 from logics.services import BaseService
+from logics.engines.tasks.task_fetching_worker import TaskFetchingWorker
 
 
-class CompanyInfoYahoo(BaseService, TaskWorker):
+
+class CompanyInfoYahoo(BaseService, TaskFetchingWorker):
 
     def __init__(self, engine: Engine):
         super().__init__(engine)
-        # Step 2.2 define custom handler for logger to handle yfinance error
-        class FetchingExceptionHandler(logging.Handler):
-            def emit(self, record):
-                try:
-                    # Check if the log record is an error and contains the specified message
-                    if record.levelname == 'ERROR' and 'No data found, symbol may be delisted' in record.msg:
-                        # Extract the symbol from the message
-                        symbol = record.msg.split(':')[0]
-                        # Update the MarketSymbol model to set is_delisted to True
-                        MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
-                        print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
-                except Exception as e:
-                    print(f"Error in yfinance Fetching Exception Handler: {e}")
 
-        # Get configure logger
+        # setup logger
         logger = logging.getLogger('yfinance')
-
         # Add the custom handler to the logger
         if not any(handler.name == "yfinance: Fetching CompanyInfo Exception [Error]" for handler in logger.handlers):
+            # Step 2.2 define custom handler for logger to handle yfinance error
+            class FetchingExceptionHandler(logging.Handler):
+                def emit(self, record):
+                    try:
+                        # Check if the log record is an error and contains the specified message
+                        if record.levelname == 'ERROR' and 'No data found, symbol may be delisted' in record.msg:
+                            # Extract the symbol from the message
+                            symbol = record.msg.split(':')[0]
+                            # Update the MarketSymbol model to set is_delisted to True
+                            MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
+                            print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
+                    except Exception as e:
+                        print(f"Error in yfinance Fetching Exception Handler: {e}")
+
             # Add the custom handler to the logger
             db_handler = FetchingExceptionHandler()
             db_handler.setLevel(logging.INFO)

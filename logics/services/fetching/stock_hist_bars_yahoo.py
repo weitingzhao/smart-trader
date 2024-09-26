@@ -2,52 +2,58 @@ import logging, re
 import yfinance as yf
 from typing import List
 from apps.common.models import *
-from logics.logic import TaskWorker
 from logics.services import BaseService
+from logics.engines.tasks.task_fetching_worker import TaskFetchingWorker
 
 
-class StockHistBarsYahoo(BaseService, TaskWorker):
+class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
     def __init__(self, engine):
         super().__init__(engine)
-        # Step 2.2 define custom handler for logger to handle yfinance error
-        class FetchingExceptionHandler(logging.Handler):
-            def emit(self, record):
-                try:
-                    # Check if the log record is an error and contains the specified message
-                    if record.levelname == 'ERROR':
-                        if (    'No data found, symbol may be delisted' in record.msg or
-                                'possibly delisted; No price data found' in record.msg
-                        ):
-                            # Extract the symbol from the message
-                            symbol = record.msg.split(':')[0].replace('$', '')
-                            # Update the MarketSymbol model to set is_delisted to True
-                            MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
-                            print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
-
-                        if ( 'is invalid, must be one of' in record.msg):
-                            # Regular expression to find the array
-                            # Regular expression to find the symbol, period, and the first element of the array
-                            match = re.search(r"([\w-]+): Period '(\d+\w)' is invalid, must be one of \['(\w+)'", record.msg)
-                            if match:
-                                symbol = match.group(1)
-                                period = match.group(2)
-                                first_element = match.group(3)
-
-                                if period == "5d":
-                                    MarketSymbol.objects.filter(symbol=symbol).update(daily_period_yfinance=first_element)
-                                    print(f"Mark symbol {symbol} daily fetch period change to {first_element}. and use it fetch data next time")
-                                else:
-                                    MarketSymbol.objects.filter(symbol=symbol).update(min_period_yfinance=first_element)
-                                    print(f"Mark symbol {symbol} min fetch period change to {first_element}. and use it fetch data next time")
-
-                except Exception as e:
-                    print(f"Error in yfinance Fetching Exception Handler: {e}")
 
         # Get configure logger
         logger = logging.getLogger('yfinance')
 
         # Add the custom handler to the logger
         if not any(handler.name == "yfinance: Fetching HistBars Exception [Error]" for handler in logger.handlers):
+            # Step 2.2 define custom handler for logger to handle yfinance error
+            class FetchingExceptionHandler(logging.Handler):
+                def emit(self, record):
+                    try:
+                        # Check if the log record is an error and contains the specified message
+                        if record.levelname == 'ERROR':
+                            if ('No data found, symbol may be delisted' in record.msg or
+                                    'possibly delisted; No price data found' in record.msg
+                            ):
+                                # Extract the symbol from the message
+                                symbol = record.msg.split(':')[0].replace('$', '')
+                                # Update the MarketSymbol model to set is_delisted to True
+                                MarketSymbol.objects.filter(symbol=symbol).update(is_delisted=True)
+                                print(f"Mark symbol {symbol} as delisted, and will not fetch data next time")
+
+                            if ('is invalid, must be one of' in record.msg):
+                                # Regular expression to find the array
+                                # Regular expression to find the symbol, period, and the first element of the array
+                                match = re.search(r"([\w-]+): Period '(\d+\w)' is invalid, must be one of \['(\w+)'",
+                                                  record.msg)
+                                if match:
+                                    symbol = match.group(1)
+                                    period = match.group(2)
+                                    first_element = match.group(3)
+
+                                    if period == "5d":
+                                        MarketSymbol.objects.filter(symbol=symbol).update(
+                                            daily_period_yfinance=first_element)
+                                        print(
+                                            f"Mark symbol {symbol} daily fetch period change to {first_element}. and use it fetch data next time")
+                                    else:
+                                        MarketSymbol.objects.filter(symbol=symbol).update(
+                                            min_period_yfinance=first_element)
+                                        print(
+                                            f"Mark symbol {symbol} min fetch period change to {first_element}. and use it fetch data next time")
+
+                    except Exception as e:
+                        print(f"Error in yfinance Fetching Exception Handler: {e}")
+
             # Add the custom handler to the logger
             db_handler = FetchingExceptionHandler()
             db_handler.setLevel(logging.INFO)
