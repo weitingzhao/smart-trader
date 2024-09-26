@@ -1,20 +1,24 @@
 from argparse import ArgumentParser
 from logics.service import Service
-from logics import researchs as analyse
-from logics.researchs import BaseResearch
+from  logics import researchs
 from logics.researchs.treading.patterns import pattern
 
-class Research(BaseResearch):
+class Research(researchs.BaseResearch):
+
     def __init__(self, service: Service):
         super().__init__(service)
 
     # analyses data
-    def treading(self, args: ArgumentParser) -> analyse.TradingResearch:
-        return analyse.TradingResearch(self.service, args)
+    def category(self)  -> researchs.CategoryResearch:
+        return researchs.CategoryResearch(self.service)
 
-    def symbols(self) -> analyse.SymbolResearch:
-        return analyse.SymbolResearch(self.service)
+    def treading(self, args: ArgumentParser) -> researchs.TradingResearch:
+        return researchs.TradingResearch(self.service, args)
 
+    def symbols(self) -> researchs.SymbolResearch:
+        return researchs.SymbolResearch(self.service)
+
+    # patterns
     def pattern_list(self) -> list:
         return pattern.get_pattern_list()
 

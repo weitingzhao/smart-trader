@@ -2,11 +2,11 @@ import logging, re
 import yfinance as yf
 from typing import List
 from apps.common.models import *
-from logics.services import BaseService
+from logics.researchs.base_research import BaseResearch
 from logics.engines.tasks.task_fetching_worker import TaskFetchingWorker
 
 
-class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
+class Volume(BaseResearch, TaskFetchingWorker):
 
     def __init__(self, engine):
         super().__init__(engine)
@@ -69,11 +69,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
     def _get_init_load_test(self)->List:
         self.symbol_data = None
         return ["DMYY-U","DMYY-U"]
-        # return ["BKSB", "BKWO", "BLACR"]
-        # return ["IVCBW"]
-        # ["BWCAU"]
-        # return ["BKSB","BKWO","BLACR"]
-        # return ["ABEO", "AAPL", "MSFT"]
+
 
     def _get_init_load(self) -> List:
         interval = self.args.get("interval", "1m")
@@ -85,7 +81,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
         # return symbol by type
         is_append = bool(self.args.get("append",False))
         if is_append:
-            query = f"SELECT symbol,daily_period_yfinance, min_period_yfinance FROM market_symbol WHERE is_delisted=FALSE"
+            query = f"SELECT symbol FROM market_symbol WHERE is_delisted=FALSE"
         else:
             query = f"""
                     SELECT symbol,daily_period_yfinance, min_period_yfinance FROM market_symbol WHERE symbol NOT IN (

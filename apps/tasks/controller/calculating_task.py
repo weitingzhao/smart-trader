@@ -13,5 +13,4 @@ class CalculatingTask(BaseTask):
 
     def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
         if script_name == 'volume':
-            pass
-            # logic.service.saving().symbol().index_symbol()
+            logic.research.category().volume().run(meta, task_result, args, is_test=False)
