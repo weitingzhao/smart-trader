@@ -93,14 +93,6 @@
                                       </div>
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Symbols</h6>
-                                          <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-symbols', 'fetching symbols')">
-                                                <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
-                                            </a>
-                                            <a class="btn btn-link text-warning px-1 mb-0" onclick="call_celery_task('indexing-symbols', 'indexing symbols')">
-                                                <i class="fas fa-copy text-dark me-2" aria-hidden="true"></i>Index
-                                            </a>
-                                          </div>
                                           <hr class="horizontal dark my-3">
                                           <h5 class="font-weight-bolder mb-0">
                                               <span id="symbols_num" countTo="{{ counts.market_symbol }}"></span>
@@ -120,11 +112,6 @@
                                       </div>
                                       <div class="card-body pt-0 p-3 text-center">
                                           <h6 class="text-center mb-0">Company Info</h6>
-                                          <div class="d-inline-block">
-                                            <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-company-info', 'fetching company Info')">
-                                                <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Fetching
-                                            </a>
-                                          </div>
                                           <hr class="horizontal dark my-3">
                                           <h5 class="font-weight-bolder mb-0">
                                               <span id="company_info_num" countTo="{{ counts.market_stock }}"></span>
@@ -144,21 +131,13 @@
                                       </div>
                                       <div class="card-body pt-0 p-3 text-center">
                                         <h6 class="text-center mb-0">Stock (Time Series) Bars</h6>
-                                          <div class="d-inline-block">
-                                              <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-stock-hist-bars', 'fetching stock history bars', 'append=True,delta=2,period=5d,interval=1d')">
-                                                  <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>append daily interval for 5 days period (delta=2)
-                                              </a>
-                                              <a class="btn btn-link text-success px-1 mb-0" onclick="call_celery_task('fetching-stock-hist-bars', 'fetching stock history bars', 'append=True,delta=2,period=1d,interval=1m')">
-                                                  <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>append min interval for 1 day period (delta=2)
-                                              </a>
-                                          </div>
                                           <hr class="horizontal dark my-3">
                                           <h5 class="font-weight-bolder mb-0">
-                                              1 day: {{ counts.market_stock_hist_bars_day_ts|intcomma }}
+                                              1 day: <span id="market_stock_hist_bars_day_ts_num" countTo="{{ counts.market_stock_hist_bars_day_ts }}"></span>
                                               <span class="text-info text-sm font-weight-bolder">+?.?%</span>
                                           </h5>
                                           <h5 class="font-weight-bolder mb-0">
-                                              1 min: {{ counts.market_stock_hist_bars_min_ts|intcomma }}
+                                              1 min: <span id="market_stock_hist_bars_min_ts_num" countTo="{{ counts.market_stock_hist_bars_min_ts }}"></span>
                                               <span class="text-info text-sm font-weight-bolder">+?.?%</span>
                                           </h5>
                                       </div>
@@ -880,22 +859,23 @@
 <script>
     if (document.getElementById('symbols_num')) {
         const countUp = new CountUp('symbols_num', document.getElementById("symbols_num").getAttribute("countTo"));
-        if (!countUp.error) {
-            countUp.start();
-        } else {
-            console.error(countUp.error);
-        }
+        if (!countUp.error) { countUp.start(); } else { console.error(countUp.error); }
     }
 
     if (document.getElementById('company_info_num')) {
         const countUp = new CountUp('company_info_num', document.getElementById("company_info_num").getAttribute("countTo"));
-        if (!countUp.error) {
-            countUp.start();
-        } else {
-            console.error(countUp.error);
-        }
+        if (!countUp.error) { countUp.start(); } else { console.error(countUp.error); }
     }
 
+    if (document.getElementById('market_stock_hist_bars_day_ts_num')) {
+        const countUp = new CountUp('market_stock_hist_bars_day_ts_num', document.getElementById("market_stock_hist_bars_day_ts_num").getAttribute("countTo"));
+        if (!countUp.error) { countUp.start(); } else { console.error(countUp.error); }
+    }
+
+    if (document.getElementById('market_stock_hist_bars_min_ts_num')) {
+        const countUp = new CountUp('market_stock_hist_bars_min_ts_num', document.getElementById("market_stock_hist_bars_min_ts_num").getAttribute("countTo"));
+        if (!countUp.error) { countUp.start(); } else { console.error(countUp.error); }
+    }
 
     document.getElementById('data-tab').addEventListener('click', function() {
         document.getElementById('data').style.display = 'block';

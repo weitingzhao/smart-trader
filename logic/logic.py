@@ -200,18 +200,17 @@ class TaskBase(ABC):
 
     @abstractmethod
     def _worker_run(self,
-             task_name: str,
-             logic : Logic,
-             task_result:
-             TaskResult,
-             meta: dict,
-             args: str = None):
+                    script_name: str,
+                    logic : Logic,
+                    task_result: TaskResult,
+                    meta: dict,
+                    args: str = None):
         """Abstract method that must be implemented in any subclass"""
         pass
 
     # Simulate for test use only
     @abstractmethod
-    def support_tasks(self) -> List:
+    def job_scripts(self) -> List:
         """Abstract method that must be implemented in any subclass"""
         pass
 
@@ -245,11 +244,13 @@ class TaskBase(ABC):
             raise ValueError(f"User with ID {user_id} does not exist")
 
         # Step 1.b. Get task_name
-        task_name = self.data.get('task_name')
-        if not task_name:
-            raise ValueError("Task name is required to execute")
-        if task_name not in self.support_tasks():
-            raise ValueError(f"Task name '{task_name}' is not supported")
+        script_name = self.data.get('script_name')
+        if not script_name:
+            raise ValueError("Script Name is required to execute")
+        # Extract script names from job_scripts
+        script_names = [script['name'] for script in self.job_scripts()]
+        if script_name not in script_names:
+            raise ValueError(f"Script '{script_name}' is not supported")
 
         # Step 1.c.  Get args & meta
         args = self.data.get('args', None)
@@ -263,10 +264,10 @@ class TaskBase(ABC):
             log_file = meta.get("log_file")
             log_file_name = os.path.splitext(os.path.basename(log_file))[0]
         else:
-            log_file = self.get_log_file_path(task_name)
+            log_file = self.get_log_file_path(script_name)
             log_file_name = os.path.splitext(os.path.basename(log_file))[0]
             meta = {
-                "input": task_name, "error": "false", "output": "", "status": "STARTED",
+                "input": script_name, "error": "false", "output": "", "status": "STARTED",
                 "log_file": log_file,
                 "initial": "true", "leftover": [], "done": []
             }
@@ -292,13 +293,13 @@ class TaskBase(ABC):
             logic.progress.log_flush()
             logic.engine.notify(user).send(
                 recipient=user,
-                verb=f'{task_name} Task {("done" if is_success else "failed")}!',
+                verb=f'{script_name} Job {("done" if is_success else "failed")}!',
                 level=Level.INFO if is_success else Level.ERROR,
                 description=f'click <a href="#" class="text-xs text-danger" '
                             f'onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
             )
         try:
-            self._worker_run(task_name, logic, task_result, meta, args)
+            self._worker_run(script_name, logic, task_result, meta, args)
             # Done. sent notification
             end_log(log_file_name, is_success=True)
             return meta

@@ -494,26 +494,6 @@ function showFileView(fileName) {
 }
 
 ////////////////////////////////Celery Task/////////////////////////////////////
-function call_celery_task(task, task_name, args) {
-    console.log(args)
-    fetch(`celery_task/${task}/${args}`)
-        .then(response => response.json())
-        .then(data => {
-            const currentTime = new Date().toLocaleTimeString();
-            if (data.success) {
-                showNotification(
-                    'success', task_name,
-                    `Task satus: <b>${data.status}</b> <br>id: <b>${data.task_id}</b>`,
-                    data.on);
-            } else {
-                showNotification('error', task_name, data.error, currentTime);
-            }
-        })
-        .catch(error => {
-            showNotification('error', task_name, error, new Date().toLocaleTimeString());
-        });
-}
-
 function retryTask(taskId) {
     fetch(`tasks/retry/${taskId}`)
     .then(response => {

@@ -4,7 +4,7 @@ import time
 import json
 from django.shortcuts import redirect
 from celery import current_app
-from apps.tasks.tasks import get_scripts, fetching_daily_task
+from apps.tasks import tasks as celery_tasks
 from django_celery_results.models import TaskResult
 from celery.contrib.abortable import AbortableAsyncResult
 from apps.tasks.celery import app
@@ -21,19 +21,19 @@ def index(request):
 
 # @login_required(login_url="/login/")
 def tasks(request):
-    support_tasks = get_scripts()
+    tasks, task_scripts = get_celery_all_tasks()
     context = {
         'cfgError' : None,
-        'backend_tasks': support_tasks,
-        'tasks'    : get_celery_all_tasks(),
         'segment'  : 'tasks',
         'parent'   : 'tools',
+        'tasks'    : tasks,
+        'task_scripts': task_scripts,
     }
     # django_celery_results_task_result
     task_results = TaskResult.objects.order_by("-id")[:10]
     context["task_results"] = task_results
     html_template = loader.get_template('pages/tools/tasks.html')
-    return HttpResponse(html_template.render(context, request)) 
+    return HttpResponse(html_template.render(context, request))
 
 def run_task(request, task_name):
     """
@@ -42,26 +42,27 @@ def run_task(request, task_name):
     :param task_name:
     :return:
     """
-    tasks = [fetching_daily_task]
     _args   = request.POST.get("args")
-    _backend_tasks = request.POST.get("backend_tasks")
-    for task in tasks:
+    _script_name = request.POST.get("script_name")
+
+    for task in celery_tasks.get_tasks():
         if task.__name__ == task_name:
             task.delay({
                 "args": _args,
                 "user_id": request.user.id,
-                "task_name": _backend_tasks
+                "script_name": _script_name,
+                "task_name": task_name
             })
     time.sleep(1)  # Waiting for task status to update in db
-    return redirect("tasks") 
+    return redirect("tasks")
 
 def cancel_task(request, task_id):
-    '''
-    Cancels a celery task using its task id
-    :param request HttpRequest: Request
-    :param task_id str: task_id of result to cancel execution
-    :rtype: (HttpResponseRedirect | HttpResponsePermanentRedirect)
-    '''
+    """
+    Cancels a celery task
+    :param request:
+    :param task_id:
+    :return:
+    """
     result = TaskResult.objects.get(task_id=task_id)
     abortable_result = AbortableAsyncResult(result.task_id, task_name=result.task_name, app=app)
     if not abortable_result.is_aborted():
@@ -93,8 +94,10 @@ def retry_task(request, task_id):
 
 def get_celery_all_tasks():
     current_app.loader.import_default_modules()
-    tasks = list(sorted(name for name in current_app.tasks if not name.startswith('celery.')))
-    tasks = [{"name": name.split(".")[-1], "script":name} for name in tasks]
+    tasks_jobs = list(sorted(name for name in current_app.tasks if not name.startswith('celery.')))
+    tasks = [{"name": name.split(".")[-1], "script":name, 'scripts': celery_tasks.get_task_scripts(name.split(".")[-1])} for name in tasks_jobs]
+    task_scripts = [{"name": name.split(".")[-1], 'scripts': celery_tasks.get_task_scripts(name.split(".")[-1])} for name in tasks_jobs]
+
     for task in tasks:
         last_task = TaskResult.objects.filter(
             task_name=task["script"]).order_by("date_created").last()
@@ -110,7 +113,7 @@ def get_celery_all_tasks():
                 task["input"] = json.loads(last_task.result).get("input")
             except:
                 task["input"] = ''
-    return tasks
+    return tasks,task_scripts
 
 def task_output(request):
     '''

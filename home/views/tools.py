@@ -52,28 +52,8 @@ def settings(request):
             'counts': get_market_summary()
         })
 
-def celery_task(request, task_name, args):
-    if request.method != 'GET':
-        return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-    try:
-        feedback = tasks.fetching_daily_task.delay({
-            'user_id': request.user.id,
-            'task_name': task_name,
-            'args': args,
-        })
-        return JsonResponse({
-            'success': True,
-            'on': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'status': feedback.status,
-            'task_id': feedback.task_id})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
-
-
 def my_handler(sender, instance, created, **kwargs):
     notify.send(instance, verb='was saved')
-
 
 def customize(request):
     try:

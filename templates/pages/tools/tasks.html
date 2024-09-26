@@ -58,95 +58,81 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Running Task -->
-                    {% for task in  tasks %}
-                        {% if task.status == "STARTED" or task.status == "PROGRESS"%}
-                        <form action="{% url 'cancel-task' task.id %}" method="post">
+                  <!-- Running Task -->
+                  {% for task in  tasks %}
+                      {% if task.status == "STARTED" or task.status == "PROGRESS"%}
+                          <form action="{% url 'cancel-task' task.id %}" method="post">
+                      {% else %}
+                          <form action="{% url 'run-task' task.name %}" method="post">
+                      {% endif %}
+                  {% csrf_token %}
+                  <tr>
+                      <td>
+                      <div class="d-flex px-2 py-1">
+                        <div class="mx-3">
+                          <i class="fa fa-file-code-o fa-2x"></i>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm">
+                            {{task.name}}
+                          </h6>
+                          <p class="text-xs text-dark mb-0">
+                            Celery Task
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                      <td class="align-middle text-center text-sm">
+                        {% if task.status == "STARTED"%}
+                            <span class="badge bg-warning">INITIAL</span>
+                        {% elif task.status == "PROGRESS"%}
+                            <span class="badge bg-warning">RUNNING</span>
+                        {% elif task.status == "FAILURE" %}
+                            <span class="badge bg-danger">FINISHED-Failure</span>
+                        {% elif task.status == "REVOKED" %}
+                            <span class="badge bg-secondary">CANCELLED</span>
                         {% else %}
-                        <form action="{% url 'run-task' task.name %}" method="post">
+                            <span class="badge bg-success">FINISHED-Success</span>
                         {% endif %}
-                        {% csrf_token %}
-                        <tr>
-                            <td>
-                              <div class="d-flex px-2 py-1">
-                                <div class="mx-3">
-                                  <i class="fa fa-file-code-o fa-2x"></i>
-                                </div>
-                                <div class="d-flex flex-column justify-content-center">
-                                  <h6 class="mb-0 text-sm">
-                                    {{task.name}}
-                                  </h6>
-                                  <p class="text-xs text-dark mb-0">
-                                    Celery Task
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td class="align-middle text-center text-sm">
-                                {% if task.status == "STARTED"%}
-                                    <span class="badge bg-warning">INITIAL</span>
-                                {% elif task.status == "PROGRESS"%}
-                                    <span class="badge bg-warning">RUNNING</span>
-                                {% elif task.status == "FAILURE" %}
-                                    <span class="badge bg-danger">FINISHED</span>
-                                {% elif task.status == "REVOKED" %}
-                                    <span class="badge bg-secondary">CANCELLED</span>
-                                {% else %}
-                                    <span class="badge bg-success">FINISHED</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle text-center">
-                              <span class="text-dark text-xs font-weight-bold">
-                                {% if task.name == 'fetching_daily_task' %}
-                                  <select class="form-control" name="backend_tasks"
-                                  {% if task.status == "STARTED" or not backend_tasks %}
-                                    disabled
-                                  {% endif %}
-                                  >
-                                    {% for item in backend_tasks %}
-                                      <option value="{{item}}" {% if item == task.input %}selected{% endif %}>{{ item }}</option>
-                                    {% endfor %}
-                                  </select>
+                    </td>
+                      <td class="align-middle text-center">
+                      <span class="text-dark text-xs font-weight-bold">
+                          <select class="form-control"
+                                   id="script_name_{{ forloop.counter0 }}" name="script_name"
+                                  {% if task.status == "STARTED"%}disabled{% endif %}>
+                            {% for script in task.scripts%}
+                              <option value="{{script.name}}" {% if script.name == task.input %}selected{% endif %}>{{ script.name }}</option>
+                            {% endfor %}
+                          </select>
+                      </span>
+                      <input id="args_{{ forloop.counter0 }}" name="args" type="hidden" value=""/>
+                    </td>
+                      <td class="align-middle text-center" id="args-field_{{ forloop.counter0 }}">
+                          <!-- This will be dynamically updated by JavaScript -->
+                      </td>
+                      {% if request.user.is_authenticated %}
+                          <td class="align-middle text-center">
+                      {% if task.status == "STARTED" or task.status == "PROGRESS"%}
+                        <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                class="btn text-danger font-weight-bold text-xs">
+                          Cancel Task
+                        </button>
+                      {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
+                          <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
+                                  class="btn btn-primary font-weight-bold">
+                            Execute
+                          </button>
+                      {% else %}
+                          <button href="javascript:;"  data-toggle="tooltip" data-original-title="Edit user"
+                                  class="btn btn-primary font-weight-bold">
+                            Execute
+                          </button>
+                      {% endif %}
 
-                                {% else %}
-                                  NA
-                                {% endif %}
-                              </span>
-                            </td>
-                            <td class="align-middle text-center">
-                                {% if task.name == 'fetching_daily_task' %}
-                                    <select class="form-control" id="args" name="args">
-                                    </select>
-                                {% else %}
-                                    <span class="text-dark text-md font-weight-bold">
-                                        <input type="text" id="args" name="args" value="" class="form-control w-100"/>
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            {% if request.user.is_authenticated %}
-                            <td class="align-middle text-center">
-                              {% if task.status == "STARTED" or task.status == "PROGRESS"%}
-                                <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
-                                        class="btn text-danger font-weight-bold text-xs">
-                                  Cancel Task
-                                </button>
-                              {% elif task.status == "FAILURE" or task.status == "REVOKED" %}
-                                  <button href="javascript:;" data-toggle="tooltip" data-original-title="Edit user"
-                                          class="btn btn-primary font-weight-bold">
-                                    Execute
-                                  </button>
-                              {% else %}
-                                  <button href="javascript:;"  data-toggle="tooltip" data-original-title="Edit user"
-                                          class="btn btn-primary font-weight-bold">
-                                    Execute
-                                  </button>
-                              {% endif %}
-
-                            </td>
-                            {% endif %}
-                        </tr>
-                    </form>
+                    </td>
+                      {% endif %}
+                  </tr>
+                  </form>
                   {% endfor %}
                   </tbody>
                 </table>
@@ -215,15 +201,15 @@
                           {{ result.status}}
                           </p>
                         </td>
-                        
+
                         <td>
                           <p class="text-sm text-center mb-0">{{result.date_created|date_format}}</p>
                         </td>
-                        
+
                         <td>
                           <p class="text-sm text-center mb-0">{{result.date_done|date_format}}</p>
-                        </td>      
-                        
+                        </td>
+
                         <td>
                             <p class="text-sm text-center mb-0">
                                 {% if result.status == 'REVOKED' %}
@@ -233,14 +219,14 @@
                                {% endif %}
                             </p>
                         </td>
-                      
+
                         <td class="text-center">
                         <button class="btn btn-xs btn-dark text-xs" onclick="showFileView('{{result|get_result_log_file}}')">View Log</button>
                         {% if result.status == 'FAILURE' %}
                             <button class="btn btn-xs btn-primary text-xs" onclick="retryTask('{{ result.task_id }}')">Retry</button>
                         {% endif %}
                         </td>
-                      
+
                       </tr>
                     {% endfor %}
 
@@ -251,49 +237,71 @@
           </div>
         </div>
       </div>
-
     </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const scriptSelect = document.querySelector('select[name="backend_tasks"]');
-    const argsSelect = document.getElementById('args');
+    const tasks = {{ task_scripts|safe }};
 
-    function updateArgsOptions() {
-        const selectedScript = scriptSelect.value;
-        argsSelect.innerHTML = ''; // Clear existing options
+    function updateArgsField(index) {
+        const backendTasksSelect = document.getElementById(`script_name_${index}`);
+        const selectedTask = backendTasksSelect.value;
+        const argsField = document.getElementById(`args-field_${index}`);
+        const hiddenArgsField = document.getElementById(`args_${index}`);
 
-        if (selectedScript === 'fetching-stock-hist-bars') {
-            const option1 = document.createElement('option');
-            option1.value = "append=True,delta=2,period='5d',interval='1d'";
-            option1.text = "append -> daily interval for 5d period";
-            const option2 = document.createElement('option');
-            option2.value = "append=True,delta=2,period='1d',interval='1m'";
-            option2.text = "append -> min interval for 1d period";
-            const option3 = document.createElement('option');
-            option3.value = "period='5d',interval='1d'";
-            option3.text = "init -> daily interval for max period";
-            const option4 = document.createElement('option');
-            option4.value = "period='5d',interval='1m'";
-            option4.text = "init -> min interval for max period";
+        const script = tasks[index].scripts.find(s => s.name === selectedTask);
+        argsField.innerHTML = ''; // Clear the existing content
 
-            argsSelect.appendChild(option2);
-            argsSelect.appendChild(option1);
+        if (script && script.options) {
+            const select = document.createElement('select');
+            select.className = 'form-control w-100';
+            select.id = `args_${index}_select`;
+            select.name = 'args';
 
-            argsSelect.appendChild(option4);
-            argsSelect.appendChild(option3);
+            script.options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.textContent = option.text;
+                select.appendChild(optionElement);
+            });
+
+            select.addEventListener('change', function() {
+                hiddenArgsField.value = select.value;
+            });
+            // Initialize hiddenArgsField with the current value of the select
+            if (select.options.length > 0) {
+                hiddenArgsField.value = select.options[0].value;
+            }
+            
+            argsField.appendChild(select);
         } else {
-            const defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.text = "None";
-            argsSelect.appendChild(defaultOption);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = `args_${index}_input`;
+            input.name = 'args';
+            input.className = 'form-control w-100';
+
+            input.addEventListener('input', function() {
+                hiddenArgsField.value = input.value;
+            });
+            // Initialize hiddenArgsField with the current value of the input
+            hiddenArgsField.value = input.value;
+
+            argsField.appendChild(input);
         }
     }
 
-    scriptSelect.addEventListener('change', updateArgsOptions);
+    tasks.forEach((task, index) => {
+        updateArgsField(index);
+    });
 
-    // Initial load
-    updateArgsOptions();
+    document.querySelectorAll('[id^=script_name_]').forEach((element, index) => {
+        element.addEventListener('change', function() {
+            updateArgsField(index);
+        });
+    });
 });
 </script>
 {% endblock content %}
+
+
 <!-- MAIN Content END -->
