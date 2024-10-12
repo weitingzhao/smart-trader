@@ -13,6 +13,9 @@ class ResearchStockVolume(models.Model):
 
     class Meta:
         db_table = 'research_stock_volume'
+        constraints = [
+            models.UniqueConstraint(fields=['symbol'], name='unique_symbol')
+        ]
 
     def __str__(self):
         return f"research.stock_volume: {self.symbol}"

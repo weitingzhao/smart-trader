@@ -68,7 +68,8 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
     #Simluate for test use only
     def _get_init_load_test(self)->List:
         self.symbol_data = None
-        return ["DMYY-U","DMYY-U"]
+        return ["TTEK"]
+        # return ["DMYY-U","DMYY-U"]
         # return ["BKSB", "BKWO", "BLACR"]
         # return ["IVCBW"]
         # ["BWCAU"]
@@ -101,9 +102,9 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
 
         # Convert the result to a list of symbols
         if self._use_day_table(interval):
-            self.symbol_data = {row[0]: {"interval": row[1]} for row in rows}
+            self.symbol_data = {row[0]: {"period": row[1]} for row in rows}
         else:
-            self.symbol_data = {row[0]: {"interval": row[2]} for row in rows}
+            self.symbol_data = {row[0]: {"period": row[2]} for row in rows}
 
         return [row[0] for row in rows]
 
@@ -119,12 +120,12 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
         is_append = self.args.get("append",False)
         delta= int(self.args.get("delta", 1))
         # “1d”, “5d”, “1mo”, “3mo”, “6mo”, “1y”, “2y”, “5y”, “10y”, “ytd”, “max”
-        period = self.args.get("period", "max") #"1d"
+        interval = self.args.get("interval", "max") #"1d"
         # “1m”, “2m”, “5m”, “15m”, “30m”, “60m”, “90m”, “1h”, “1d”, “5d”, “1wk”, “1mo”, “3mo”
         if self.symbol_data is None:
-            interval = self.args.get("interval", "1m")
+            period = self.args.get("period", "1m")
         else:
-            interval = self.symbol_data[record]["interval"]
+            period = self.symbol_data[record]["period"]
 
         #If not using period – in the format (yyyy-mm-dd) or datetime.
         start = self.args.get("start", None)

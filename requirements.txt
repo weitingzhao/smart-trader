@@ -60,7 +60,7 @@ mplfinance~=0.12.10b0
 yfinance~=0.2.41
 
 # Science library
-numpy~=2.0.1
+numpy<2.0.0
 matplotlib~=3.9.1.post1
 
 

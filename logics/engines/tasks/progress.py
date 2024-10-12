@@ -25,9 +25,13 @@ class Progress:
 
         # assign function for log and notification
         def flush():
-            logs = self.log_stream.getvalue()
-            with open(self.log_file_path, 'a') as log_file:
-                log_file.write(logs)
+            try:
+                logs = self.log_stream.getvalue()
+                with open(self.log_file_path, 'a') as log_file:
+                    log_file.write(logs)
+            except Exception as e:
+                self.log_stream = StringIO()
+
             self.log_stream.truncate(0) # Clear the log stream after flushing
             self.log_stream.seek(0)
 

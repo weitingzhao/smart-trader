@@ -3,6 +3,9 @@ from logics.utilities.dates import Dates
 
 matplotlib.use('Agg')
 
+import talib as ta
+import numpy as np
+
 import calendar
 from django.contrib.staticfiles import finders
 from matplotlib.ticker import MaxNLocator, FuncFormatter
@@ -63,6 +66,53 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         # Return the image as a response
         return HttpResponse(buf, content_type='image/png')
 
+    # Calculate volatility contraction
+    def detect_vcp(self, stock_data):
+        stock_data['SMA_50'] = ta.SMA(stock_data['close'], timeperiod=50)
+        stock_data['ATR'] = ta.ATR(stock_data['high'], stock_data['low'], stock_data['close'], timeperiod=14)
+        # Calculate the relative contraction in volatility (percentage reduction in ATR over time)
+        stock_data['Volatility_Contraction'] = stock_data['ATR'].pct_change().rolling(window=5).mean()
+        # Define contraction condition: multiple successive lower ATR readings
+        contraction = (stock_data['Volatility_Contraction'] < 0).rolling(window=10).sum() > 5
+        # Detect when price is contracting and trending above its 50-day SMA
+        vcp_candidate = contraction & (stock_data['close'] > stock_data['SMA_50'])
+        return stock_data[vcp_candidate]
+
+    def detect_higher_lows(self, stock_data, window=5):
+        # Detect higher lows over the defined window period
+        stock_data = stock_data.copy()
+        stock_data.loc[:, 'Low_Delta'] = stock_data['low'].diff(periods=window)
+        higher_lows = (stock_data['Low_Delta'] > 0).rolling(window=window).sum() >= (window - 1)
+
+        # Check for tightening price ranges: higher lows and lower highs
+        stock_data.loc[:, 'High_Delta'] = stock_data['high'].diff(periods=window)
+        tightening_ranges = (stock_data['High_Delta'] < 0).rolling(window=window).sum() >= (window - 1)
+
+        vcp_candidate = higher_lows & tightening_ranges
+        return stock_data[vcp_candidate]
+
+    def detect_volume_dryup(self, stock_data, window=10):
+        stock_data['Volume_SMA'] = ta.SMA(stock_data['volume'], timeperiod=window)
+        # Check for volume dry-up (low volume) during price contraction
+        volume_dryup = stock_data['volume'] < (stock_data['Volume_SMA'] * 0.5)
+        return stock_data[volume_dryup]
+
+    def detect_vcp_pattern(self, stock_data):
+        # Detect price contraction (volatility contraction)
+        contraction_data = self.detect_vcp(stock_data)
+
+        # Detect higher lows and tightening price ranges
+        higher_lows_data = self.detect_higher_lows(contraction_data)
+
+        # Detect volume dry-up
+        volume_dryup_data = self.detect_volume_dryup(higher_lows_data)
+
+        # The final VCP candidates are the intersection of all conditions
+        vcp_candidates = contraction_data.index.intersection(higher_lows_data.index).intersection(
+            volume_dryup_data.index)
+
+        return stock_data.loc[vcp_candidates]
+
     def fetch_data(self, symbol, interval, elements=None):
         # Base query
 
@@ -89,8 +139,21 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         df = df.sort_values(by='time', ascending=True)
 
         # Calculate 50-day and 200-day SMA
-        df['SMA_50'] = df['close'].rolling(window=50).mean()
-        df['SMA_200'] = df['close'].rolling(window=200).mean()
+
+        # Calculate volatility contraction
+        df['SMA_50'] = ta.SMA(df['close'], timeperiod=50)
+        df['SMA_200'] = ta.SMA(df['close'], timeperiod=200)
+
+        # print(vcp_data.tail())
+        # higher_lows_data = self.detect_higher_lows(vcp_data)
+        # print(higher_lows_data.tail())
+        # volume_dryup_data = self.detect_volume_dryup(df)
+        # print(volume_dryup_data.tail())
+
+        # Example usage
+        # vcp_candidates = self.detect_vcp_pattern(df)
+        # print(vcp_candidates.tail())
+
 
         if interval == 'weekly':
             df.set_index('time', inplace=True)
@@ -170,6 +233,15 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
             plots.append(mpf.make_addplot(df['SMA_50'], color='#0000FF', width=0.5))
         if np.isnan(df['SMA_200']).all() is np.False_:
             plots.append(mpf.make_addplot(df['SMA_200'], color='#FF0000', width=0.5))
+
+        # # if np.isnan(df['Volatility_Contraction']).all() is np.False_:
+        vcp_data = self.detect_vcp(df)
+        df['VCP_Candidate'] = np.where(df.index.isin(vcp_data.index), 1, np.nan)
+
+        plots.append(mpf.make_addplot(df['VCP_Candidate'], type='scatter', markersize=100, marker='^', color='white'))
+
+
+
 
         # Step 5. Build Chart
         dpi = 100
@@ -286,7 +358,8 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
                     return date.strftime('%b')
             else:
                 return date.strftime('%d')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: custom_date_formatter(x,pos, date_min=df.index)))
+        # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: custom_date_formatter(x,pos, date_min=df.index)))
+        
 
         # Step 6. Add symbol and symbol name to the figure
         # symbol_name = MarketSymbol.objects.get(symbol=symbol).name

@@ -209,3 +209,5 @@ def stock_charts(request):
             'segment': 'stock charts',
         })
 
+
+

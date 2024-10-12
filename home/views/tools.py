@@ -55,9 +55,9 @@ def my_handler(sender, instance, created, **kwargs):
 
 def customize(request):
     try:
-        position_sizing = PositionSizing.objects.get(user=request.user)
+        position_sizing = UserStaticSetting.objects.get(user=request.user)
         form = PositionSizingForm(instance=position_sizing)
-    except PositionSizing.DoesNotExist:
+    except UserStaticSetting.DoesNotExist:
         form = PositionSizingForm()
 
     return render(
@@ -74,7 +74,7 @@ def customize_position_sizing(request):
     if request.method == 'POST':
         form = PositionSizingForm(request.POST)
         if form.is_valid():
-            position_sizing, created = PositionSizing.objects.update_or_create(
+            position_sizing, created = UserStaticSetting.objects.update_or_create(
                 user=request.user,
                 defaults=form.cleaned_data
             )

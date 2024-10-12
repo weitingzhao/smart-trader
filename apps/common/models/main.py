@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -20,6 +21,26 @@ from django.db import models
 # 	Refunded = models.CharField(max_length=20, choices=RefundedChoices.choices, default=RefundedChoices.NO)
 # 	Currency = models.CharField(max_length=10, choices=CurrencyChoices.choices, default=CurrencyChoices.USD)
 # 	Quantity = models.IntegerField(blank=True, null=True)
+
+class UserStaticSetting(models.Model):
+    """
+    This model is used to store the static setting for the system
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    capital = models.DecimalField(max_digits=15, decimal_places=2, default=10000)
+    risk = models.DecimalField(max_digits=5, decimal_places=2, default=0.5)
+    rounding = models.IntegerField(null=True, default=2)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    expect_gain_risk_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=2)
+    position_min = models.IntegerField(null=True, default=2)
+    position_max = models.IntegerField(null=True, default=2)
+
+    class Meta:
+        db_table = 'user_static_setting'
+
+    def __str__(self):
+        return f"Position Sizing for {self.user.username}"
 
 
 class UtilitiesLookup(models.Model):
