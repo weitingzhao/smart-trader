@@ -106,7 +106,7 @@ def stock_screener(request):
 
     return render(
         request=request,
-        template_name='pages/research/stock_screener.html',
+        template_name='pages/screening/stock_screener.html',
         context= {
             'parent': 'research',
             'segment': 'stock screener',
@@ -144,7 +144,7 @@ def stock_quote(request, symbol):
             }
         }
     }
-    return render(request, 'pages/stock/quote.html', context)
+    return render(request, 'pages/screening/quote.html', context)
 
 
 def get_stock_data(request):
@@ -203,7 +203,7 @@ def get_stock_data(request):
 def stock_charts(request):
     return render(
         request=request,
-        template_name='pages/research/stock_charts.html',
+        template_name='pages/screening/stock_charts.html',
         context= {
             'parent': 'research',
             'segment': 'stock charts',

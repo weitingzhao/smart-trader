@@ -14,7 +14,7 @@ def get_portfolios(request):
     user_id = 2 # for testing user
     portfolios = Portfolio.objects.filter(user=user_id)
 
-    return render(request, 'pages/portfolio/portfolios.html', {
+    return render(request, 'pages/position/portfolios.html', {
         'parent': 'portfolio',
         'segment': 'my portfolio',
         'portfolios': portfolios
@@ -140,7 +140,7 @@ def portfolio_detail(request, pk):
         'portfolio_items': final_json,
     }
     return render(request,
-                  template_name='pages/portfolio/portfolio_detail.html',
+                  template_name='pages/position/portfolio_detail.html',
                   context= context)
 
 
@@ -199,7 +199,7 @@ def add_portfolio_item(request, pk):
 def transaction_history(request, pk):
     item = get_object_or_404(PortfolioItem, pk=pk)
     transactions = Transaction.objects.filter(portfolio_item=item)
-    return render(request, 'pages/portfolio/transaction_history.html', {'item': item, 'transactions': transactions})
+    return render(request, 'pages/position/transaction_history.html', {'item': item, 'transactions': transactions})
 
 def add_transaction(request):
     if request.method == 'POST':

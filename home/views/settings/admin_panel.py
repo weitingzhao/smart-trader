@@ -43,7 +43,7 @@ def get_market_summary():
 def settings(request):
     return render(
         request,
-        template_name='pages/tools/settings.html',
+        template_name='pages/settings/admin_panel/settings.html',
         context = {
             'parent': 'tools',
             'segment': 'settings',
@@ -62,7 +62,7 @@ def customize(request):
 
     return render(
         request,
-        template_name='pages/tools/customize.html',
+        template_name='pages/settings/admin_panel/customize.html',
         context = {
             'parent': 'account',
             'segment': 'customize',
@@ -86,7 +86,7 @@ def customize_position_sizing(request):
             messages.error(request, f'Position Sizing form is invalid.', extra_tags='position sizing')
             return render(
                 request,
-                template_name='pages/tools/customize.html',
+                template_name='pages/settings/admin_panel/customize.html',
                 context={
                     'parent': 'account',
                     'segment': 'customize',
@@ -118,7 +118,7 @@ def lookup_page(request):
 
     return render(
         request,
-        template_name='pages/tools/lookup.html',
+        template_name='pages/settings/admin_panel/lookup.html',
         context={
             'parent': 'tools',
             'segment': 'lookup',

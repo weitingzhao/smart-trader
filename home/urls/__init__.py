@@ -4,18 +4,23 @@ from home import views
 urlpatterns = [
 
     ########## Default Index ####################
+    # Default Index
     path('', views.main.index, name='index'),
+    # Auto Reminder & Task Logs
+    path('auto_reminder/', views.main.auto_reminder, name='auto_reminder'),
+    path('tasks_logs/', views.main.get_task_log, name='get_task_log'),
+
+
 
     ########## Main System ####################
-
     # 1. Dashboard
     # path('dashboard/', include('home.urls.dashboard_urls')),
     # # 2. Screening
-    path('screening/', include('home.urls.screening_urls')),
+    path('screening/', include('home.urls.screening')),
     # # 3. Wishlist
     # path('wishlist/', include('home.urls.wishlist_urls')),
     # # 4. Position
-    path('position/', include('home.urls.position_urls')),
+    path('position/', include('home.urls.position')),
     # # 5. Performance
     # path('performance/', include('home.urls.performance_urls')),
     # # 6. Cash Flow
@@ -23,16 +28,13 @@ urlpatterns = [
     # # 7. Report & Analytics
     # path('analytics/', include('home.urls.analytics_urls')),
     # # 8. Settings
-    path('settings/', include('home.urls.settings_urls')),
+    path('settings/', include('home.urls.settings')),
+
 
 
     ########## Utilities ############$$########
-
-    # Auto Reminder & Task Logs
-    path('auto_reminder/', views.main.auto_reminder, name='auto_reminder'),
-    path('tasks_logs/', views.main.get_task_log, name='get_task_log'),
     # Authorization & Authentication
-    path('accounts/', include('home.urls.accounts_urls')),
+    path('accounts/', include('home.urls.accounts')),
     path('logout/', views.account.logout_view, name='logout'),
     # Error
     path('error/404/', views.accounts.error_404, name="error_404"),
