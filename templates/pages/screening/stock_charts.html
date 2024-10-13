@@ -227,8 +227,8 @@
     <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
     <script>
         if (document.getElementById('stock-charts-option')) {
-            var stock_charts_option = document.getElementById('stock-charts-option');
-            const example = new Choices(stock_charts_option, {
+            const stock_charts_option = document.getElementById('stock-charts-option');
+            new Choices(stock_charts_option, {
                 delimiter: ',',
                 editItems: true,
                 maxItemCount: 50,
