@@ -19,4 +19,4 @@ class TransactionForm(forms.ModelForm):
 class PositionSizingForm(forms.ModelForm):
     class Meta:
         model = UserStaticSetting
-        fields = ['capital', 'risk', 'rounding', 'commission', 'tax']
+        fields = ['capital', 'risk', 'rounding', 'commission', 'tax', 'expect_gain_risk_ratio', 'position_min', 'position_max']

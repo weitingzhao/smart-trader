@@ -55,8 +55,8 @@ def my_handler(sender, instance, created, **kwargs):
 
 def customize(request):
     try:
-        position_sizing = UserStaticSetting.objects.get(user=request.user)
-        form = PositionSizingForm(instance=position_sizing)
+        user_static_setting = UserStaticSetting.objects.get(user=request.user)
+        form = PositionSizingForm(instance=user_static_setting)
     except UserStaticSetting.DoesNotExist:
         form = PositionSizingForm()
 

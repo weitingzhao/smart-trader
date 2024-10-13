@@ -56,7 +56,7 @@ urlpatterns = [
 
 
 urlpatterns += i18n_patterns(
-    path('i18n/', views.common.i18n_view, name="i18n_view")
+    path('i18n/', views.main.i18n_view, name="i18n_view")
 )
 
 if not DEBUG:

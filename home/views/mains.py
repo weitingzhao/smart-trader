@@ -16,6 +16,15 @@ def index(request):
     }
     return render(request, template_name='pages/index.html', context= context)
 
+# i18n
+def i18n_view(request):
+  context = {
+    'parent': 'apps',
+    'segment': 'i18n'
+  }
+  return render(request, 'pages/apps/i18n.html', context)
+
+
 @require_GET
 def auto_reminder(request):
     query = request.GET.get('query', '')

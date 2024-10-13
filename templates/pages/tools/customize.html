@@ -89,14 +89,16 @@
                             <div class="row">
                                 <div class="col-md-2 mb-3">
                                     <label for="id_capital" class="form-label">Capital</label>
-                                    <input type="text" class="form-control {% if position_sizing_form.capital.errors %}is-invalid{% endif %}" id="id_capital" name="capital" value="{{ position_sizing_form.capital.value }}">
+                                    <input type="text" class="form-control {% if position_sizing_form.capital.errors %}is-invalid{% endif %}" id="id_capital" name="capital_display" value="{{ position_sizing_form.capital.value }}">
+                                    <input type="hidden" id="id_capital_hidden" name="capital" value="{{ position_sizing_form.capital.value }}">
                                     <div class="invalid-feedback">
                                         {{ position_sizing_form.capital.errors }}
                                     </div>
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label for="id_risk" class="form-label">Risk</label>
-                                    <input type="text" class="form-control {% if position_sizing_form.risk.errors %}is-invalid{% endif %}" id="id_risk" name="risk" value="{{ position_sizing_form.risk.value }}">
+                                    <input type="text" class="form-control {% if position_sizing_form.risk.errors %}is-invalid{% endif %}" id="id_risk" name="risk_display" value="{{ position_sizing_form.risk.value }}">
+                                    <input type="hidden" id="id_risk_hidden" name="risk" value="{{ position_sizing_form.risk.value }}">
                                     <div class="invalid-feedback">
                                         {{ position_sizing_form.risk.errors }}
                                     </div>
@@ -120,6 +122,29 @@
                                     <input type="text" class="form-control {% if position_sizing_form.tax.errors %}is-invalid{% endif %}" id="id_tax" name="tax" value="{{ position_sizing_form.tax.value }}">
                                     <div class="invalid-feedback">
                                         {{ position_sizing_form.tax.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_expect_gain_risk_ratio" class="form-label">Expect Gain Risk Ratio</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.expect_gain_risk_ratio.errors %}is-invalid{% endif %}" id="id_expect_gain_risk_ratio" name="expect_gain_risk_ratio" value="{{ position_sizing_form.expect_gain_risk_ratio.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.expect_gain_risk_ratio.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_position_min" class="form-label">Position Min</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.position_min.errors %}is-invalid{% endif %}" id="id_position_min" name="position_min" value="{{ position_sizing_form.position_min.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.position_min.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_position_max" class="form-label">Position Max</label>
+                                    <input type="text" class="form-control {% if position_sizing_form.position_max.errors %}is-invalid{% endif %}" id="id_position_max" name="position_max" value="{{ position_sizing_form.position_max.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ position_sizing_form.position_max.errors }}
                                     </div>
                                 </div>
                             </div>
@@ -648,6 +673,49 @@
 <script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
 <script src="{% static 'assets/js/plugins/countup.min.js' %}"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const capitalInput = document.getElementById('id_capital');
+        const riskInput = document.getElementById('id_risk');
+        const capitalHiddenInput = document.getElementById('id_capital_hidden');
+        const riskHiddenInput = document.getElementById('id_risk_hidden');
+    
+        function formatCurrency(value) {
+            if (typeof Intl !== 'undefined' && Intl.NumberFormat) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(value);
+            } else {
+                console.error('Intl.NumberFormat is not supported in this environment.');
+                return value;
+            }
+        }
+    
+        function formatPercentage(value) {
+            if (typeof parseFloat === 'function') {
+                return `${parseFloat(value).toFixed(2)}%`;
+            } else {
+                console.error('parseFloat is not supported in this environment.');
+                return value;
+            }
+        }
+    
+        // Format the inputs by default
+        capitalInput.value = formatCurrency(capitalHiddenInput.value);
+        riskInput.value = formatPercentage(riskHiddenInput.value);
+    
+        capitalInput.addEventListener('blur', function () {
+            capitalHiddenInput.value = capitalInput.value.replace(/[^0-9.-]+/g, '');
+            capitalInput.value = formatCurrency(capitalHiddenInput.value);
+        });
+    
+        riskInput.addEventListener('blur', function () {
+            riskHiddenInput.value = riskInput.value.replace(/[^0-9.-]+/g, '');
+            riskInput.value = formatPercentage(riskHiddenInput.value);
+        });
+    });
+
+
     {% if messages %}
         const currentTime = new Date().toLocaleTimeString();
         {% for message in messages %}

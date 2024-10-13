@@ -4,7 +4,6 @@ from logics.utilities.dates import Dates
 matplotlib.use('Agg')
 
 import talib as ta
-import numpy as np
 
 import calendar
 from django.contrib.staticfiles import finders
