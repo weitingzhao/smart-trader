@@ -1,4 +1,3 @@
-from home import views
 from django.urls import path
 from home.views import screening as screening
 

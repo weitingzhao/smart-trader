@@ -47,8 +47,6 @@ FROM
             SUM(volume) AS volume
         FROM
             market_stock_hist_bars_{table_name}_ts
-        WHERE
-            symbol = mk.symbol            
         GROUP BY
             symbol, DATE(time)
     ) sub ON sub.symbol = mk.symbol
