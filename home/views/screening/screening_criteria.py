@@ -14,6 +14,17 @@ from logics.utilities.dates import Dates
 # Create your views here.
 instance = Logic()
 
+
+def default(request):
+    return render(
+        request=request,
+        template_name='pages/screening/screening_criteria.html',
+        context= {
+            'parent': 'screening',
+            'segment': 'screening_criteria',
+        })
+
+
 @csrf_exempt
 def stock_search(request):
     if request.method == 'POST':

@@ -8,6 +8,15 @@ from django.shortcuts import render, get_object_or_404
 
 
 
+def default(request):
+    return render(
+        request=request,
+        template_name='pages/position/open_positions.html',
+        context= {
+            'parent': 'screening',
+            'segment': 'wishlist_overview',
+        })
+
 
 def get_portfolios(request):
     # user_id = request.user

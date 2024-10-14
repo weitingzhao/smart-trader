@@ -1,0 +1,24 @@
+{% extends 'layouts/../layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container-fluid py-4">
+
+        overview 
+        
+        Displays general system health, account balance, total portfolio value, and performance metrics.
+        Displays a real-time summary of the entire portfolio, including:
+        1. Current Holdings: A list of all open positions and their individual performance.
+        2. Portfolio Value: Total portfolio value including cash, stocks, and other assets.
+        3. Cash Balance: Total available cash, showing recent cash inflows/outflows.
+        4. Allocation: Visualize how capital is allocated across asset classes (e.g., stocks, cash), sectors, and individual positions.
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block scripts %}
+
+{% endblock scripts %}
