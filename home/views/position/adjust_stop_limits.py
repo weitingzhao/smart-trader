@@ -6,6 +6,6 @@ def default(request):
         request=request,
         template_name='pages/position/adjust_stop_limits.html',
         context= {
-            'parent': 'screening',
+            'parent': 'position',
             'segment': 'adjust_stop_limits',
         })

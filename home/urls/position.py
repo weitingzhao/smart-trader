@@ -5,6 +5,12 @@ from home.views import position
 urlpatterns = [
 
     ####### position.open_positions #######
+    # Open Positions -> Default
+    path(
+        'open_positions/',
+        position.open_positions.default,
+        name='open_positions'),
+
     # Open Positions -> Portfolio -> List
     path(
         '',
@@ -47,7 +53,17 @@ urlpatterns = [
         name='delete_transaction'),
 
     ####### position.adjust_stop_limits #######
+    # Adjust Stop Limit  -> Default
+    path(
+        'adjust_stop_limits/',
+        position.adjust_stop_limits.default,
+        name='adjust_stop_limits'),
 
     ####### position.close_position #######
+    # Close Position  -> Default
+    path(
+        'close_positions/',
+        position.close_positions.default,
+        name='close_positions'),
 
 ]

@@ -6,6 +6,6 @@ def default(request):
         request=request,
         template_name='pages/position/close_positions.html',
         context= {
-            'parent': 'screening',
-            'segment': 'close_position',
+            'parent': 'position',
+            'segment': 'close_positions',
         })

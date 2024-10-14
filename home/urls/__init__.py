@@ -18,15 +18,15 @@ urlpatterns = [
     # # 2. Screening
     path('screening/', include('home.urls.screening')),
     # # 3. Wishlist
-    # path('wishlist/', include('home.urls.wishlist')),
+    path('wishlist/', include('home.urls.wishlist')),
     # # 4. Position
     path('position/', include('home.urls.position')),
     # # 5. Performance
-    # path('performance/', include('home.urls.performance')),
+    path('performance/', include('home.urls.performance')),
     # # 6. Cash Flow
-    # path('cashflow/', include('home.urls.cash_flow')),
+    path('cashflow/', include('home.urls.cash_flow')),
     # # 7. Report & Analytics
-    # path('analytics/', include('home.urls.analytics')),
+    path('analytics/', include('home.urls.analytics')),
     # # 8. Settings
     path('settings/', include('home.urls.settings')),
 

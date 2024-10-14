@@ -13,8 +13,8 @@ def default(request):
         request=request,
         template_name='pages/position/open_positions.html',
         context= {
-            'parent': 'screening',
-            'segment': 'wishlist_overview',
+            'parent': 'position',
+            'segment': 'open_positions',
         })
 
 

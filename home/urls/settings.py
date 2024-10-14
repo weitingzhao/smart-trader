@@ -4,6 +4,29 @@ from home.views import settings
 #all below path with [settings]
 urlpatterns = [
 
+    ####### settings.account_settings #######
+    # Account Settings -> Default
+    path(
+        'account_settings/',
+        settings.account_settings.default,
+        name='account_settings'),
+
+    ####### settings.risk_references #######
+    # Risk References -> Default
+    path(
+        'overview/',
+        settings.risk_preferences.default,
+        name='risk_preferences'),
+
+    ####### settings.notifications #######
+    # Overview -> Default
+    path(
+        'notifications/',
+        settings.notifications.default,
+        name='notifications'),
+
+
+
     # Admin Panel -> Settings
     path(
         'settings',

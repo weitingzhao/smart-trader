@@ -6,6 +6,6 @@ def default(request):
         request=request,
         template_name='pages/performance/trade_history.html',
         context= {
-            'parent': 'screening',
+            'parent': 'performance',
             'segment': 'trade_history',
         })

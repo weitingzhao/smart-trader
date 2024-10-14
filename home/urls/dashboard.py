@@ -1,5 +1,5 @@
 from django.urls import path
-from home.views import dashboard as dashboard
+from home.views import dashboard
 
 #all below path with [screening]
 urlpatterns = [

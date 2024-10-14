@@ -16,19 +16,19 @@
               <ul class="nav ms-4 ps-3">
                 <li class="nav-item {% if 'overview' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'overview' in segment %}active{% endif %}" href="{% url 'dashboard_overview' %}">
-                    <span class="sidenav-mini-icon"> O </span>
+                    <span class="sidenav-mini-icon"> OV </span>
                     <span class="sidenav-normal"> Overview </span>
                   </a>
                 </li>
                 <li class="nav-item {% if 'market_summary' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'market_summary' in segment %}active{% endif %}" href="{% url 'dashboard_market_summary' %}">
-                    <span class="sidenav-mini-icon"> O </span>
+                    <span class="sidenav-mini-icon"> MS </span>
                     <span class="sidenav-normal"> Market Summary </span>
                   </a>
                 </li>
                 <li class="nav-item {% if 'recent_activity' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'recent_activity' in segment %}active{% endif %}" href="{% url 'dashboard_recent_activity' %}">
-                    <span class="sidenav-mini-icon"> O </span>
+                    <span class="sidenav-mini-icon"> RA </span>
                     <span class="sidenav-normal"> Recent Activity </span>
                   </a>
                 </li>
@@ -52,32 +52,32 @@
           <ul class="nav ms-4 ps-3">
               <li class="nav-item {% if 'screening_criteria' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'screening_criteria' in segment %}active{% endif %}" href="{% url 'screening_criteria' %}" target="_self">
-                      <span class="sidenav-mini-icon"> C </span>
+                      <span class="sidenav-mini-icon"> SC </span>
                       <span class="sidenav-normal"> Screening Criteria </span>
                   </a>
               </li>
               <li class="nav-item {% if 'screening_results' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'screening_results' in segment %}active{% endif %}" href="{% url 'screening_results' %}" target="_self">
-                      <span class="sidenav-mini-icon"> R </span>
+                      <span class="sidenav-mini-icon"> SR </span>
                       <span class="sidenav-normal"> Screening Results </span>
                   </a>
               </li>
               <li class="nav-item {% if 'saved_screeners' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'saved_screeners' in segment %}active{% endif %}" href="{% url 'saved_screeners' %}" target="_self">
-                      <span class="sidenav-mini-icon"> S </span>
+                      <span class="sidenav-mini-icon"> SS </span>
                       <span class="sidenav-normal"> Saved Screeners </span>
                   </a>
               </li>
               <li class="nav-item {% if 'stock screener' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'stock screener' in segment %}active{% endif %}" href="{% url 'stock_screener' %}" target="_self">
-                      <span class="sidenav-mini-icon"> K </span>
-                      <span class="sidenav-normal"> Stock Screener </span>
+                      <span class="sidenav-mini-icon"> -- </span>
+                      <span class="sidenav-normal"> --Stock Screener </span>
                   </a>
               </li>
               <li class="nav-item {% if 'stock charts' in segment %}active{% endif %}">
                   <a class="nav-link {% if 'stock charts' in segment %}active{% endif %}" href="{% url 'stock_charts' %}" target="_self">
-                      <span class="sidenav-mini-icon"> C </span>
-                      <span class="sidenav-normal"> Stock Charts </span>
+                      <span class="sidenav-mini-icon"> -- </span>
+                      <span class="sidenav-normal"> --Stock Charts </span>
                   </a>
               </li>
           </ul>
@@ -85,24 +85,223 @@
       </li>
     {% endif %}
 
-    <!-- Portfolio -->
-    {%check_menu_permission request.user True True False as perm_Portfolio%}
-    {% if perm_Portfolio %}
+    <!-- Wishlist -->
+    {%check_menu_permission request.user True True False as perm_wishlist %}
+    {% if perm_wishlist %}
       <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#portfolioPanel" class="nav-link {% if 'portfolio' in parent %}active{% endif %}" aria-controls="portfolioPanel" role="button" aria-expanded="false">
+        <a data-bs-toggle="collapse" href="#wishlistPanel"
+           class="nav-link {% if 'wishlist' in parent %}active{% endif %}" aria-controls="screeningPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-chart-pie fs-7 {% if 'my portfolio' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'wishlist_overview' in segment or 'position_sizing' in segment or 'stop_limit_setup' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
-          <span class="nav-link-text ms-1">Portfolio</span>
+          <span class="nav-link-text ms-1">Wishlist</span>
         </a>
-        <div class="collapse {% if 'portfolio' in parent %}show{% endif %} " id="portfolioPanel">
+        <div class="collapse {% if 'wishlist' in parent %}show{% endif %} " id="wishlistPanel">
           <ul class="nav ms-4 ps-3">
-            <li class="nav-item {% if 'my portfolio' in segment %}active{% endif %}">
-              <a class="nav-link {% if 'my portfolio' in segment %}active{% endif %}" href="{% url 'portfolios' %}">
-                <span class="sidenav-mini-icon"> P </span>
-                <span class="sidenav-normal"> My Portfolio </span>
-              </a>
-            </li>
+              <li class="nav-item {% if 'wishlist_overview' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'wishlist_overview' in segment %}active{% endif %}" href="{% url 'wishlist_overview' %}" target="_self">
+                      <span class="sidenav-mini-icon"> WO </span>
+                      <span class="sidenav-normal"> Wishlist Overview </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'position_sizing' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'position_sizing' in segment %}active{% endif %}" href="{% url 'position_sizing' %}" target="_self">
+                      <span class="sidenav-mini-icon"> PS </span>
+                      <span class="sidenav-normal"> Position Sizing </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'stop_limit_setup' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'stop_limit_setup' in segment %}active{% endif %}" href="{% url 'stop_limit_setup' %}" target="_self">
+                      <span class="sidenav-mini-icon"> SL </span>
+                      <span class="sidenav-normal"> Stop Limit Setup </span>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </li>
+    {% endif %}
+
+    <!-- Position -->
+    {%check_menu_permission request.user True True False as perm_position %}
+    {% if perm_position %}
+      <li class="nav-item">
+        <a data-bs-toggle="collapse" href="#positionPanel"
+           class="nav-link {% if 'position' in parent %}active{% endif %}" aria-controls="positionPanel" role="button" aria-expanded="false">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+              <i class="fas fa-flask-vial fs-7 {% if 'open_positions' in segment or 'adjust_stop_limits' in segment or 'close_positions' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+          </div>
+          <span class="nav-link-text ms-1">Position</span>
+        </a>
+        <div class="collapse {% if 'position' in parent %}show{% endif %} " id="positionPanel">
+          <ul class="nav ms-4 ps-3">
+              <li class="nav-item {% if 'open_positions' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'open_positions' in segment %}active{% endif %}" href="{% url 'open_positions' %}" target="_self">
+                      <span class="sidenav-mini-icon"> OP </span>
+                      <span class="sidenav-normal"> Open Positions </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'adjust_stop_limits' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'adjust_stop_limits' in segment %}active{% endif %}" href="{% url 'adjust_stop_limits' %}" target="_self">
+                      <span class="sidenav-mini-icon"> SL </span>
+                      <span class="sidenav-normal"> Adjust Stop Limits </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'close_positions' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'close_positions' in segment %}active{% endif %}" href="{% url 'close_positions' %}" target="_self">
+                      <span class="sidenav-mini-icon"> CP </span>
+                      <span class="sidenav-normal"> Close Position </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'my portfolio' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'my portfolio' in segment %}active{% endif %}" href="{% url 'portfolios' %}">
+                      <span class="sidenav-mini-icon"> MP </span>
+                      <span class="sidenav-normal"> My Portfolio </span>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </li>
+    {% endif %}
+
+    <!-- Performance -->
+    {%check_menu_permission request.user True True False as perm_performance %}
+    {% if perm_performance %}
+      <li class="nav-item">
+        <a data-bs-toggle="collapse" href="#performancePanel"
+           class="nav-link {% if 'performance' in parent %}active{% endif %}" aria-controls="performancePanel" role="button" aria-expanded="false">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+              <i class="fas fa-flask-vial fs-7 {% if 'calendar_view' in segment or 'daily_logs' in segment or 'portfolio_performance' in segment or 'trade_history' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+          </div>
+          <span class="nav-link-text ms-1">Performance</span>
+        </a>
+        <div class="collapse {% if 'performance' in parent %}show{% endif %} " id="performancePanel">
+          <ul class="nav ms-4 ps-3">
+              <li class="nav-item {% if 'calendar_view' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'calendar_view' in segment %}active{% endif %}" href="{% url 'calendar_view' %}" target="_self">
+                      <span class="sidenav-mini-icon"> CV </span>
+                      <span class="sidenav-normal"> Calendar View </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'daily_logs' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'daily_logs' in segment %}active{% endif %}" href="{% url 'daily_logs' %}" target="_self">
+                      <span class="sidenav-mini-icon"> DL </span>
+                      <span class="sidenav-normal"> Daily Logs </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'portfolio_performance' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'portfolio_performance' in segment %}active{% endif %}" href="{% url 'portfolio_performance' %}" target="_self">
+                      <span class="sidenav-mini-icon"> PP </span>
+                      <span class="sidenav-normal"> Portfolio Performance </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'trade_history' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'trade_history' in segment %}active{% endif %}" href="{% url 'trade_history' %}">
+                      <span class="sidenav-mini-icon"> TH </span>
+                      <span class="sidenav-normal"> Trade History </span>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </li>
+    {% endif %}
+
+    <!-- Cash Flow -->
+    {%check_menu_permission request.user True True False as perm_cash_flow %}
+    {% if perm_cash_flow %}
+      <li class="nav-item">
+        <a data-bs-toggle="collapse" href="#cashFlowPanel"
+           class="nav-link {% if 'cash_flow' in parent %}active{% endif %}" aria-controls="performancePanel" role="button" aria-expanded="false">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+              <i class="fas fa-flask-vial fs-7 {% if 'cash_overview' in segment or 'cash_flow_history' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+          </div>
+          <span class="nav-link-text ms-1">Cash Flow</span>
+        </a>
+        <div class="collapse {% if 'cash_flow' in parent %}show{% endif %} " id="cashFlowPanel">
+          <ul class="nav ms-4 ps-3">
+              <li class="nav-item {% if 'cash_overview' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'cash_overview' in segment %}active{% endif %}" href="{% url 'cash_overview' %}" target="_self">
+                      <span class="sidenav-mini-icon"> CO </span>
+                      <span class="sidenav-normal"> Cash Overview </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'cash_flow_history' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'cash_flow_history' in segment %}active{% endif %}" href="{% url 'cash_flow_history' %}" target="_self">
+                      <span class="sidenav-mini-icon"> CF </span>
+                      <span class="sidenav-normal"> Cash Flow History </span>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </li>
+    {% endif %}
+
+    <!-- Analytics -->
+    {%check_menu_permission request.user True True False as perm_analytics %}
+    {% if perm_analytics %}
+      <li class="nav-item">
+        <a data-bs-toggle="collapse" href="#analyticsPanel"
+           class="nav-link {% if 'analytics' in parent %}active{% endif %}" aria-controls="analyticsPanel" role="button" aria-expanded="false">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+              <i class="fas fa-flask-vial fs-7 {% if 'risk_analysis' in segment or 'performance_analytics' in segment or 'market_comparison' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+          </div>
+          <span class="nav-link-text ms-1">Analytics</span>
+        </a>
+        <div class="collapse {% if 'analytics' in parent %}show{% endif %} " id="analyticsPanel">
+          <ul class="nav ms-4 ps-3">
+              <li class="nav-item {% if 'risk_analysis' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'risk_analysis' in segment %}active{% endif %}" href="{% url 'risk_analysis' %}" target="_self">
+                      <span class="sidenav-mini-icon"> RA </span>
+                      <span class="sidenav-normal"> Risk Analysis </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'performance_analytics' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'performance_analytics' in segment %}active{% endif %}" href="{% url 'performance_analytics' %}" target="_self">
+                      <span class="sidenav-mini-icon"> PA </span>
+                      <span class="sidenav-normal"> Performance Analytics </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'market_comparison' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'market_comparison' in segment %}active{% endif %}" href="{% url 'market_comparison' %}" target="_self">
+                      <span class="sidenav-mini-icon"> MC </span>
+                      <span class="sidenav-normal"> Market Comparison </span>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </li>
+    {% endif %}
+
+    <!-- Settings -->
+    {%check_menu_permission request.user True True False as perm_settings %}
+    {% if perm_settings %}
+      <li class="nav-item">
+        <a data-bs-toggle="collapse" href="#settingsPanel"
+           class="nav-link {% if 'settings' in parent %}active{% endif %}" aria-controls="settingsPanel" role="button" aria-expanded="false">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+              <i class="fas fa-flask-vial fs-7 {% if 'account_settings' in segment or 'risk_preferences' in segment or 'notifications' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+          </div>
+          <span class="nav-link-text ms-1">Settings</span>
+        </a>
+        <div class="collapse {% if 'settings' in parent %}show{% endif %} " id="settingsPanel">
+          <ul class="nav ms-4 ps-3">
+              <li class="nav-item {% if 'account_settings' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'account_settings' in segment %}active{% endif %}" href="{% url 'account_settings' %}" target="_self">
+                      <span class="sidenav-mini-icon"> AS </span>
+                      <span class="sidenav-normal"> Account Settings </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'risk_preferences' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'risk_preferences' in segment %}active{% endif %}" href="{% url 'risk_preferences' %}" target="_self">
+                      <span class="sidenav-mini-icon"> RA </span>
+                      <span class="sidenav-normal"> Risk Preferences </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'notifications' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'notifications' in segment %}active{% endif %}" href="{% url 'notifications' %}" target="_self">
+                      <span class="sidenav-mini-icon"> NO </span>
+                      <span class="sidenav-normal"> notifications </span>
+                  </a>
+              </li>
           </ul>
         </div>
       </li>
