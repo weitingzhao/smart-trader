@@ -6,7 +6,7 @@
     {% if perm_dashboard %}
         <li class="nav-item">
             <a data-bs-toggle="collapse"  href="#dashboardPanel"
-               class="nav-link {% if 'dashboard' in parent %}active{% endif %}" href="{% url 'index' %}" aria-controls="dashboardPanel" role="button" aria-expanded="false">
+               class="nav-link {% if 'dashboard' in parent %}active{% endif %}" aria-controls="dashboardPanel" role="button" aria-expanded="false">
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
                     <i class="fas fa-house fs-7 {% if segment in 'overview' or segment in 'market_summary' or segment in 'recent_activity'%}text-white{% else %}text-dark{% endif %}"></i>
                 </div>
