@@ -210,11 +210,12 @@
         const currentTime = new Date().toLocaleTimeString();
         {% for message in messages %}
             console.log('{{ message }}');
-            showNotification(
-                {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %},
-                '{{ message.extra_tags }}',  // Replace with the actual task name if needed
-                '{{ message.message }}',
-                currentTime)
+            
+            level = {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %} 
+            title = '{{ message.extra_tags }}'; // Replace with the actual task name if needed
+            content = '{{ message.message }}';
+            
+            showNotification(level, title, content, currentTime);
             {#showNotification('error', task_name, data.error, currentTime);#}
 
         {% endfor %}
