@@ -1,0 +1,119 @@
+{% extends 'layouts/../layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+            <div class="multisteps-form mb-5">
+                <!--progress bar-->
+                <div class="row">
+                    <div class="col-12 col-lg-8 mx-auto my-5">
+                        <div class="multisteps-form__progress">
+                            <button class="multisteps-form__progress-btn js-active" type="button" title="User Info">
+                                <span>Pick Holding Symbol under <b>{{ portfolio.name }}</b></span>
+                            </button>
+                            <button class="multisteps-form__progress-btn" type="button" title="Address">Fill Buy order</button>
+                        </div>
+                    </div>
+                </div>
+                <!--form panels-->
+                <div class="row">
+                    <div class="col-12 col-lg-8 m-auto">
+                      <form  class="multisteps-form__form mb-8" id="holding_buy_order_form" class="mb-8">
+                          {% csrf_token %}
+                          <!--single form panel-->
+                          <div class="card multisteps-form__panel p-3 border-radius-xl bg-white js-active" data-animation="FadeIn">
+                              <h5 class="font-weight-bolder mb-0">Select or Create Holding</h5>
+                              <div class="row mt-3">
+                                  <div class="col-12 col-sm-6">
+                                      <label for="{{ holding_selection_form.holding.id_for_label }}">Select Holding</label>
+                                      {{ holding_selection_form.holding }}
+                                  </div>
+                                  <div class="col-12 col-sm-6">
+                                      <label for="{{ holding_selection_form.new_holding_symbol.id_for_label }}">New Holding Symbol</label>
+                                      {{ holding_selection_form.new_holding_symbol }}
+                                  </div>
+                              </div>
+                              <div class="button-row d-flex mt-4">
+                                  <button class="btn bg-gradient-dark ms-auto mb-0" type="submit" name="holding_selection" title="Next">Next</button>
+                              </div>
+                          </div>
+                          <!--single form panel-->
+                          <div class="card multisteps-form__panel p-3 border-radius-xl bg-white" data-animation="FadeIn">
+                              <h5 class="font-weight-bolder mb-0">Initial Positions</h5>
+                              <p class="mb-0 text-sm">order for open position</p>
+                              <div class="row mt-3">
+                                  <div class="col-12 col-sm-4">
+                                      <label for="{{ form.action.id_for_label }}">Action</label>
+                                      <select class="form-select" id="{{ form.action.id_for_label }}" name="{{ form.action.name }}">
+                                        {% for choice in form.action.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if choice.0 == form.action.value %}selected{% endif %}>
+                                                {{ choice.1 }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.order_place_date.id_for_label }}">Order Place Date</label>
+                                      {{ form.order_place_date }}
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.quality_target.id_for_label }}">Quantity target</label>
+                                      {{ form.quantity_target }}
+                                  </div>
+                              </div>
+                              <div class="row mt-3">
+                                  <div class="col-12 col-sm-4">
+                                      <label for="{{ form.price_market.id_for_label }}">Market Price</label>
+                                      {{ form.price_market }}
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.price_stop.id_for_label }}">Stop Price</label>
+                                      {{ form.price_stop }}
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.price_limit.id_for_label }}">Limit Price</label>
+                                      {{ form.price_limit }}
+                                  </div>
+                              </div>
+                              <div class="row mt-3">
+                                  <div class="col-12 col-sm-4">
+                                      <label for="{{ form.is_initial.id_for_label }}">Is Initial</label>
+                                      {{ form.is_initial }}
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.is_additional.id_for_label }}">Is Additional</label>
+                                      {{ form.is_additional }}
+                                  </div>
+                                  <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                      <label for="{{ form.timing.id_for_label }}">Timing</label>
+                                      <select class="form-select" id="{{ form.timing.id_for_label }}" name="{{ form.timing.name }}">
+                                        {% for choice in form.timing.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if choice.0 == form.timing.value %}selected{% endif %}>
+                                                {{ choice.1 }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                  </div>
+                              </div>
+                              <div class="button-row d-flex mt-4">
+                                  <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next">Submit</button>
+                              </div>
+                          </div>
+                      </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      {% include 'includes/footer.html' %}
+  </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block scripts %}
+
+{% endblock scripts %}

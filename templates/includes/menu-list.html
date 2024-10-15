@@ -92,7 +92,7 @@
         <a data-bs-toggle="collapse" href="#wishlistPanel"
            class="nav-link {% if 'wishlist' in parent %}active{% endif %}" aria-controls="screeningPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-flask-vial fs-7 {% if 'wishlist_overview' in segment or 'position_sizing' in segment or 'stop_limit_setup' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'wishlist_overview' in segment or 'position_sizing' in segment or 'initial_positions' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
           <span class="nav-link-text ms-1">Wishlist</span>
         </a>
@@ -110,10 +110,10 @@
                       <span class="sidenav-normal"> Position Sizing </span>
                   </a>
               </li>
-              <li class="nav-item {% if 'stop_limit_setup' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'stop_limit_setup' in segment %}active{% endif %}" href="{% url 'stop_limit_setup' %}" target="_self">
-                      <span class="sidenav-mini-icon"> SL </span>
-                      <span class="sidenav-normal"> Stop Limit Setup </span>
+              <li class="nav-item {% if 'initial_positions' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'initial_positions' in segment %}active{% endif %}" href="{% url 'initial_positions' %}" target="_self">
+                      <span class="sidenav-mini-icon"> IP </span>
+                      <span class="sidenav-normal"> Initial Positions </span>
                   </a>
               </li>
           </ul>
@@ -150,12 +150,6 @@
                   <a class="nav-link {% if 'close_positions' in segment %}active{% endif %}" href="{% url 'close_positions' %}" target="_self">
                       <span class="sidenav-mini-icon"> CP </span>
                       <span class="sidenav-normal"> Close Position </span>
-                  </a>
-              </li>
-              <li class="nav-item {% if 'my portfolio' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'my portfolio' in segment %}active{% endif %}" href="{% url 'portfolios' %}">
-                      <span class="sidenav-mini-icon"> MP </span>
-                      <span class="sidenav-normal"> My Portfolio </span>
                   </a>
               </li>
           </ul>

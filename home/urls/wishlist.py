@@ -18,10 +18,10 @@ urlpatterns = [
         wishlist.position_sizing.default,
         name='position_sizing'),
 
-    ####### wishlist.stop_limit_setup #######
+    ####### wishlist.initial_positions #######
     # Screening Result -> Default
     path(
-        'stop_limit_setup/',
-        wishlist.stop_limit_setup.default,
-        name='stop_limit_setup'),
+        'initial_positions/',
+        wishlist.initial_positions.default,
+        name='initial_positions'),
 ]

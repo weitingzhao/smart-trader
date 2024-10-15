@@ -11,22 +11,11 @@ urlpatterns = [
         position.open_positions.default,
         name='open_positions'),
 
-    # Open Positions -> Portfolio -> List
-    path(
-        '',
-        position.open_positions.get_portfolios,
-        name='portfolios'),
-    # Open Positions -> Portfolio -> Detail
-    path(
-        '<int:pk>/',
-        position.open_positions.portfolio_detail,
-        name='portfolio_detail'),
-
     # Open Positions -> Holding -> Add
     path(
-        '<int:pk>/add_item/',
-        position.open_positions.add_portfolio_item,
-        name='add_portfolio_item'),
+        'holding/<int:pk>/add/',
+        position.open_positions.add_holding,
+        name='add_holding'),
 
 
     # Open Positions -> Transactions -> List

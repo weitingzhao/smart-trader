@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% load static %}
+{% load static home_filter %}
 
 {% block content %}
     <div class="container-fluid">
@@ -16,164 +16,572 @@
             <div class="col-auto my-auto">
               <div class="h-100">
                 <h5 class="mb-1">
-                   Open Positions
+                    Open Positions
                 </h5>
-                <p class="mb-0 font-weight-bold text-sm">
-                  xxx,xxx
-                </p>
+                <p  class="mb-0 font-weight-bold text-sm text-primary">{{ portfolio.name }}</p>
               </div>
-            </div>
-            <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
-                    <button type="button" id="add-portfolio-btn" class="btn bg-gradient-info w-18 mb-0 toast-btn"
-                            data-bs-toggle="modal" data-bs-target="#modal-default">
-                      Create New Portfolio
-                    </button>                
             </div>
           </div>
         </div>
     </div>
     <div class="container-fluid py-4">
         <div class="row">
-            <div class="col-12">
+            <div id="detail_panel" class="col-lg-6 col-md-10 col-12">
+                <div class="nav-wrapper position-relative end-0">
+                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                        <li class="nav-item">
+                            <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
+                                <span class="ms-1">Summary</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                <span class="ms-1">My Holdings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                <span class="ms-1">Fundamentals</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="summary_panel" class="col-12">
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
                         <p>
-                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn">
-                                My Portfolio
+                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn"
+                                    data-bs-toggle="collapse" href="#symbolCollapse" role="button" aria-expanded="false" aria-controls="symbolCollapse">
+                                +&nbsp; Add Symbol
                             </button>
-                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn">
-                                My Holdings
+                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn"
+                                    data-bs-toggle="collapse" data-bs-target="#reorderCollapse" aria-expanded="false" aria-controls="reorderCollapse">
+                                Reorder
                             </button>
                             {% include "layouts/screen-tools.html" %}
                         </p>
-                    </div>
+                        <div class="collapse" id="symbolCollapse">
+                            <div class="card text-sm">
+                                <div class="card-header me-2 d-flex align-items-start col-md-4">
+                                    <div class="input-group" style="border-right: 1px solid lightgray;">
+                                        <span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span>
+                                        <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
+                                               data-bs-toggle="dropdown" aria-expanded="false"
+                                               oninput="symbolSearchAutoReminder(event, 'symbol_auto_reminder_results')"
+                                               onkeydown="symbolSearchKeyDown(event, 'symbol_auto_reminder_results')"
+                                               onblur="symbolSearchBlur('symbol_auto_reminder_results')"
+                                               onfocus="symbolFocus('symbol_auto_reminder_results')">
+                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.portfolio_id }}"/>
+                                        <ul id="symbol_auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
+                                    </div>
+                                </div>
+                                <div class=" card-body pt-0">
+                                    <b>Enter Symbols or company names</b>
+                                    <br/>Tip: Use Comma to separate multiple symbols and then press enter
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="reorderCollapse">
+                            <div class="card card-body">
+                                order Collapse
+                            </div>
+                        </div>
+                      </div>
                     <div class="card-body px-0 pb-0">
                         <div class="table-responsive">
-                      <table class="table table-flush table-hover" id="products-list">
-                        <thead class="thead-light">
-                          <tr>
-                            <th>Portfolio Name</th>
-                            <th>Symbols</th>
-                            <th>Cost Basis</th>
-                            <th>Market Value</th>
-                            <th>Day Change</th>
-                            <th>Unrealized Gain/Loss</th>
-                            <th>Realized Gain/Loss</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-
-                        {% for portfolio in portfolios %}
-                          <tr>
-                            <td>
-                            <a href="{% url 'portfolio_detail' portfolio.pk %}" class="text-default text-decoration-none">{{ portfolio.name }}</a>
-                            </td>
-                            <td class="text-sm">--</td>
-                            <td class="text-sm">--</td>
-                            <td class="text-sm">--</td>
-                            <td class="text-sm">--</td>
-                            <td>
-                              <span class="badge badge-danger badge-sm">Out of Stock</span>
-                            </td>
-                            <td class="text-sm">--</td>
-                          </tr>
-                        {% endfor %}
-
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <th>Portfolio Name</th>
-                            <th>Symbols</th>
-                            <th>Cost Basis</th>
-                            <th>Market Value</th>
-                            <th>Day Change</th>
-                            <th>Unrealized Gain/Loss</th>
-                            <th>Realized Gain/Loss</th>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
+                            <table class="table table-flush table-hover text-end" id="summary-list">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Change</th>
+                                    <th>Day Chg<br/>%</th>
+                                    <th>Day<br/>Chg</th>
+                                    <th>Shares</th>
+                                    <th>Cost /<br/>Share</th>
+                                    <th>Last<br/>Price</th>
+                                    <th>Market<br/>Value</th>
+                                    <th>Total <br/>Chg %</th>
+                                    <th>Total <br/>Chg</th>
+                                    <th>52-Wk Range</th>
+                                    <th>Day Range</th>
+                                    <th>Day Chart</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in portfolio_items|to_json%}
+                                <tr>
+                                    <td class="text-start">
+                                        <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
+                                            <b>{{ item.symbol }}</b>
+                                        </a>
+                                    </td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg 2 '{0}'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_pct 2 '{0}%'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_position 2 '{0}'%}</b></td>
+                                    <td class="text-md mb-0 text-dark">{%round_by_digits item.quantity 0 '{0}' False%}</td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.close 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_pct 2 '{0}%'%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_position 2 '{0}'%}</b></td>
+                                    <td class="text-md">
+                                        <!-- Range slider container -->
+                                        <div id="sliderDouble"></div>
+                                    </td>
+                                    <td class="text-md">
+                                        <!-- Range slider container -->
+                                        <div id="sliderDouble"></div>
+                                    </td>
+                                    <td class="text-sm"></td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Change</th>
+                                    <th>Day Chg<br/>%</th>
+                                    <th>Day<br/>Chg</th>
+                                    <th>Shares</th>
+                                    <th>Cost /<br/>Share</th>
+                                    <th>Last<br/>Price</th>
+                                    <th>Market<br/>Value</th>
+                                    <th>Total <br/>Chg %</th>
+                                    <th>Total <br/>Chg</th>
+                                    <th>52-Wk Range</th>
+                                    <th>Day Range</th>
+                                    <th>Day Chart</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div id="holdings_panel" class="col-12">
+                <div class="card">
+                    <!-- Card header -->
+                    <div class="card-header pb-0">
+                        <p>
+                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn"
+                                    data-bs-toggle="collapse" href="#symbolCollapse" role="button" aria-expanded="false" aria-controls="symbolCollapse">
+                                +&nbsp; Add Symbol
+                            </button>
+                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn"
+                                    data-bs-toggle="collapse" data-bs-target="#reorderCollapse" aria-expanded="false" aria-controls="reorderCollapse">
+                                Reorder
+                            </button>
+                        </p>
+                        <div class="collapse" id="symbolCollapse">
+                            <div class="card text-sm">
+                                <div class="card-header me-2 d-flex align-items-start col-md-4">
+                                    <div class="input-group" style="border-right: 1px solid lightgray;">
+                                        <span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span>
+                                        <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
+                                               data-bs-toggle="dropdown" aria-expanded="false"
+                                               oninput="symbolSearchAutoReminder(event, 'symbol_auto_reminder_results')"
+                                               onkeydown="symbolSearchKeyDown(event, 'symbol_auto_reminder_results')"
+                                               onblur="symbolSearchBlur('symbol_auto_reminder_results')"
+                                               onfocus="symbolFocus('symbol_auto_reminder_results')">
+                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.portfolio_id }}"/>
+                                        <ul id="symbol_auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
+                                    </div>
+                                </div>
+                                <div class=" card-body pt-0">
+                                    <b>Enter Symbols or company names</b>
+                                    <br/>Tip: Use Comma to separate multiple symbols and then press enter
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="reorderCollapse">
+                            <div class="card card-body">
+                                order Collapse
+                            </div>
+                        </div>
+                      </div>
+                    <div class="card-body px-0 pb-0">
+                        <div class="table-responsive">
+                          <table class="table table-flush table-hover" id="holding-list">
+                            <thead class="thead-light">
+                              <tr>
+                                <th>Symbol</th>
+                                <th>Status <i class="fas fa-exclamation-circle custom-tooltip"></i></th>
+                                <th>Shares</th>
+                                <th>Last Price</th>
+                                <th>Average Cost / Share</th>
+                                <th>Total Cost</th>
+                                <th>Total Dividend Income</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in portfolio_items|to_json%}
+                                <tr>
+                                    <td>
+                                        <i id="expand" class="fas fa-chevron-right" style="cursor:pointer; margin-right: 10px;"  onclick="toggleDetails(this)"></i>
+                                        <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
+                                            <b>{{ item.symbol }}</b>
+                                        </a>
+                                    </td>
+                                    <td class="text-sm">
+                                        {% if  item.quantity is None %}
+                                            <span class="badge badge-light badge-sm"><i class="fas fa-dot-circle"></i> No Shares</span>
+                                        {% elif item.quantity > 0 %}
+                                            <span class="badge badge-success badge"><i class="fas fa-dot-circle"></i> Open</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary badge-sm"><i class="fas fa-dot-circle"></i> Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.quantity 0 '{0}'%}</b></td>
+                                    <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.close 2 '$ {0}'%}</b></td>
+                                    <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '$ {0}'%}</b></td>
+                                    <td class="text-sm mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '$ {0}'%}</b></td>
+                                    <td class="text-sm">
+                                        <a href="javascript:" data-bs-toggle="tooltip" data-bs-original-title="Preview product">
+                                            <i class="fas fa-eye text-secondary"></i>
+                                        </a>
+                                        <a href="javascript:" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit product">
+                                            <i class="fas fa-user-edit text-secondary"></i>
+                                        </a>
+                                        <a href="javascript:" data-bs-toggle="tooltip" data-bs-original-title="Delete product">
+                                            <i class="fas fa-trash text-secondary"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="details-row" style="display: none;">
+                                    <td colspan="8">
+                                        <!-- Add Transaction Button -->
+                                        <div class="row mt-4">
+                                            <button id="addTransactionButton-{{ item.portfolio_item_id }}" type="button" class="btn bg-gradient-info btn-sm w-15 mb-3 toast-btn" onclick="toggleAddTransactionForm({{ item.portfolio_item_id }})">
+                                                +&nbsp; Add a Transaction
+                                            </button>
+                                        </div>
+
+                                        <div class="details-content">
+                                            <div id="addTransactionForm-{{ item.portfolio_item_id }}" style="display: none; position: relative;">
+                                                <button type="button" class="btn-close bg-primary" onclick="hideAddTransactionForm({{ item.portfolio_item_id }})" style="position: absolute; top: 10px; right: 10px;">&times;</button>
+                                                <form id="addTransactionFormContent-{{ item.portfolio_item_id }}" onsubmit="submitTransaction(event, '{{ item.symbol }}')" data-portfolio-id="{{ portfolio.portfolio_id }}" data-portfolio-item-id="{{ item.portfolio_item_id }}">
+                                                    <!-- Form fields for adding a transaction -->
+                                                    <div class="row mt-3">
+                                                        <div class="col-3">
+                                                            <b class="text-dark">Add a new transaction for {{ item.symbol }} - ({{ item.symbol_name }})</b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-2">
+                                                            <label for="type" class="form-label">Transaction Type</label>
+                                                            <select class="form-control form-control-sm" name="type" required>
+                                                                <option value="buy">Buy</option>
+                                                                <option value="sell">Sell</option>
+                                                                <option value="sell Short">Sell Short</option>
+                                                                <option value="buy to cover">Buy to Cover</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-2">
+                                                            <label for="date" class="form-label">Trade Date</label>
+                                                            <input type="date" class="form-control form-control-sm" name="date" required>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="quantity" class="form-label">Shares</label>
+                                                            <input type="number" class="form-control form-control-sm" name="quantity" required>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="price" class="form-label">Cost / Share</label>
+                                                            <input type="number" step="0.01" class="form-control form-control-sm" name="price" required>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="commission" class="form-label">Commission</label>
+                                                            <input type="number" step="0.01" class="form-control form-control-sm" name="commission">
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <label for="notes" class="form-label">Notes</label>
+                                                            <input type="text" class="form-control form-control-sm" name="notes">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <div class="col-3">
+                                                            <button type="submit" class="btn btn-outline-primary btn-sm mb-2 px-3 up">Save transaction</button> &nbsp;
+                                                            <button type="reset" class="btn btn-outline-dark btn-sm mb-2 px-3 up">Cancel</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                                            <!-- Existing Transactions -->
+                                            <div id="transactions-{{item.portfolio_item_id}}">
+                                                <!-- Transactions will be loaded here -->
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                              <tr>
+                                <th>Symbol</th>
+                                <th>Status <i class="fas fa-exclamation-circle custom-tooltip"></i></th>
+                                <th>Shares</th>
+                                <th>Last Price</th>
+                                <th>Average Cost / Share</th>
+                                <th>Total Cost</th>
+                                <th>Total Dividend Income</th>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            <div id="fundamentals_panel" class="col-12">
+                Fundamentals
             </div>
         </div>
         {% include 'includes/footer.html' %}
     </div>
-    
-
-
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
+  <script src="{% static 'assets/js/plugins/nouislider.min.js' %}"></script>
   <script>
-    if (document.getElementById('products-list')) {
-      const dataTableSearch = new simpleDatatables.DataTable("#products-list", {
-        searchable: true,
-        fixedHeight: false,
-        perPage: 7
-      });
 
-      document.querySelectorAll(".export").forEach(function(el) {
-        el.addEventListener("click", function() {
-          var type = el.dataset.type;
+    document.addEventListener('DOMContentLoaded', function() {
+        var slider = document.getElementById('sliderDouble');
 
-          var data = {
-            type: type,
-            filename: "soft-ui-" + type,
-          };
-
-          if (type === "csv") {
-            data.columnDelimiter = "|";
-          }
-
-          dataTableSearch.export(data);
+        noUiSlider.create(slider, {
+            start: [20, 80], // Initial values
+            connect: true, // Display a colored bar between the handles
+            range: {
+                'min': 0,
+                'max': 100
+            },
+            step: 1, // Increment step
+            tooltips: true, // Show tooltips
+            format: {
+                to: function (value) {
+                    return value.toFixed(0);
+                },
+                from: function (value) {
+                    return Number(value);
+                }
+            }
         });
-      });
+        // Make the slider readonly
+        slider.setAttribute('disabled', true);
+    });
+    
+    function pagination(element_id, per_page=5) {
+        if (document.getElementById(element_id)) {
+            const dataTableSearch = new simpleDatatables.DataTable(`#${element_id}`, {
+                searchable: true,
+                fixedHeight: false,
+                perPage: per_page
+            });
+            document.querySelectorAll(".export").forEach(function (el) {
+                el.addEventListener("click", function (e) {
+                    let type = el.dataset.type;
+                    let data = { type: type, filename: "soft-ui-" + type, };
+                    if (type === "csv") { data.columnDelimiter = "|"; }
+                    dataTableSearch.export(data);
+                });
+            });
+        }
+    }
+    pagination('summary-list');
+    pagination('holding-list',20);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const summary_btn = document.getElementById('summary_btn');
+        const holding_btn = document.getElementById('holding_btn');
+        const fundamental_btn = document.getElementById('fundamental_btn');
+
+        const summaryPanel = document.getElementById('summary_panel');
+        const holdingsPanel = document.getElementById('holdings_panel');
+        const fundamentalsPanel = document.getElementById('fundamentals_panel');
+
+        function showPanel(panelToShow) {
+            summaryPanel.style.display = 'none';
+            holdingsPanel.style.display = 'none';
+            fundamentalsPanel.style.display = 'none';
+            panelToShow.style.display = 'block';
+        }
+
+        summary_btn.addEventListener('click', function () {
+            showPanel(summaryPanel);
+        });
+
+        holding_btn.addEventListener('click', function () {
+            showPanel(holdingsPanel);
+        });
+
+        fundamental_btn.addEventListener('click', function () {
+            showPanel(fundamentalsPanel);
+        });
+
+        // Initialize by showing the summary panel
+        showPanel(summaryPanel);
+    });
+
+    function toggleDetails(button) {
+        const detailsRow = button.closest('tr').nextElementSibling;
+        const icon = button;
+        if (detailsRow.style.display === 'none') {
+            detailsRow.style.display = 'table-row';
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-down');
+            icon.style.marginRight = '4px';
+        } else {
+            detailsRow.style.display = 'none';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-right');
+            icon.style.marginRight = '10px';
+        }
     }
 
-    function submitAddPortfolio() {
-        const portfolioName = document.getElementById('portfolioName').value;
-        console.log("==>"+portfolioName)
-        if (portfolioName) {
-            fetch('/portfolio/add/', {
-                method: 'POST',
+    function submitTransaction(event, symbol) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        formData.append('symbol', symbol);
+        // Get CSRF token from the cookie
+        const csrftoken = getCookie('csrftoken');
+        formData.append('csrfmiddlewaretoken', csrftoken);
+
+        fetch('/portfolio/add/transaction/', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Transaction submitted successfully');
+                    form.reset();
+                } else {
+                    alert('Error submitting transaction: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting transaction');
+            });
+    }
+
+    function deleteBasket(transaction_id) {
+        if (confirm('Are you sure you want to delete this transaction?')) {
+            fetch(`/portfolio/delete/${transaction_id}/`, {
+                method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({name: portfolioName})
+                }
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Portfolio added successfully');
-                        location.reload(); // Reload the page to see the new portfolio
+                        alert('Basket deleted successfully');
+                        location.reload();
                     } else {
-                        alert('Error adding portfolio: ' + data.error);
+                        alert('Error deleting basket: ' + data.error);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    alert('Error deleting basket');
                 });
         }
     }
 
-    // Function to get CSRF token from cookies
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+    function toggleAddTransactionForm(itemId) {
+        const form = document.getElementById(`addTransactionForm-${itemId}`);
+        const button = document.getElementById(`addTransactionButton-${itemId}`);
+        form.style.display = 'block';
+        button.onclick = null; // Disable the onclick event
     }
+
+    function hideAddTransactionForm(itemId) {
+        const form = document.getElementById(`addTransactionForm-${itemId}`);
+        const button = document.getElementById(`addTransactionButton-${itemId}`);
+        form.style.display = 'none';
+        button.onclick = function() { toggleAddTransactionForm(itemId); }; // Re-enable the onclick event
+    }
+
+    function toggleEditTransactionForm(transactionId) {
+        const form = document.getElementById(`editTransactionForm-${transactionId}`);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function loadTransactions(portfolio_id, portfolio_item_id) {
+        fetch(`/portfolio/${portfolio_id}/item/${portfolio_item_id}/transactions/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.transactions.length <= 0) {
+                    return;
+                }
+                const transactionsDiv = document.getElementById(`transactions-${portfolio_item_id}`);
+                transactionsDiv.innerHTML = data.transactions.map(transaction => `
+                    <div class="transaction">
+                        <p>${transaction.date} - ${transaction.transaction_type} - ${transaction.quantity} shares at ${transaction.price}</p>
+                        <button type="button" onclick="toggleEditTransactionForm(${transaction.id})">Edit</button>
+                        <div id="editTransactionForm-${transaction.id}" style="display: none;">
+                            <form onsubmit="submitEditTransaction(event, ${transaction.id})">
+                                <!-- Form fields for editing a transaction -->
+                                <div class="row mt-3">
+                                    <div class="col-3">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm mb-2 px-3 up">Submit</button>
+                                        <button type="reset" class="btn btn-outline-dark btn-sm mb-2 px-3 up">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <label for="type" class="form-label">Transaction Type</label>
+                                        <select class="form-control form-control-sm" name="type" required>
+                                            <option value="buy" ${transaction.transaction_type === 'buy' ? 'selected' : ''}>Buy</option>
+                                            <option value="sell" ${transaction.transaction_type === 'sell' ? 'selected' : ''}>Sell</option>
+                                            <option value="sell Short" ${transaction.transaction_type === 'sell Short' ? 'selected' : ''}>Sell Short</option>
+                                            <option value="buy to cover" ${transaction.transaction_type === 'buy to cover' ? 'selected' : ''}>Buy to Cover</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <label for="date" class="form-label">Trade Date</label>
+                                        <input type="date" class="form-control form-control-sm" name="date" value="${formatToDate(transaction.date)}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="quantity" class="form-label">Shares</label>
+                                        <input type="number" class="form-control form-control-sm" name="quantity" value="${transaction.quantity}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="price" class="form-label">Cost / Share</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" name="price" value="${transaction.price}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="commission" class="form-label">Commission</label>
+                                        <input type="number" class="form-control form-control-sm" name="commission" value="${transaction.commission !== undefined ? transaction.commission : ''}">
+                                    </div>
+                                    <div class="col-5">
+                                        <label for="notes" class="form-label">Notes</label>
+                                        <input type="text" class="form-control form-control-sm" name="notes" value="${transaction.notes}">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading transactions');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.details-row').forEach(row => {
+            const form = row.querySelector('form');
+            const portfolio_id = form.getAttribute('data-portfolio-id');
+            const portfolio_item_id = form.getAttribute('data-portfolio-item-id');
+            loadTransactions(portfolio_id, portfolio_item_id);
+        });
+    });
 
 
   </script>

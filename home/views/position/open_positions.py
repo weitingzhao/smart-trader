@@ -7,78 +7,16 @@ from django.shortcuts import render, get_object_or_404
 
 
 def default(request):
-    
+    user_id = request.user.id  # Assuming you have the user_id from the request
+    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
+    if not portfolio:
+        return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    return render(
-        request=request,
-        template_name='pages/position/open_positions.html',
-        context= {
-            'parent': 'position',
-            'segment': 'open_positions',
-        })
-
-
-def get_portfolios(request):
-    # user_id = request.user
-    user_id = 2 # for testing user
-    portfolios = Portfolio.objects.filter(user=user_id)
-
-    return render(request, 'pages/position/portfolios.html', {
-        'parent': 'portfolio',
-        'segment': 'my portfolio',
-        'portfolios': portfolios
-    })
-
-
-def get_stock_hist_bars(is_day, symbols:list[str], row_num:int):
-    table_name = 'day' if is_day else 'min'
-
-    with connection.cursor() as cursor:
-        cursor.execute(f"""
-SELECT
-    mk.symbol,
-    mk.name as symbol_name,
-    sub.date,
-    main_start.open,
-    main_end.close,
-    sub.volume,
-    sub.*
-FROM
-    market_symbol mk
-    LEFT JOIN LATERAL(
-        SELECT
-            symbol,
-            ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY MAX(DATE(time)) DESC) AS row_num,
-            MAX(DATE(time)) AS max_date,
-            DATE(time) AS date,
-            MIN(time) AS start_min,
-            MAX(time) AS end_min,
-            SUM(volume) AS volume
-        FROM
-            market_stock_hist_bars_{table_name}_ts
-        GROUP BY
-            symbol, DATE(time)
-    ) sub ON sub.symbol = mk.symbol
-    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_start 
-        ON main_start.symbol = sub.symbol AND main_start.time = sub.start_min
-    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_end 
-        ON main_end.symbol = sub.symbol AND main_end.time = sub.end_min
-WHERE
-    sub.row_num = {row_num} AND mk.symbol IN ('{"', '".join(symbols)}')
-            """)
-        latest_rows = cursor.fetchall()
-
-        # Convert the fetched rows into a list of dictionaries
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in latest_rows]
-
-def portfolio_detail(request, pk):
-    portfolio = get_object_or_404(Portfolio, pk=pk)
-    items = PortfolioItem.objects.filter(portfolio=portfolio)
+    holdings = Holding.objects.filter(portfolio=portfolio)
 
     # Extract symbols from portfolio items
-    symbols = [item.symbol.symbol for item in items]
+    symbols = [item.symbol.symbol for item in holdings]
 
     if len(symbols) > 0:
         # get current time previous day benchmark
@@ -96,7 +34,7 @@ def portfolio_detail(request, pk):
         benchmark_df = pd.DataFrame(benchmark)
         latest_bar_df = pd.DataFrame(latest_bar)
         # Convert PortfolioItem queryset to DataFrame
-        items_df = pd.DataFrame(list(items.values()))
+        items_df = pd.DataFrame(list(holdings.values()))
 
         # Step 2. Calculate dataframes
         # Merge the DataFrames on the 'symbol' column
@@ -143,21 +81,64 @@ def portfolio_detail(request, pk):
     else:
         final_json = []
 
-    context = {
-        'parent': 'portfolio',
-        'segment': 'my portfolio',
-        'portfolio': portfolio,
-        'portfolio_items': final_json,
-    }
-    return render(request,
-                  template_name='pages/position/portfolio_detail.html',
-                  context= context)
+    return render(
+        request = request,
+        template_name='pages/position/open_positions.html',
+        context= {
+            'parent': 'position',
+            'segment': 'open_positions',
+            'portfolio': portfolio,
+            'portfolio_items': final_json,
+        })
 
 
 
 
+def get_stock_hist_bars(is_day, symbols:list[str], row_num:int):
+    table_name = 'day' if is_day else 'min'
 
-def add_portfolio_item(request, pk):
+    with connection.cursor() as cursor:
+        cursor.execute(f"""
+SELECT
+    mk.symbol,
+    mk.name as symbol_name,
+    sub.date,
+    main_start.open,
+    main_end.close,
+    sub.volume,
+    sub.*
+FROM
+    market_symbol mk
+    LEFT JOIN LATERAL(
+        SELECT
+            symbol,
+            ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY MAX(DATE(time)) DESC) AS row_num,
+            MAX(DATE(time)) AS max_date,
+            DATE(time) AS date,
+            MIN(time) AS start_min,
+            MAX(time) AS end_min,
+            SUM(volume) AS volume
+        FROM
+            market_stock_hist_bars_{table_name}_ts
+        GROUP BY
+            symbol, DATE(time)
+    ) sub ON sub.symbol = mk.symbol
+    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_start 
+        ON main_start.symbol = sub.symbol AND main_start.time = sub.start_min
+    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_end 
+        ON main_end.symbol = sub.symbol AND main_end.time = sub.end_min
+WHERE
+    sub.row_num = {row_num} AND mk.symbol IN ('{"', '".join(symbols)}')
+            """)
+        latest_rows = cursor.fetchall()
+
+        # Convert the fetched rows into a list of dictionaries
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in latest_rows]
+
+
+
+def add_holding(request, pk):
     portfolio = get_object_or_404(Portfolio, pk=pk)
     if request.method == 'POST':
         try:
@@ -188,6 +169,8 @@ def add_portfolio_item(request, pk):
             return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+
 
 def transaction_history(request, pk):
     item = get_object_or_404(PortfolioItem, pk=pk)
