@@ -4,7 +4,7 @@ from apps.common.models import *
 class PortfolioForm(forms.ModelForm):
     class Meta:
         model = Portfolio
-        fields = ['name']
+        fields = ['name','cash','money_market','is_default']
 
 class PortfolioItemForm(forms.ModelForm):
     class Meta:

@@ -1,19 +1,308 @@
-{% extends 'layouts/../layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %}
+{% load static admin_soft%}
 
 {% block content %}
+  <div class="container-fluid my-3 py-3">
+      <div id="data">
+          <div class="row mb-5">
+              <div class="col-lg-2">
+                  <div class="card position-sticky top-1">
+                      <ul class="nav flex-column bg-white border-radius-lg p-3">
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#portfolios_div">
+                                  <i class="fas fa-chart-simple me-2"></i>
+                                  <span class="text-sm">Portfolios</span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="col-lg-10 mt-lg-0 mt-4">
+                <!-- Portfolio List -->
+                <div class="card mt-4" id="portfolios_div">
+                    <div class="card-header">
+                        <h5>Set default portfolios</h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" id="add-portfolio-btn" class="btn bg-gradient-info w-18 mb-0 toast-btn" data-bs-toggle="modal" data-bs-target="#modal-new-portfolio">
+                                Create New Portfolio
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-flush table-hover" id="portfolio-list">
+                                <thead class="thead-light">
+                                  <tr>
+                                      <th>Portfolio Name</th>
+                                      <th>Cash</th>
+                                      <th>Market Value</th>
+                                      <th>Default ?</th>
+                                      <th>Actions</th> <!-- New column for actions -->
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                {% for portfolio in portfolios %}
+                                    <tr>
+                                        <td>
+                                            <a class="text-default text-decoration-none">{{ portfolio.name }}</a>
+                                        </td>
+                                        <td>
+                                            <a class="text-default text-decoration-none">{{ portfolio.cash }}</a>
+                                        </td>
+                                        <td>
+                                            <a class="text-default text-decoration-none">{{ portfolio.money_market }}</a>
+                                        </td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="defaultSwitch{{ portfolio.portfolio_id }}" {% if portfolio.is_default %}checked{% endif %} onchange="toggleDefault({{ portfolio.portfolio_id }}, this.checked)">
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-warning btn-xs" onclick="editPortfolio({{ portfolio.portfolio_id }}, '{{ portfolio.name }}')">Edit</button>
+                                            <button class="btn btn-danger btn-xs" onclick="deletePortfolio({{ portfolio.portfolio_id }})">Delete</button>
+                                        </td>
+                                  </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Portfolio Name</th>
+                                    <th>Cash</th>
+                                    <th>Market Value</th>
+                                    <th>Default ?</th>
+                                  </tr>
+                                </tfoot>
+                              </table>
+                        </div>
+                    </div>
+                </div>
+          </div>
+      </div>
+    {% include 'includes/footer.html' %}
+      </div>
+  </div>
 
-    <div class="container-fluid py-4">
-
-        Account Settings
-
-        Manage account preferences, notifications, and security settings.
-
+    <!-- Add Portfolio Modal -->
+    <div class="modal fade" id="modal-new-portfolio" tabindex="-1" role="dialog" aria-labelledby="modal-new-portfolio" aria-hidden="true">
+      <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-title-default">Add New Portfolio</h6>
+            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addPortfolioForm">
+              <div class="form-group">
+                <label for="portfolioName">Portfolio Name</label>
+                <input type="text" class="form-control" id="portfolioName" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-gradient-primary" onclick="submitAddPortfolio()">Add Portfolio</button>
+            <button type="button" class="btn btn-link ml-auto" data-bs-dismiss="modal" aria-label="Close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Edit Portfolio Modal -->
+    <div class="modal fade" id="modal-edit-portfolio" tabindex="-1" role="dialog" aria-labelledby="modal-edit-portfolio" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-title-edit">Edit Portfolio</h6>
+            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="editPortfolioForm">
+              <div class="form-group">
+                <label for="editPortfolioName">Portfolio Name</label>
+                <input type="text" class="form-control" id="editPortfolioName" required>
+                <input type="hidden" id="editPortfolioId">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-gradient-primary" onclick="submitEditPortfolio()">Save Changes</button>
+            <button type="button" class="btn btn-link ml-auto" data-bs-dismiss="modal" aria-label="Close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this portfolio?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+          </div>
+        </div>
+      </div>
     </div>
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE --> 
-{% block scripts %}
+{% block extra_js %}
 
-{% endblock scripts %}
+<script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
+<script>
+    if (document.getElementById('portfolio-list')) {
+      const dataTableSearch = new simpleDatatables.DataTable("#portfolio-list", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+    }
+
+    function editPortfolio(portfolioId, portfolioName) {
+        document.getElementById('editPortfolioId').value = portfolioId;
+        document.getElementById('editPortfolioName').value = portfolioName;
+        const editModal = new bootstrap.Modal(document.getElementById('modal-edit-portfolio'));
+        editModal.show();
+    }
+    
+    function submitEditPortfolio() {
+        const portfolioId = document.getElementById('editPortfolioId').value;
+        const portfolioName = document.getElementById('editPortfolioName').value;
+    
+        if (portfolioName) {
+            fetch('/settings/portfolio/edit/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: portfolioId, name: portfolioName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Portfolio updated successfully');
+                    location.reload(); // Reload the page to see the updated portfolio
+                } else {
+                    alert('Error updating portfolio: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
+    
+    function submitAddPortfolio() {
+        const portfolioName = document.getElementById('portfolioName').value;
+        {#console.log("==>" + portfolioName)#}
+        if (portfolioName) {
+            fetch('/settings/portfolio/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({name: portfolioName})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Portfolio added successfully');
+                        location.reload(); // Reload the page to see the new portfolio
+                    } else {
+                        alert('Error adding portfolio: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+    function toggleDefault(portfolioId, isDefault) {
+        fetch('/settings/portfolio/toggle_default/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({id: portfolioId, is_default: isDefault})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Default status updated successfully');
+                    {#showNotification('success', 'Portfolio Update', 'Default status updated successfully', new Date().toLocaleTimeString());#}
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert('Error updating default status: ' + data.error);
+                    {#showNotification('error', 'Portfolio Update Error', 'Error updating default status: ' + error.message, new Date().toLocaleTimeString());#}
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    let portfolioIdToDelete = null;
+
+    function deletePortfolio(portfolioId) {
+        portfolioIdToDelete = portfolioId;
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        confirmDeleteModal.show();
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (portfolioIdToDelete !== null) {
+            fetch('/settings/portfolio/delete/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: portfolioIdToDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('success', 'Portfolio Deleted', 'Portfolio deleted successfully', new Date().toLocaleTimeString());
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    showNotification('error', 'Portfolio Deletion Error', 'Error deleting portfolio: ' + data.error, new Date().toLocaleTimeString());
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('error', 'Portfolio Deletion Error', 'Error deleting portfolio: ' + error.message, new Date().toLocaleTimeString());
+            });
+        }
+    });
+
+    {% if messages %}
+        const currentTime = new Date().toLocaleTimeString();
+        {% for message in messages %}
+            console.log('{{ message }}');
+
+            const level = {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %}
+            const title = '{{ message.extra_tags }}'; // Replace with the actual task name if needed
+            const content = '{{ message.message }}';
+
+            showNotification(level, title, content, currentTime);
+            {#showNotification('error', task_name, data.error, currentTime);#}
+
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock extra_js %}

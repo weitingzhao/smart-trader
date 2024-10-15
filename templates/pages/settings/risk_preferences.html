@@ -9,7 +9,7 @@
                   <div class="card position-sticky top-1">
                       <ul class="nav flex-column bg-white border-radius-lg p-3">
                           <li class="nav-item">
-                              <a class="nav-link text-body" data-scroll="" href="#chart">
+                              <a class="nav-link text-body" data-scroll="" href="#static_risk_model_div">
                                   <i class="fas fa-chart-simple me-2"></i>
                                   <span class="text-sm">Static Risk Model Settings</span>
                               </a>
@@ -37,7 +37,7 @@
               </div>
               <div class="col-lg-10 mt-lg-0 mt-4">
                   <!-- chart -->
-                  <div class="card mt-4" id="chart">
+                  <div class="card mt-4" id="static_risk_model_div">
                       <div class="card-header">
                         <h5>Static Risk Model settings</h5>
                       <div class="card-body pt-0">
@@ -210,11 +210,11 @@
         const currentTime = new Date().toLocaleTimeString();
         {% for message in messages %}
             console.log('{{ message }}');
-            
-            level = {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %} 
+
+            level = {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %}
             title = '{{ message.extra_tags }}'; // Replace with the actual task name if needed
             content = '{{ message.message }}';
-            
+
             showNotification(level, title, content, currentTime);
             {#showNotification('error', task_name, data.error, currentTime);#}
 

@@ -23,12 +23,6 @@
                 </p>
               </div>
             </div>
-            <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
-                    <button type="button" id="add-portfolio-btn" class="btn bg-gradient-info w-18 mb-0 toast-btn"
-                            data-bs-toggle="modal" data-bs-target="#modal-default">
-                      Create New Portfolio
-                    </button>                
-            </div>
           </div>
         </div>
     </div>
@@ -101,31 +95,7 @@
         {% include 'includes/footer.html' %}
     </div>
 
-    <!-- Add Portfolio Modal -->
-    <div class="modal fade" id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
-      <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h6 class="modal-title" id="modal-title-default">Add New Portfolio</h6>
-            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id="addPortfolioForm">
-              <div class="form-group">
-                <label for="portfolioName">Portfolio Name</label>
-                <input type="text" class="form-control" id="portfolioName" required>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-gradient-primary" onclick="submitAddPortfolio()">Add Portfolio</button>
-            <button type="button" class="btn btn-link ml-auto" data-bs-dismiss="modal" aria-label="Close">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
 
 {% endblock %}

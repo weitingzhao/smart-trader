@@ -2,8 +2,6 @@ import json
 import pandas as pd
 from django.http import JsonResponse
 from apps.common.models import *
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 
 
@@ -156,24 +154,7 @@ def portfolio_detail(request, pk):
                   context= context)
 
 
-@csrf_exempt
-def add_portfolio(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            portfolio_name = data.get('name')
 
-            if not portfolio_name:
-                return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
-
-            # user = request.user
-            user = User.objects.get(pk=2)
-
-            portfolio = Portfolio.objects.create(name=portfolio_name, user=user)
-            return JsonResponse({'success': True, 'portfolio_id': portfolio.pk})
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
-    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 
 def add_portfolio_item(request, pk):

@@ -11,6 +11,28 @@ urlpatterns = [
         settings.account_settings.default,
         name='account_settings'),
 
+    # Account Settings -> Add Portfolio
+    path(
+        'portfolio/add/',
+        settings.account_settings.add_portfolio,
+        name='account_add_portfolio'),
+    # Account Settings -> Edit Portfolio
+    path(
+        'portfolio/edit/',
+        settings.account_settings.edit_portfolio,
+        name='account_edit_portfolio'),
+    # Account Settings -> Delete Default Portfolio
+    path(
+        'portfolio/delete/',
+        settings.account_settings.delete_portfolio,
+        name='account_delete_portfolio'),
+    # Account Settings -> Toggle Default Portfolio
+    path(
+        'portfolio/toggle_default/',
+        settings.account_settings.toggle_default_portfolio,
+        name='account_toggle_default_portfolio'),
+
+
     ####### settings.risk_references #######
     # Risk References -> Default
     path(
