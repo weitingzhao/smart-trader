@@ -1,19 +1,223 @@
-{% extends 'layouts/../layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %}
+{% load static admin_soft%}
 
 {% block content %}
+  <div class="container-fluid my-3 py-3">
+      <div id="data">
+          <div class="row mb-5">
+              <div class="col-lg-2">
+                  <div class="card position-sticky top-1">
+                      <ul class="nav flex-column bg-white border-radius-lg p-3">
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#chart">
+                                  <i class="fas fa-chart-simple me-2"></i>
+                                  <span class="text-sm">Static Risk Model Settings</span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#screener">
+                                  <i class="fas fa-magnifying-glass me-2"></i>
+                                  <span class="text-sm">Screener Settings</span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#view">
+                                  <i class="fas fa-table me-2"></i>
+                                  <span class="text-sm">View Settings</span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#watch">
+                                  <i class="fas fa-list-check me-2"></i>
+                                  <span class="text-sm">Watch lists</span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="col-lg-10 mt-lg-0 mt-4">
+                  <!-- chart -->
+                  <div class="card mt-4" id="chart">
+                      <div class="card-header">
+                        <h5>Static Risk Model settings</h5>
+                      <div class="card-body pt-0">
+                        <form id="static_risk_form" method="post" action="{% url 'settings_risk_static_risk' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_capital" class="form-label">Capital</label>
+                                    <input type="text" class="form-control {% if static_risk_form.capital.errors %}is-invalid{% endif %}" id="id_capital" name="capital_display" value="{{ static_risk_form.capital.value }}">
+                                    <input type="hidden" id="id_capital_hidden" name="capital" value="{{ static_risk_form.capital.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.capital.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_risk" class="form-label">Risk</label>
+                                    <input type="text" class="form-control {% if static_risk_form.risk.errors %}is-invalid{% endif %}" id="id_risk" name="risk_display" value="{{ static_risk_form.risk.value }}">
+                                    <input type="hidden" id="id_risk_hidden" name="risk" value="{{ static_risk_form.risk.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.risk.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_rounding" class="form-label">Rounding</label>
+                                    <input type="number" class="form-control {% if static_risk_form.rounding.errors %}is-invalid{% endif %}" id="id_rounding" name="rounding" value="{{ static_risk_form.rounding.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.rounding.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_commission" class="form-label">Commission</label>
+                                    <input type="text" class="form-control {% if static_risk_form.commission.errors %}is-invalid{% endif %}" id="id_commission" name="commission" value="{{ static_risk_form.commission.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.commission.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_tax" class="form-label">Tax</label>
+                                    <input type="text" class="form-control {% if static_risk_form.tax.errors %}is-invalid{% endif %}" id="id_tax" name="tax" value="{{ static_risk_form.tax.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.tax.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_expect_gain_risk_ratio" class="form-label">Expect Gain Risk Ratio</label>
+                                    <input type="text" class="form-control {% if static_risk_form.expect_gain_risk_ratio.errors %}is-invalid{% endif %}" id="id_expect_gain_risk_ratio" name="expect_gain_risk_ratio" value="{{ static_risk_form.expect_gain_risk_ratio.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.expect_gain_risk_ratio.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_position_min" class="form-label">Position Min</label>
+                                    <input type="text" class="form-control {% if static_risk_form.position_min.errors %}is-invalid{% endif %}" id="id_position_min" name="position_min" value="{{ static_risk_form.position_min.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.position_min.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_position_max" class="form-label">Position Max</label>
+                                    <input type="text" class="form-control {% if static_risk_form.position_max.errors %}is-invalid{% endif %}" id="id_position_max" name="position_max" value="{{ static_risk_form.position_max.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.position_max.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_total_risk_cap" class="form-label">Total Risk Cap</label>
+                                    <input type="text" class="form-control {% if static_risk_form.total_risk_cap.errors %}is-invalid{% endif %}" id="id_total_risk_cap" name="total_risk_cap_display" value="{{ static_risk_form.total_risk_cap.value }}">
+                                    <input type="hidden" id="id_total_risk_cap_hidden" name="total_risk_cap" value="{{ static_risk_form.total_risk_cap.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.total_risk_cap.errors }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_net_risk_cap" class="form-label">Net Risk Cap</label>
+                                    <input type="text" class="form-control {% if static_risk_form.net_risk_cap.errors %}is-invalid{% endif %}" id="id_net_risk_cap" name="net_risk_cap_display" value="{{ static_risk_form.net_risk_cap.value }}">
+                                    <input type="hidden" id="id_net_risk_cap_hidden" name="net_risk_cap" value="{{ static_risk_form.net_risk_cap.value }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.net_risk_cap.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                                </div>
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="reset" class="btn btn-secondary w-100">Reset</button>
+                                </div>
+                            </div>
+                        </form>
+                      </div>
+                  </div>
 
-    <div class="container-fluid py-4">
 
-        Risk Preferences
-
-        Define global risk settings (e.g., max loss per trade, max portfolio drawdown).
-
-    </div>
-
+              </div>
+          </div>
+      </div>
+    {% include 'includes/footer.html' %}
+  </div>
 {% endblock content %}
 
-<!-- Specific JS goes HERE --> 
-{% block scripts %}
+{% block extra_js %}
 
-{% endblock scripts %}
+<script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/countup.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const capitalInput = document.getElementById('id_capital');
+        const riskInput = document.getElementById('id_risk');
+        const totalRiskCapInput = document.getElementById('id_total_risk_cap');
+        const netRiskCapInput = document.getElementById('id_net_risk_cap');
+        const capitalHiddenInput = document.getElementById('id_capital_hidden');
+        const riskHiddenInput = document.getElementById('id_risk_hidden');
+        const totalRiskCapHiddenInput = document.getElementById('id_total_risk_cap_hidden');
+        const netRiskCapHiddenInput = document.getElementById('id_net_risk_cap_hidden');
+
+        function formatCurrency(value) {
+            if (typeof Intl !== 'undefined' && Intl.NumberFormat) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(value);
+            } else {
+                console.error('Intl.NumberFormat is not supported in this environment.');
+                return value;
+            }
+        }
+
+        function formatPercentage(value) {
+            if (typeof parseFloat === 'function') {
+                return `${parseFloat(value).toFixed(2)}%`;
+            } else {
+                console.error('parseFloat is not supported in this environment.');
+                return value;
+            }
+        }
+
+        // Format the inputs by default
+        capitalInput.value = formatCurrency(capitalHiddenInput.value);
+        riskInput.value = formatPercentage(riskHiddenInput.value);
+        totalRiskCapInput.value = formatPercentage(totalRiskCapHiddenInput.value);
+        netRiskCapInput.value = formatPercentage(netRiskCapHiddenInput.value);
+
+        capitalInput.addEventListener('blur', function () {
+            capitalHiddenInput.value = capitalInput.value.replace(/[^0-9.-]+/g, '');
+            capitalInput.value = formatCurrency(capitalHiddenInput.value);
+        });
+
+        riskInput.addEventListener('blur', function () {
+            riskHiddenInput.value = riskInput.value.replace(/[^0-9.-]+/g, '');
+            riskInput.value = formatPercentage(riskHiddenInput.value);
+        });
+
+        totalRiskCapInput.addEventListener('blur', function () {
+            totalRiskCapHiddenInput.value = totalRiskCapInput.value.replace(/[^0-9.-]+/g, '');
+            totalRiskCapInput.value = formatPercentage(totalRiskCapHiddenInput.value);
+        });
+
+        netRiskCapInput.addEventListener('blur', function () {
+            netRiskCapHiddenInput.value = netRiskCapInput.value.replace(/[^0-9.-]+/g, '');
+            netRiskCapInput.value = formatPercentage(netRiskCapHiddenInput.value);
+        });
+    });
+
+
+    {% if messages %}
+        const currentTime = new Date().toLocaleTimeString();
+        {% for message in messages %}
+            console.log('{{ message }}');
+            showNotification(
+                {% if message.level_tag == 'alert-success' %} 'success' {% else %} 'error' {% endif %},
+                '{{ message.extra_tags }}',  // Replace with the actual task name if needed
+                '{{ message.message }}',
+                currentTime)
+            {#showNotification('error', task_name, data.error, currentTime);#}
+
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock extra_js %}

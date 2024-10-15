@@ -1,27 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
-# class RefundedChoices(models.TextChoices):
-#     YES = 'YES', 'Yes'
-#     NO = 'NO', 'No'
-#
-#
-# class CurrencyChoices(models.TextChoices):
-#     USD = 'USD', 'USD'
-#     EUR = 'EUR', 'EUR'
-
-# class Sales(models.Model):
-# 	ID = models.AutoField(primary_key=True)
-# 	Product = models.TextField(blank=True, null=True)
-# 	BuyerEmail = models.EmailField(blank=True, null=True)
-# 	PurchaseDate = models.DateField(blank=True, null=True)
-# 	Country = models.TextField(blank=True, null=True)
-# 	Price = models.FloatField(blank=True, null=True)
-# 	Refunded = models.CharField(max_length=20, choices=RefundedChoices.choices, default=RefundedChoices.NO)
-# 	Currency = models.CharField(max_length=10, choices=CurrencyChoices.choices, default=CurrencyChoices.USD)
-# 	Quantity = models.IntegerField(blank=True, null=True)
-
 class UserStaticSetting(models.Model):
     """
     This model is used to store the static setting for the system
@@ -35,6 +14,8 @@ class UserStaticSetting(models.Model):
     expect_gain_risk_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=2)
     position_min = models.IntegerField(null=True, default=2)
     position_max = models.IntegerField(null=True, default=2)
+    total_risk_cap = models.DecimalField(max_digits=5, decimal_places=2, default=10)
+    net_risk_cap = models.DecimalField(max_digits=5, decimal_places=2, default=5)
 
     class Meta:
         db_table = 'user_static_setting'

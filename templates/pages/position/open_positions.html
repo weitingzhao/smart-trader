@@ -1,19 +1,206 @@
-{% extends 'layouts/../layouts/base.html' %}
+{% extends "layouts/base.html" %}
 {% load static %}
 
 {% block content %}
-
+    <div class="container-fluid">
+        <div class="page-header min-height-300 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+          <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+          <div class="row gx-4">
+            <div class="col-auto">
+              <div class="avatar avatar-xl position-relative">
+                <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+              </div>
+            </div>
+            <div class="col-auto my-auto">
+              <div class="h-100">
+                <h5 class="mb-1">
+                   Open Positions
+                </h5>
+                <p class="mb-0 font-weight-bold text-sm">
+                  xxx,xxx
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
+                    <button type="button" id="add-portfolio-btn" class="btn bg-gradient-info w-18 mb-0 toast-btn"
+                            data-bs-toggle="modal" data-bs-target="#modal-default">
+                      Create New Portfolio
+                    </button>                
+            </div>
+          </div>
+        </div>
+    </div>
     <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <!-- Card header -->
+                    <div class="card-header pb-0">
+                        <p>
+                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn">
+                                My Portfolio
+                            </button>
+                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn">
+                                My Holdings
+                            </button>
+                            {% include "layouts/screen-tools.html" %}
+                        </p>
+                    </div>
+                    <div class="card-body px-0 pb-0">
+                        <div class="table-responsive">
+                      <table class="table table-flush table-hover" id="products-list">
+                        <thead class="thead-light">
+                          <tr>
+                            <th>Portfolio Name</th>
+                            <th>Symbols</th>
+                            <th>Cost Basis</th>
+                            <th>Market Value</th>
+                            <th>Day Change</th>
+                            <th>Unrealized Gain/Loss</th>
+                            <th>Realized Gain/Loss</th>
+                          </tr>
+                        </thead>
+                        <tbody>
 
-        Open Positions
-    
-        Detailed view of all active trades with real-time tracking of stock prices, stop limits, and unrealized gains/losses.
+                        {% for portfolio in portfolios %}
+                          <tr>
+                            <td>
+                            <a href="{% url 'portfolio_detail' portfolio.pk %}" class="text-default text-decoration-none">{{ portfolio.name }}</a>
+                            </td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td class="text-sm">--</td>
+                            <td>
+                              <span class="badge badge-danger badge-sm">Out of Stock</span>
+                            </td>
+                            <td class="text-sm">--</td>
+                          </tr>
+                        {% endfor %}
 
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th>Portfolio Name</th>
+                            <th>Symbols</th>
+                            <th>Cost Basis</th>
+                            <th>Market Value</th>
+                            <th>Day Change</th>
+                            <th>Unrealized Gain/Loss</th>
+                            <th>Realized Gain/Loss</th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'includes/footer.html' %}
     </div>
 
-{% endblock content %}
+    <!-- Add Portfolio Modal -->
+    <div class="modal fade" id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+      <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-title-default">Add New Portfolio</h6>
+            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addPortfolioForm">
+              <div class="form-group">
+                <label for="portfolioName">Portfolio Name</label>
+                <input type="text" class="form-control" id="portfolioName" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-gradient-primary" onclick="submitAddPortfolio()">Add Portfolio</button>
+            <button type="button" class="btn btn-link ml-auto" data-bs-dismiss="modal" aria-label="Close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<!-- Specific JS goes HERE --> 
-{% block scripts %}
 
-{% endblock scripts %}
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
+  <script>
+    if (document.getElementById('products-list')) {
+      const dataTableSearch = new simpleDatatables.DataTable("#products-list", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+
+      document.querySelectorAll(".export").forEach(function(el) {
+        el.addEventListener("click", function() {
+          var type = el.dataset.type;
+
+          var data = {
+            type: type,
+            filename: "soft-ui-" + type,
+          };
+
+          if (type === "csv") {
+            data.columnDelimiter = "|";
+          }
+
+          dataTableSearch.export(data);
+        });
+      });
+    }
+
+    function submitAddPortfolio() {
+        const portfolioName = document.getElementById('portfolioName').value;
+        console.log("==>"+portfolioName)
+        if (portfolioName) {
+            fetch('/portfolio/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({name: portfolioName})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Portfolio added successfully');
+                        location.reload(); // Reload the page to see the new portfolio
+                    } else {
+                        alert('Error adding portfolio: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+  </script>
+
+{% endblock extra_js %}

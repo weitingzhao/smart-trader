@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.contrib import messages
+from apps.common.models import *
+from home.forms.portfolio import UserStaticSettingForm
 
 
 def default(request):

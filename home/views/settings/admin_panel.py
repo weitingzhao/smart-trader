@@ -7,7 +7,7 @@ from apps.notifications.signals import notify
 from django.shortcuts import render, redirect
 from rest_framework.authtoken.models import Token
 from django.conf import settings  as django_settings
-from home.forms.portfolio import PositionSizingForm
+from home.forms.portfolio import UserStaticSettingForm
 
 # Create your views here.
 instance = Logic()
@@ -53,49 +53,8 @@ def settings(request):
 def my_handler(sender, instance, created, **kwargs):
     notify.send(instance, verb='was saved')
 
-def customize(request):
-    try:
-        user_static_setting = UserStaticSetting.objects.get(user=request.user)
-        form = PositionSizingForm(instance=user_static_setting)
-    except UserStaticSetting.DoesNotExist:
-        form = PositionSizingForm()
 
-    return render(
-        request,
-        template_name='pages/settings/admin_panel/customize.html',
-        context = {
-            'parent': 'account',
-            'segment': 'customize',
-            'position_sizing_form': form,
-            'messages': messages.get_messages(request),
-        })
 
-def customize_position_sizing(request):
-    if request.method == 'POST':
-        form = PositionSizingForm(request.POST)
-        if form.is_valid():
-            position_sizing, created = UserStaticSetting.objects.update_or_create(
-                user=request.user,
-                defaults=form.cleaned_data
-            )
-            if created:
-                messages.success(request, 'Position Sizing created successfully.', extra_tags='position sizing')
-            else:
-                messages.success(request, 'Position Sizing updated successfully.', extra_tags='position sizing')
-        else:
-            messages.error(request, f'Position Sizing form is invalid.', extra_tags='position sizing')
-            return render(
-                request,
-                template_name='pages/settings/admin_panel/customize.html',
-                context={
-                    'parent': 'account',
-                    'segment': 'customize',
-                    'position_sizing_form': form,
-                })
-    else:
-        messages.error(request, "method not supported", extra_tags='position sizing')
-
-    return redirect('customize')
 
 def lookup(request):
     if request.method == 'GET':

@@ -14,9 +14,13 @@ urlpatterns = [
     ####### settings.risk_references #######
     # Risk References -> Default
     path(
-        'overview/',
+        'risk/',
         settings.risk_preferences.default,
         name='risk_preferences'),
+    path(
+        'risk/static_risk',
+        settings.risk_preferences.settings_risk_static_risk,
+        name='settings_risk_static_risk'),
 
     ####### settings.notifications #######
     # Overview -> Default
@@ -32,16 +36,6 @@ urlpatterns = [
         'settings',
         settings.admin_panel.settings,
         name="settings"),
-
-    # Admin Panel -> Customize
-    path(
-        'customize/',
-        settings.admin_panel.customize,
-        name='customize'),
-    path(
-        'customize/position_sizing',
-        settings.admin_panel.customize_position_sizing,
-        name='customize_position_sizing'),
 
     # Admin Panel -> Lookup
     path(

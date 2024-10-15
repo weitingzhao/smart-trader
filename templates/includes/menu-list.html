@@ -271,8 +271,17 @@
       </li>
     {% endif %}
 
-    <!-- Settings -->
-    {%check_menu_permission request.user True True False as perm_settings %}
+
+    <!-- SETUP Section -->
+    {%check_menu_permission request.user False True True as perm_setup%}
+    {% if perm_setup %}
+        <li class="nav-item mt-3">
+            <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6">SETUP</h6>
+        </li>
+    {% endif %}
+
+    <!-- Settings (user)-->
+    {%check_menu_permission request.user False True False as perm_settings %}
     {% if perm_settings %}
       <li class="nav-item">
         <a data-bs-toggle="collapse" href="#settingsPanel"
@@ -307,36 +316,6 @@
       </li>
     {% endif %}
 
-    <!-- SETUP Section -->
-    {%check_menu_permission request.user False True True as perm_setup%}
-    {% if perm_setup %}
-        <li class="nav-item mt-3">
-            <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6">SETUP</h6>
-        </li>
-    {% endif %}
-
-    <!-- Account (user) -->
-    {%check_menu_permission request.user False True False as perm_account%}
-    {% if perm_account %}
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#accountPanel" class="nav-link {% if 'account' in parent %}active{% endif %}" aria-controls="accountPanel" role="button" aria-expanded="false">
-            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                <i class="fas fa-user fs-7 {% if 'account' in parent %}text-white{% else %}text-dark{% endif %}"></i>
-            </div>
-            <span class="nav-link-text ms-1">Account</span>
-        </a>
-        <div class="collapse {% if 'account' in parent %}show{% endif %} " id="accountPanel">
-            <ul class="nav ms-4 ps-3">
-                <li class="nav-item {% if 'customize' in segment %}active{% endif %}">
-                    <a class="nav-link {% if 'customize' in segment %}active{% endif %}" href="{% url 'customize' %}">
-                        <span class="sidenav-mini-icon text-xs"> C </span>
-                        <span class="sidenav-normal"> Customize </span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
-  {% endif %}
 
     <!-- Tools -->
     {%check_menu_permission request.user False False True as perm_tools%}

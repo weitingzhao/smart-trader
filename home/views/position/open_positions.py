@@ -9,6 +9,9 @@ from django.shortcuts import render, get_object_or_404
 
 
 def default(request):
+    
+
+
     return render(
         request=request,
         template_name='pages/position/open_positions.html',
