@@ -216,3 +216,4 @@ class PortfolioPerformance(models.Model):
 
     def __str__(self):
         return f"Performance for {self.portfolio.name}"
+
