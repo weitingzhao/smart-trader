@@ -120,11 +120,11 @@ class HoldingBuyOrder(models.Model):
     """
     holding_buy_order_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
-    holding_buy_action = models.ForeignKey(HoldingBuyAction, on_delete=models.CASCADE)
+    holding_buy_action = models.ForeignKey(HoldingBuyAction, on_delete=models.CASCADE, null=True, blank=True)
     wishlist = models.ForeignKey(Wishlist, on_delete=models.DO_NOTHING, null=True, blank=True)
 
-    action = models.CharField(max_length=20, choices=ActionChoices.choices, default=ActionChoices.NONE)
-    timing = models.CharField(max_length=20, choices=TimingChoices.choices, default=TimingChoices.NONE)
+    action = models.CharField(max_length=20, choices=ActionChoices.choices, default=ActionChoices.NONE, null=True)
+    timing = models.CharField(max_length=20, choices=TimingChoices.choices, default=TimingChoices.NONE, null=True)
     order_place_date = models.DateTimeField(null=True, blank=True)
 
     quantity_target = models.IntegerField(null=True, blank=True)

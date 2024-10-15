@@ -21,7 +21,7 @@ class HoldingBuyOrderForm(forms.ModelForm):
     }))
 
     order_place_date =  forms.DateTimeField(widget=forms.DateTimeInput(attrs={
-        'type': 'datetime-local',
+        'type': 'date',
         'class': 'form-control'
     }))
     quantity_target = forms.IntegerField(widget=forms.NumberInput(attrs={

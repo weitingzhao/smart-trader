@@ -121,7 +121,9 @@ function selectResult(reminder) {
     const symbol = getSelectResult(reminder)
     if (reminder === 'auto_reminder_results') {
         window.location.href = `/screening/stock/quote/${symbol}`;
-    }else if (reminder === 'symbol_auto_reminder_results') {
+    }else if (reminder === 'auto_complete_symbol') {
+        document.getElementById("auto_complete_symbol_result").value = symbol;
+    }else if (reminder === 'add_holding_directly') {
         // Send AJAX request to add portfolio item
         fetch(`/position/holding/${currentPortfolioIndex}/add/`, {
             method: 'POST',
