@@ -184,13 +184,13 @@
 <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
 <script>
     if (document.getElementById('holding_table')) {
-      const holding = new simpleDatatables.DataTable("#holding_table", {
+      new simpleDatatables.DataTable("#holding_table", {
         searchable: true,
         fixedHeight: false,
         perPage: 7
       });
     }
-    
+
     function selectHolding(symbol) {
         document.getElementById('auto_complete_symbol_result').value = symbol;
     }
