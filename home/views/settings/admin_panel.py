@@ -1,13 +1,11 @@
 import requests
 from logics.logic import Logic
 from apps.common.models import *
-from django.contrib import messages
 from django.http import JsonResponse
 from apps.notifications.signals import notify
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from rest_framework.authtoken.models import Token
 from django.conf import settings  as django_settings
-from home.forms.portfolio import UserStaticSettingForm
 
 # Create your views here.
 instance = Logic()
