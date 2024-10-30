@@ -25,11 +25,12 @@
                           {% csrf_token %}
                           <!--single form panel-->
                           <div class="card multisteps-form__panel p-3 border-radius-xl bg-white js-active" data-animation="FadeIn">
-                              <h5 class="font-weight-bolder mb-0">Create a new Holding</h5>
+                              <h6 class="font-weight-bolder mb-0">Create a new Holding</h6>
                               <div class="multisteps-form__content">
                                   <div class="row mt-3">
                                       <p>
                                           <button type="button" class="btn bg-gradient-info w-12 mb-0 toast-btn"
+                                                  id="add_holding_button"
                                                   data-bs-toggle="collapse" href="#symbolCollapse" role="button" aria-expanded="false" aria-controls="symbolCollapse">
                                               +&nbsp; Add Holding Symbol
                                           </button>
@@ -56,7 +57,7 @@
                                       </div>
                                   </div>
                                   <div class="row mt-3">
-                                      <h5 class="font-weight-bolder mb-0">or Select existing Holding</h5>
+                                      <h6 class="font-weight-bolder mb-0">or Select existing Holding</h6>
                                   </div>
                                   <div class="row mt-3">
                                       <div class="table-responsive">
@@ -91,7 +92,7 @@
                                       </div>
                                   </div>
                                   <div class="row mt-3">
-                                      <label>Select Holding</label>
+                                      <label><h5>Selected Holding</h5></label>
                                       <input id='auto_complete_symbol_result'  name='holding_symbol' class="form-control" readonly>
                                   </div>
                                   <div class="button-row d-flex mt-4">
@@ -101,13 +102,13 @@
                           </div>
                           <!--single form panel-->
                           <div class="card multisteps-form__panel p-3 border-radius-xl bg-white" data-animation="FadeIn">
-                              <h5 class="font-weight-bolder mb-0">Initial Positions</h5>
+                              <h5 id="selected_holding" class="font-weight-bolder mb-0">Initial Positions</h5>
                               <p class="mb-0 text-sm">order for open position</p>
                               <div class="multisteps-form__content">
                                   <div class="row mt-3">
                                       <div class="col-12 col-sm-4">
                                           <label for="{{ form.action.id_for_label }}">Action</label>
-                                          <select class="form-select" id="{{ form.action.id_for_label }}" name="{{ form.action.name }}">
+                                          <select class="form-select" id="{{ form.action.id_for_label }}" name="{{ form.action.name }}" disabled="disabled">
                                             {% for choice in form.action.field.choices %}
                                                 <option value="{{ choice.0 }}" {% if choice.0 == form.action.value %}selected{% endif %}>
                                                     {{ choice.1 }}
@@ -193,7 +194,10 @@
 
     function selectHolding(symbol) {
         document.getElementById('auto_complete_symbol_result').value = symbol;
+        document.getElementById('selected_holding').innerHTML = `Initial Positions for <b>${symbol}</b>`;
+        document.getElementById('id_action').value = 2;
     }
+    
 </script>
 
 {% endblock extra_js %}

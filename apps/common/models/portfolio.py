@@ -85,7 +85,7 @@ class HoldingBuyAction(models.Model):
     holding_buy_action_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
     date = models.DateTimeField(null=True, blank=True)
-    quality_final = models.IntegerField(null=True, blank=True)
+    quantity_final = models.IntegerField(null=True, blank=True)
     price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     class Meta:
@@ -102,7 +102,7 @@ class HoldingSellAction(models.Model):
     holding_sell_action_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
     date = models.DateTimeField(null=True, blank=True)
-    quality_final = models.IntegerField(null=True, blank=True)
+    quantity_final = models.IntegerField(null=True, blank=True)
     price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
     commission = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 

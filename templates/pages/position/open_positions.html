@@ -52,42 +52,8 @@
                     <!-- Card header -->
                     <div class="card-header pb-0">
                         <p>
-                            <button type="button" class="btn bg-gradient-info w-10 mb-0 toast-btn"
-                                    data-bs-toggle="collapse" href="#symbolCollapse" role="button" aria-expanded="false" aria-controls="symbolCollapse">
-                                +&nbsp; Add Symbol
-                            </button>
-                            <button type="button" class="btn bg-gradient-default w-10 mb-0 toast-btn"
-                                    data-bs-toggle="collapse" data-bs-target="#reorderCollapse" aria-expanded="false" aria-controls="reorderCollapse">
-                                Reorder
-                            </button>
                             {% include "layouts/screen-tools.html" %}
                         </p>
-                        <div class="collapse" id="symbolCollapse">
-                            <div class="card text-sm">
-                                <div class="card-header me-2 d-flex align-items-start col-md-4">
-                                    <div class="input-group" style="border-right: 1px solid lightgray;">
-                                        <span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span>
-                                        <input id="header_search" type="text" class="form-control" autocomplete="off" placeholder="Stock name or symbol"
-                                               data-bs-toggle="dropdown" aria-expanded="false"
-                                               oninput="symbolSearchAutoReminder(event, 'symbol_auto_reminder_results')"
-                                               onkeydown="symbolSearchKeyDown(event, 'symbol_auto_reminder_results')"
-                                               onblur="symbolSearchBlur('symbol_auto_reminder_results')"
-                                               onfocus="symbolFocus('symbol_auto_reminder_results')">
-                                        <input id="currentPortfolioIndex" type="hidden" value="{{ portfolio.portfolio_id }}"/>
-                                        <ul id="symbol_auto_reminder_results" class="dropdown-menu" aria-labelledby="header_search"></ul>
-                                    </div>
-                                </div>
-                                <div class=" card-body pt-0">
-                                    <b>Enter Symbols or company names</b>
-                                    <br/>Tip: Use Comma to separate multiple symbols and then press enter
-                                </div>
-                            </div>
-                        </div>
-                        <div class="collapse" id="reorderCollapse">
-                            <div class="card card-body">
-                                order Collapse
-                            </div>
-                        </div>
                       </div>
                     <div class="card-body px-0 pb-0">
                         <div class="table-responsive">
@@ -579,7 +545,7 @@
             const form = row.querySelector('form');
             const portfolio_id = form.getAttribute('data-portfolio-id');
             const portfolio_item_id = form.getAttribute('data-portfolio-item-id');
-            loadTransactions(portfolio_id, portfolio_item_id);
+            {#loadTransactions(portfolio_id, portfolio_item_id);#}
         });
     });
 

@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from django.db.models import Sum, F
 from django.http import JsonResponse
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
@@ -42,8 +43,32 @@ def default(request):
         # Merge items DataFrame with merged_df on 'symbol'
         final_df = pd.merge(items_df, merged_df, left_on='symbol_id', right_on='symbol')
 
+        # Fetch and sum the quantity_final from holding_buy_action and holding_sell_action
+        # Get column names using model's meta options
+        buy_actions_column_names = [field.name for field in HoldingBuyAction._meta.fields]
+        buy_actions = (HoldingBuyAction.objects.filter(holding__in=holdings).values('holding_id').annotate(
+            total_buy=Sum('quantity_final'),
+            total_buy_price=Sum(F('quantity_final') * F('price_final'))
+        ))
+        sell_actions_column_names = [field.name for field in HoldingSellAction._meta.fields]
+        sell_actions = (HoldingSellAction.objects.filter(holding__in=holdings).values('holding_id').annotate(
+            total_sell=Sum('quantity_final'),
+            total_sell_price=Sum(F('quantity_final') * F('price_final'))
+        ))
+
+        buy_df = pd.DataFrame(list(buy_actions), columns=['holding_id', 'total_buy', 'total_buy_price'])
+        sell_df = pd.DataFrame(list(sell_actions), columns=['holding_id', 'total_sell', 'total_sell_price'])
+
+        # Merge buy and sell dataframes
+        action_df = pd.merge(buy_df, sell_df, on='holding_id', how='outer').fillna(0)
+        action_df['quantity'] = action_df['total_buy'] - action_df['total_sell']
+        action_df['total_price'] = action_df['total_buy_price'] - action_df['total_sell_price']
+
+        # Merge action_df with final_df
+        final_df = pd.merge(final_df, action_df, left_on='holding_id', right_on='holding_id', how='left').fillna(0)
+
         # Step 3. Calculate the total cost & market value
-        final_df['total_cost'] = final_df['average_price'] * final_df['quantity']
+        final_df['total_cost'] = final_df['total_price'] * final_df['quantity']
         final_df['market_value'] = final_df['quantity'] * final_df['close']
 
         # Step 4. Calculate the change since last biz day
@@ -120,6 +145,8 @@ FROM
             SUM(volume) AS volume
         FROM
             market_stock_hist_bars_{table_name}_ts
+        WHERE
+            symbol IN ('{"', '".join(symbols)}')
         GROUP BY
             symbol, DATE(time)
     ) sub ON sub.symbol = mk.symbol

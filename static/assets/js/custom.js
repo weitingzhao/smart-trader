@@ -123,6 +123,8 @@ function selectResult(reminder) {
         window.location.href = `/screening/stock/quote/${symbol}`;
     }else if (reminder === 'auto_complete_symbol') {
         document.getElementById("auto_complete_symbol_result").value = symbol;
+        document.getElementById('selected_holding').innerHTML = `Initial Positions for <b>${symbol}</b>`;
+        document.getElementById('id_action').value = 1;
     }else if (reminder === 'add_holding_directly') {
         // Send AJAX request to add portfolio item
         fetch(`/position/holding/${currentPortfolioIndex}/add/`, {
