@@ -1,4 +1,4 @@
-{% extends 'layouts/../layouts/base.html' %}
+{% extends 'layouts/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -110,9 +110,11 @@
                                           <label for="{{ form.action.id_for_label }}">Action</label>
                                           <select class="form-select" id="{{ form.action.id_for_label }}" name="{{ form.action.name }}" disabled="disabled">
                                             {% for choice in form.action.field.choices %}
-                                                <option value="{{ choice.0 }}" {% if choice.0 == form.action.value %}selected{% endif %}>
-                                                    {{ choice.1 }}
-                                                </option>
+                                                {% if choice.0 == '0' or choice.0 == '1'  or choice.0 == '2' %}
+                                                    <option value="{{ choice.0 }}" {% if choice.0 == form.action.value %}selected{% endif %}>
+                                                        {{ choice.1 }}
+                                                    </option>
+                                                {% endif %}
                                             {% endfor %}
                                         </select>
                                       </div>

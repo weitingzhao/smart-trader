@@ -149,7 +149,7 @@ class HoldingSellOrder(models.Model):
     """
     holding_sell_order_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
-    holding_sell_action = models.ForeignKey(HoldingSellAction, on_delete=models.CASCADE)
+    holding_sell_action = models.ForeignKey(HoldingSellAction, on_delete=models.CASCADE, null=True, blank=True)
 
     action = models.CharField(max_length=20, choices=ActionChoices.choices, default=ActionChoices.NONE)
     timing = models.CharField(max_length=20, choices=TimingChoices.choices, default=TimingChoices.NONE)
