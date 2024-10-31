@@ -1,7 +1,10 @@
 import json
 import pandas as pd
+from decimal import Decimal
 from django.db.models import Sum, F
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
 
@@ -68,7 +71,7 @@ def default(request):
         final_df = pd.merge(final_df, action_df, left_on='holding_id', right_on='holding_id', how='left').fillna(0)
 
         # Step 3. Calculate the total cost & market value
-        final_df['total_cost'] = final_df['total_price'] * final_df['quantity']
+        final_df['total_cost'] = final_df.apply(lambda row: Decimal(row['total_price']) * Decimal(row['quantity']), axis=1)
         final_df['market_value'] = final_df['quantity'] * final_df['close']
 
         # Step 4. Calculate the change since last biz day
@@ -83,9 +86,9 @@ def default(request):
 
         # Step 6. Calculate the total cost & change
         # Calculate total change in value
-        final_df['total_chg_position'] = final_df['market_value'] - final_df['total_cost']
+        final_df['total_chg_position'] = final_df.apply(lambda row: Decimal(row['market_value']) - Decimal(row['total_cost']), axis=1)
         # Calculate total change percentage
-        final_df['total_chg_pct'] = ((final_df['total_chg_position'] / final_df['total_cost']) * 100).round(2)
+        final_df['total_chg_pct'] = final_df.apply(lambda row: ((row['total_chg_position'] / row['total_cost']) * 100).round(2) if row['total_cost'] != 0 else 0, axis=1)
         # Calculate total change trand
         final_df['total_trend'] = final_df['total_chg_position'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
 
@@ -198,7 +201,220 @@ def add_holding(request, pk):
         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 
+@csrf_exempt
+def add_holding_buy_action(request, holding_buy_order_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        quantity_final = data.get('quantity_final')
+        price_final = data.get('price_final')
+        date = data.get('date')
 
+        # Get the holding_buy_order record
+        order = HoldingBuyOrder.objects.get(holding_buy_order_id=holding_buy_order_id)
+
+        if order.holding_buy_action_id:
+            # Update existing holding_buy_action
+            action = HoldingBuyAction.objects.get(holding_buy_action_id=order.holding_buy_action_id)
+            action.date = date
+            action.quantity_final = quantity_final
+            action.price_final = price_final
+            action.save()
+        else:
+            # Create new holding_buy_action
+            action = HoldingBuyAction.objects.create(
+                holding_id=order.holding_id,
+                date=date,
+                quantity_final=quantity_final,
+                price_final=price_final
+            )
+            # Update holding_buy_order record
+            order.holding_buy_action_id = action.holding_buy_action_id
+            order.save()
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def add_holding_sell_action(request, holding_buy_order_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        quantity_final = data.get('quantity_final')
+        price_final = data.get('price_final')
+        date = data.get('date')
+        commission = data.get('commission')
+
+        # Get the holding_sell_order record
+        order = HoldingSellOrder.objects.get(holding_sell_order_id=holding_buy_order_id)
+
+        if order.holding_sell_action_id:
+            # Update existing holding_sell_action
+            action = HoldingSellAction.objects.get(holding_sell_order_id=order.holding_sell_action_id)
+            action.date = date
+            action.quantity_final = quantity_final
+            action.price_final = price_final
+            action.commission = commission
+            action.save()
+        else:
+            # Create new holding_sell_action
+            action = HoldingSellAction.objects.create(
+                holding_id=order.holding_id,
+                date=date,
+                quantity_final=quantity_final,
+                price_final=price_final,
+                commission=commission
+            )
+            # Update holding_sell_order record
+            order.holding_sell_action_id = action.holding_sell_action_id
+            order.save()
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+def get_holding_buy_order(request, holding_buy_order_id):
+    order = get_object_or_404(HoldingBuyOrder, holding_buy_order_id=holding_buy_order_id)
+    data = {
+        'id': order.holding_buy_order_id,
+        'quantity_target': order.quantity_target,
+        'price_market': order.price_market,
+        'order_place_date': order.order_place_date.strftime('%Y-%m-%d')
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_holding_buy_order(request, holding_buy_order_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        order = HoldingBuyOrder.objects.get(holding_buy_order_id=holding_buy_order_id)
+        order.quantity_target = data.get('quantity_target')
+        order.price_market = data.get('price_market')
+        order.order_place_date = data.get('order_place_date')
+        order.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def delete_holding_buy_order(request, holding_buy_order_id):
+    if request.method == 'DELETE':
+        order = HoldingBuyOrder.objects.get(holding_buy_order_id=holding_buy_order_id)
+        order.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+def get_holding_sell_order(request, holding_sell_order_id):
+    order = get_object_or_404(HoldingSellOrder, holding_sell_order_id=holding_sell_order_id)
+    data = {
+        'id': order.holding_sell_order_id,
+        'quantity_target': order.quantity_target,
+        'price_stop': order.price_stop,
+        'price_limit': order.price_limit,
+        'order_place_date': order.order_place_date.strftime('%Y-%m-%d')
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_holding_sell_order(request, holding_sell_order_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        order = HoldingSellOrder.objects.get(holding_sell_order_id=holding_sell_order_id)
+        order.quantity_target = data.get('quantity_target')
+        order.price_stop = data.get('price_stop')
+        order.price_limit = data.get('price_limit')
+        order.order_place_date = data.get('order_place_date')
+        order.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def delete_holding_sell_order(request, holding_sell_order_id):
+    if request.method == 'DELETE':
+        order = HoldingSellOrder.objects.get(holding_sell_order_id=holding_sell_order_id)
+        order.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+def get_holding_buy_action(request, holding_buy_action_id):
+    action = get_object_or_404(HoldingBuyAction, holding_buy_action_id=holding_buy_action_id)
+    data = {
+        'id': action.holding_buy_action_id,
+        'quantity_final': action.quantity_final,
+        'price_final': action.price_final,
+        'date': action.date.strftime('%Y-%m-%d')
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_holding_buy_action(request, holding_buy_action_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        action = HoldingBuyAction.objects.get(holding_buy_action_id=holding_buy_action_id)
+        action.quantity_final = data.get('quantity_final')
+        action.price_final = data.get('price_final')
+        action.date = data.get('date')
+        action.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def delete_holding_buy_action(request, holding_buy_action_id):
+    if request.method == 'DELETE':
+        action = HoldingBuyAction.objects.get(holding_buy_action_id=holding_buy_action_id)
+
+        order = HoldingBuyOrder.objects.get(holding_buy_action_id=holding_buy_action_id)
+        order.holding_buy_action_id = None
+        order.save()
+
+        action.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+def get_holding_sell_action(request, holding_sell_action_id):
+    action = get_object_or_404(HoldingSellAction, holding_sell_action_id=holding_sell_action_id)
+    data = {
+        'id': action.holding_sell_action_id,
+        'quantity_final': action.quantity_final,
+        'price_final': action.price_final,
+        'date': action.date.strftime('%Y-%m-%d'),
+        'commission': action.commission
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_holding_sell_action(request, holding_sell_action_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        action = HoldingSellAction.objects.get(holding_sell_action_id=holding_sell_action_id)
+        action.quantity_final = data.get('quantity_final')
+        action.price_final = data.get('price_final')
+        action.date = data.get('date')
+        action.commission = data.get('commission')
+        action.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def delete_holding_sell_action(request, holding_sell_action_id):
+    if request.method == 'DELETE':
+        action = HoldingSellAction.objects.get(holding_sell_action_id=holding_sell_action_id)
+
+        order = HoldingSellOrder.objects.get(holding_sell_action_id=holding_sell_action_id)
+        order.holding_sell_action_id = None
+        order.save()
+
+        action.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+
+
+
+
+# /////obsolete
 def transaction_history(request, pk):
     item = get_object_or_404(PortfolioItem, pk=pk)
     transactions = Transaction.objects.filter(portfolio_item=item)

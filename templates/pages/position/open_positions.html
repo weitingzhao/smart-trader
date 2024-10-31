@@ -1,6 +1,5 @@
 {% extends "layouts/base.html" %}
 {% load static home_filter %}
-
 {% block content %}
     <div class="container-fluid">
         <div class="page-header min-height-300 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
@@ -59,20 +58,27 @@
                         <div class="table-responsive">
                             <table class="table table-flush table-hover text-end" id="summary-list">
                                 <thead class="thead-light">
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Change</th>
-                                    <th>Day Chg<br/>%</th>
-                                    <th>Day<br/>Chg</th>
-                                    <th>Shares</th>
+                                <tr class="main-header">
+                                    <th>SYMBOL</th>
+                                    <th>CURRENT<br/>PRICE</th>
+                                    <th>CHANGE</th>
+                                    <th>DAY <br/>CHG %</th>
+                                    <th>DAY<br/>CHG</th>
+
+                                    <th>CURRENT<br/># of SHARES</th>
+                                    
                                     <th>Cost /<br/>Share</th>
-                                    <th>Last<br/>Price</th>
                                     <th>Market<br/>Value</th>
                                     <th>Total <br/>Chg %</th>
                                     <th>Total <br/>Chg</th>
                                     <th>52-Wk Range</th>
                                     <th>Day Range</th>
                                     <th>Day Chart</th>
+                                </tr>
+                                <tr class="subheader">
+                                    <th colspan="5">MARKET</th>
+                                    <th>CURRENT POSITION</th>
+                                    <th>Sub-Title 3</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -83,12 +89,12 @@
                                             <b>{{ item.symbol }}</b>
                                         </a>
                                     </td>
+                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.close 2 '{0}' False%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg 2 '{0}'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_pct 2 '{0}%'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_position 2 '{0}'%}</b></td>
                                     <td class="text-md mb-0 text-dark">{%round_by_digits item.quantity 0 '{0}' False%}</td>
                                     <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '{0}' False%}</b></td>
-                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.close 2 '{0}' False%}</b></td>
                                     <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '{0}' False%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_pct 2 '{0}%'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_position 2 '{0}'%}</b></td>
@@ -104,23 +110,6 @@
                                 </tr>
                                 {% endfor %}
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Change</th>
-                                    <th>Day Chg<br/>%</th>
-                                    <th>Day<br/>Chg</th>
-                                    <th>Shares</th>
-                                    <th>Cost /<br/>Share</th>
-                                    <th>Last<br/>Price</th>
-                                    <th>Market<br/>Value</th>
-                                    <th>Total <br/>Chg %</th>
-                                    <th>Total <br/>Chg</th>
-                                    <th>52-Wk Range</th>
-                                    <th>Day Range</th>
-                                    <th>Day Chart</th>
-                                </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -338,12 +327,12 @@
         slider.setAttribute('disabled', true);
     });
     
-    function pagination(element_id, per_page=5) {
+    function pagination(element_id, per_page=12) {
         if (document.getElementById(element_id)) {
             const dataTableSearch = new simpleDatatables.DataTable(`#${element_id}`, {
                 searchable: true,
                 fixedHeight: false,
-                perPage: per_page
+                perPage: per_page,
             });
             document.querySelectorAll(".export").forEach(function (el) {
                 el.addEventListener("click", function (e) {
@@ -374,17 +363,9 @@
             panelToShow.style.display = 'block';
         }
 
-        summary_btn.addEventListener('click', function () {
-            showPanel(summaryPanel);
-        });
-
-        holding_btn.addEventListener('click', function () {
-            showPanel(holdingsPanel);
-        });
-
-        fundamental_btn.addEventListener('click', function () {
-            showPanel(fundamentalsPanel);
-        });
+        summary_btn.addEventListener('click', function () {showPanel(summaryPanel);});
+        holding_btn.addEventListener('click', function () {showPanel(holdingsPanel);});
+        fundamental_btn.addEventListener('click', function () {showPanel(fundamentalsPanel);});
 
         // Initialize by showing the summary panel
         showPanel(summaryPanel);

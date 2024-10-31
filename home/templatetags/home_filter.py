@@ -3,8 +3,20 @@ import json
 from django import template
 import random
 import string
+from apps.common.models import *
 
 register = template.Library()
+
+@register.filter
+def action_lookup(value, arg):
+    # Lookup dictionaries
+    return dict(ActionChoices.choices).get(arg)
+
+@register.filter
+def timing_lookup(value, arg):
+    # Lookup dictionaries
+    return dict(TimingChoices.choices).get(arg)
+
 
 @register.filter(name='replace_value')
 def replace_value(value, arg):

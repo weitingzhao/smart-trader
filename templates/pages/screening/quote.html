@@ -26,6 +26,11 @@
             <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
               <div class="nav-wrapper position-relative end-0">
                 <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                    <li class="nav-item" role="tab" >
+                    <a id="holding_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:" aria-selected="true">
+                      <span class="ms-1">Holding</span>
+                    </a>
+                  </li>
                   <li class="nav-item" role="tab" >
                     <a id="chart_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
                       <span class="ms-1">Chart</span>
@@ -78,9 +83,220 @@
           </div>
         </div>
     </div>
+    <div id="holding_panel" class="container-fluid py-4">
+        <div class="row mt-3">
+            <div class="col-8">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 p-3">
+                        <h6 class="mb-1">Buy Order</h6>
+                        <p class="text-sm">Market/Limit</p>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="buy_order_table">
+                                    <thead class="thead-light">
+                                      <tr>
+                                          <th>Quantity</th>
+                                          <th>Market</th>
+                                          <th>Stop</th>
+                                          <th>Limit</th>
+
+                                          <th>Place Date</th>
+                                          <th>Status</th>
+                                          <th>Type</th>
+                                          <th>Purpose</th>
+                                          <th>Timing</th>
+                                          <th>Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for holding_buy_order in holding_buy_orders %}
+                                        <tr>
+                                            <td>{{ holding_buy_order.quantity_target }}</td>
+                                            <td>{{ holding_buy_order.price_market }}</td>
+                                            <td>{{ holding_buy_order.price_stop }}</td>
+                                            <td>{{ holding_buy_order.price_limit }}</td>
+
+                                            <td>{{ holding_buy_order.order_place_date|date:"m-d-Y" }}</td>
+                                            <td>
+                                                {% if holding_buy_order.holding_buy_action_id %}
+                                                    FILLED
+                                                {% else %}
+                                                    OPEN
+                                                {%endif %}
+                                            </td>
+                                            <td>
+                                                {% if holding_buy_order.is_initial %}
+                                                    INIT
+                                                {% elif holding_buy_order.is_additional %}
+                                                    ADD
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ segment|action_lookup:holding_buy_order.action }}</td>
+                                            <td>{{ segment|timing_lookup:holding_buy_order.timing }}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" onclick="showHoldingBuyAction('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')">FILL</button>
+                                                <button class="btn btn-warning btn-sm" onclick="editHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')">Edit</button>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')">Delete</button>
+                                            </td>
+                                      </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                    <div class="card mb-4">
+                        <div class="card-header pb-0 p-3">
+                            <h6 class="mb-1">Buy Action</h6>
+                            <p class="text-sm">Market</p>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-flush table-hover" id="buy_action_table">
+                                        <thead class="thead-light">
+                                          <tr>
+                                              <th>Quantity</th>
+                                              <th>Filled</th>
+                                              <th>At</th>
+                                              <th>Action</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for holding_buy_action in holding_buy_actions %}
+                                            <tr>
+                                                <td>{{ holding_buy_action.quantity_final }}</td>
+                                                <td>{{ holding_buy_action.price_final }}</td>
+                                                <td>{{ holding_buy_action.date|date:"m-d-Y" }}</td>
+                                                <td>
+                                                    <button class="btn btn-warning btn-sm" onclick="editHoldingBuyAction('{{ holding_buy_action.holding_buy_action_id }}')">Edit</button>
+                                                    <button class="btn btn-danger btn-sm" onclick="deleteHoldingBuyAction('{{ holding_buy_action.holding_buy_action_id }}')">Delete</button>
+                                                </td>
+                                          </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                      </table>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-8">
+                <div class="card mb-4">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">Sell Order</h6>
+                    <p class="text-sm">Stop Limit</p>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-flush table-hover" id="sell_order_table">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Quantity</th>
+                                        <th>Stop</th>
+                                        <th>Limit</th>
+
+                                        <th>Place Date</th>
+                                        <th>Status</th>
+                                        <th>Type</th>
+                                        <th>Purpose</th>
+                                        <th>Timing</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for holding_sell_order in holding_sell_orders %}
+                                        <tr>
+                                            <td>{{ holding_sell_order.quantity_target }}</td>
+                                            <td>{{ holding_sell_order.price_stop }}</td>
+                                            <td>{{ holding_sell_order.price_limit }}</td>
+
+                                            <td>{{ holding_sell_order.order_place_date|date:"m-d-Y" }}</td>
+                                            <td>
+                                                {% if holding_sell_order.holding_sell_action_id %}
+                                                    FILLED
+                                                {% else %}
+                                                    OPEN
+                                                {%endif %}
+                                            </td>
+                                            <td>
+                                                {% if holding_sell_order.is_initial %}
+                                                    INIT
+                                                {% elif holding_sell_order.is_additional %}
+                                                    ADD
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ segment|action_lookup:holding_sell_order.action }}</td>
+                                            <td>{{ segment|timing_lookup:holding_sell_order.timing }}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" onclick="showHoldingSellAction('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')">FILL</button>
+                                                <button class="btn btn-warning btn-sm" onclick="editHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')">Edit</button>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')">Delete</button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="col-4">
+                    <div class="card mb-4">
+                        <div class="card-header pb-0 p-3">
+                            <h6 class="mb-1">Sell Action</h6>
+                            <p class="text-sm">Market</p>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-flush table-hover" id="sell_action_table">
+                                        <thead class="thead-light">
+                                          <tr>
+                                              <th>Quantity</th>
+                                              <th>Filled</th>
+                                              <th>Commission</th>
+                                              <th>At</th>
+                                              <th>Action</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for holding_sell_action in holding_sell_actions %}
+                                            <tr>
+                                                <td>{{ holding_sell_action.quantity_final }}</td>
+                                                <td>{{ holding_sell_action.price_final }}</td>
+                                                <td>{{ holding_sell_action.commission }}</td>
+                                                <td>{{ holding_sell_action.date|date:"m-d-Y" }}</td>
+                                                <td>
+                                                    <button class="btn btn-warning btn-sm" onclick="editHoldingSellAction('{{ holding_sell_action.holding_sell_action_id }}')">Edit</button>
+                                                    <button class="btn btn-danger btn-sm" onclick="deleteHoldingSellAction('{{ holding_sell_action.holding_sell_action_id }}')">Delete</button>
+                                                </td>
+                                          </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                      </table>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
     <div id="profile_panel" class="container-fluid py-4">
         <div class="row mt-3">
-      <div class="col-12 col-md-6 col-xl-4">
+            <div class="col-12 col-md-6 col-xl-4">
         <div class="card h-100">
           <div class="card-header pb-0 p-3">
             <h6 class="mb-0">Fundamental</h6>
@@ -193,7 +409,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-6 col-xl-4 mt-md-0 mt-4">
+            <div class="col-12 col-md-6 col-xl-4 mt-md-0 mt-4">
         <div class="card h-100">
           <div class="card-header pb-0 p-3">
             <div class="row">
@@ -233,7 +449,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-xl-4 mt-xl-0 mt-4">
+            <div class="col-12 col-xl-4 mt-xl-0 mt-4">
         <div class="card h-100">
           <div class="card-header pb-0 p-3">
             <h6 class="mb-0">Conversations</h6>
@@ -294,7 +510,7 @@
           </div>
         </div>
       </div>
-    </div>
+        </div>
         <div class="row mt-4">
       <div class="col-12">
         <div class="card mb-4">
@@ -480,12 +696,581 @@
     <div id="news_panel" class="container-fluid py-4" style="display: none;">
     news_panel
     </div>
+
+    <!-- Modal holding Buy Action-->
+    <div class="modal fade" id="holdingBuyActionModal" tabindex="-1" aria-labelledby="holdingBuyActionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="holdingBuyActionModalLabel">Buy Action</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="holdingBuyActionForm">
+              <div class="mb-3">
+                <label for="buy_quantity_final" class="form-label">Final Quantity</label>
+                <input type="number" class="form-control" id="buy_quantity_final" required>
+              </div>
+              <div class="mb-3">
+                <label for="buy_price_final" class="form-label">Final Price</label>
+                <input type="number" class="form-control" id="buy_price_final" required>
+              </div>
+              <div class="mb-3">
+                <label for="buy_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="buy_date" required>
+              </div>
+              <input type="hidden" id="buy_order_Id">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="submitHoldingBuyAction()">Execute</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal holding Sell Action-->
+    <div class="modal fade" id="holdingSellActionModal" tabindex="-1" aria-labelledby="holdingSellActionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="holdingSellActionModalLabel">Sell Action</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="holdingSellActionForm">
+              <div class="mb-3">
+                <label for="sell_quantity_final" class="form-label">Final Quantity</label>
+                <input type="number" class="form-control" id="sell_quantity_final" required>
+              </div>
+              <div class="mb-3">
+                <label for="sell_price_final" class="form-label">Final Price</label>
+                <input type="number" class="form-control" id="sell_price_final" required>
+              </div>
+              <div class="mb-3">
+                <label for="sell_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="sell_date" required>
+              </div>
+              <div class="mb-3">
+                <label for="sell_commission" class="form-label">Commission</label>
+                <input type="number" class="form-control" id="sell_commission" required>
+              </div>
+              <input type="hidden" id="sell_order_id">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="submitHoldingSellAction()">Execute</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Holding Buy Order Modal -->
+    <div class="modal fade" id="editHoldingBuyOrderModal" tabindex="-1" aria-labelledby="editHoldingBuyOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldingBuyOrderModalLabel">Edit Buy Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editHoldingBuyOrderForm">
+                        <div class="mb-3">
+                            <label for="edit_quantity_target" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="edit_quantity_target" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_price_market" class="form-label">Market Price</label>
+                            <input type="number" class="form-control" id="edit_price_market" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_order_place_date" class="form-label">Place Date</label>
+                            <input type="date" class="form-control" id="edit_order_place_date" required>
+                        </div>
+                        <input type="hidden" id="edit_buy_order_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingBuyOrder()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Holding Sell Order Modal -->
+    <div class="modal fade" id="editHoldingSellOrderModal" tabindex="-1" aria-labelledby="editHoldingSellOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldingSellOrderModalLabel">Edit Sell Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editHoldingSellOrderForm">
+                        <div class="mb-3">
+                            <label for="edit_sell_quantity_target" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="edit_sell_quantity_target" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_price_stop" class="form-label">Stop Price</label>
+                            <input type="number" class="form-control" id="edit_sell_price_stop" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_price_limit" class="form-label">Limit Price</label>
+                            <input type="number" class="form-control" id="edit_sell_price_limit" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_order_place_date" class="form-label">Place Date</label>
+                            <input type="date" class="form-control" id="edit_sell_order_place_date" required>
+                        </div>
+                        <input type="hidden" id="edit_sell_order_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingSellOrder()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Holding Buy Action Modal -->
+    <div class="modal fade" id="editHoldingBuyActionModal" tabindex="-1" aria-labelledby="editHoldingBuyActionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldingBuyActionModalLabel">Edit Buy Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editHoldingBuyActionForm">
+                        <div class="mb-3">
+                            <label for="edit_buy_quantity_final" class="form-label">Final Quantity</label>
+                            <input type="number" class="form-control" id="edit_buy_quantity_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_buy_price_final" class="form-label">Final Price</label>
+                            <input type="number" class="form-control" id="edit_buy_price_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_buy_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="edit_buy_date" required>
+                        </div>
+                        <input type="hidden" id="edit_buy_action_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingBuyAction()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Holding Sell Action Modal -->
+    <div class="modal fade" id="editHoldingSellActionModal" tabindex="-1" aria-labelledby="editHoldingSellActionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldingSellActionModalLabel">Edit Sell Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editHoldingSellActionForm">
+                        <div class="mb-3">
+                            <label for="edit_sell_quantity_final" class="form-label">Final Quantity</label>
+                            <input type="number" class="form-control" id="edit_sell_quantity_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_price_final" class="form-label">Final Price</label>
+                            <input type="number" class="form-control" id="edit_sell_price_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="edit_sell_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sell_commission" class="form-label">Commission</label>
+                            <input type="number" class="form-control" id="edit_sell_commission" required>
+                        </div>
+                        <input type="hidden" id="edit_sell_action_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingSellAction()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% include 'includes/footer.html' %}
+<script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
+
+    ////////////////////////////////////////////// Holding html //////////////////////////////////////////////
+    if (document.getElementById('buy_order_table')) {
+      new simpleDatatables.DataTable("#buy_order_table", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+    }
+    if (document.getElementById('buy_action_table')) {
+      new simpleDatatables.DataTable("#buy_action_table", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+    }
+    if (document.getElementById('sell_order_table')) {
+      new simpleDatatables.DataTable("#sell_order_table", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+    }
+    if (document.getElementById('sell_action_table')) {
+      new simpleDatatables.DataTable("#sell_action_table", {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 7
+      });
+    }
+
+
+    function showHoldingBuyAction(holding_buy_order_Id, price_market, order_place_date, quantity_target) {
+        // Set the order ID in the hidden input field
+        document.getElementById('buy_order_Id').value = holding_buy_order_Id;
+        // Set the values in the modal input fields
+        document.getElementById('buy_date').value = order_place_date;
+        document.getElementById('buy_quantity_final').value = quantity_target;
+        document.getElementById('buy_price_final').value = price_market;
+        // Show the modal
+        var holdingBuyActionModal = new bootstrap.Modal(document.getElementById('holdingBuyActionModal'));
+        holdingBuyActionModal.show();
+    }
+
+    async function submitHoldingBuyAction() {
+        const holding_buy_order_Id = document.getElementById('buy_order_Id').value;
+        const quantityFinal = document.getElementById('buy_quantity_final').value;
+        const priceFinal = document.getElementById('buy_price_final').value;
+        const date = document.getElementById('buy_date').value;
+
+        if (quantityFinal && priceFinal) {
+            const response = await fetch(`/position/holding/buy/action/${holding_buy_order_Id}/add/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    quantity_final: quantityFinal,
+                    price_final: priceFinal,
+                    date: date
+                })
+            });
+
+            if (response.ok) {
+                alert("Order executed successfully!");
+                location.reload();
+            } else {
+                alert("Failed to execute order.");
+            }
+        }
+    }
+
+    function editHoldingBuyOrder(id) {
+        // Fetch the existing data and populate the modal fields
+        fetch(`/position/holding/buy/order/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_buy_order_id').value = data.id;
+                document.getElementById('edit_quantity_target').value = data.quantity_target;
+                document.getElementById('edit_price_market').value = data.price_market;
+                document.getElementById('edit_order_place_date').value = data.order_place_date;
+                var editModal = new bootstrap.Modal(document.getElementById('editHoldingBuyOrderModal'));
+                editModal.show();
+            });
+    }
+
+    async function submitEditHoldingBuyOrder() {
+        const id = document.getElementById('edit_buy_order_id').value;
+        const quantity_target = document.getElementById('edit_quantity_target').value;
+        const price_market = document.getElementById('edit_price_market').value;
+        const order_place_date = document.getElementById('edit_order_place_date').value;
+
+        const response = await fetch(`/position/holding/buy/order/${id}/edit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                quantity_target: quantity_target,
+                price_market: price_market,
+                order_place_date: order_place_date
+            })
+        });
+
+        if (response.ok) {
+            alert("Order updated successfully!");
+            location.reload();
+        } else {
+            alert("Failed to update order.");
+        }
+    }
+
+    async function deleteHoldingBuyOrder(id) {
+        if (confirm("Are you sure you want to delete this order?")) {
+            const response = await fetch(`/position/holding/buy/order/${id}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+
+            if (response.ok) {
+                alert("Order deleted successfully!");
+                location.reload();
+            } else {
+                alert("Failed to delete order.");
+            }
+        }
+    }
+
+
+    function showHoldingSellAction(holding_sell_order_id, price_limit, order_place_date, quantity_target) {
+        // Set the order ID in the hidden input field
+        document.getElementById('sell_order_id').value = holding_sell_order_id;
+        console.log("=>"+holding_sell_order_id)
+        // Set the values in the modal input fields
+        document.getElementById('sell_price_final').value = price_limit;
+        document.getElementById('sell_date').value = order_place_date;
+        document.getElementById('sell_quantity_final').value = quantity_target;
+        // Show the modal
+        var holdingSellActionModal = new bootstrap.Modal(document.getElementById('holdingSellActionModal'));
+        holdingSellActionModal.show();
+    }
+
+    async function submitHoldingSellAction() {
+        const holding_sell_order_Id = document.getElementById('sell_order_id').value;
+        const quantityFinal = document.getElementById('sell_quantity_final').value;
+        const priceFinal = document.getElementById('sell_price_final').value;
+        const date = document.getElementById('sell_date').value;
+        const commission = document.getElementById('sell_commission').value;
+
+        if (quantityFinal && priceFinal && commission) {
+            const response = await fetch(`/position/holding/sell/action/${holding_sell_order_Id}/add/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    quantity_final: quantityFinal,
+                    price_final: priceFinal,
+                    date: date,
+                    commission: commission
+                })
+            });
+
+            if (response.ok) {
+                alert("Order executed successfully!");
+                location.reload();
+            } else {
+                alert("Failed to execute order.");
+            }
+        }
+    }
+
+    function editHoldingSellOrder(id) {
+        fetch(`/position/holding/sell/order/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_sell_order_id').value = data.id;
+                document.getElementById('edit_sell_quantity_target').value = data.quantity_target;
+                document.getElementById('edit_sell_price_stop').value = data.price_stop;
+                document.getElementById('edit_sell_price_limit').value = data.price_limit;
+                document.getElementById('edit_sell_order_place_date').value = data.order_place_date;
+                var editModal = new bootstrap.Modal(document.getElementById('editHoldingSellOrderModal'));
+                editModal.show();
+            })
+            .catch(error => console.error('Error fetching sell order data:', error));
+    }
+
+    async function submitEditHoldingSellOrder() {
+        const id = document.getElementById('edit_sell_order_id').value;
+        const quantity_target = document.getElementById('edit_sell_quantity_target').value;
+        const price_stop = document.getElementById('edit_sell_price_stop').value;
+        const price_limit = document.getElementById('edit_sell_price_limit').value;
+        const order_place_date = document.getElementById('edit_sell_order_place_date').value;
+
+        const response = await fetch(`/position/holding/sell/order/${id}/edit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                quantity_target: quantity_target,
+                price_stop: price_stop,
+                price_limit: price_limit,
+                order_place_date: order_place_date
+            })
+        });
+
+        if (response.ok) {
+            alert("Order updated successfully!");
+            location.reload();
+        } else {
+            alert("Failed to update order.");
+        }
+    }
+
+    async function deleteHoldingSellOrder(id) {
+        if (confirm("Are you sure you want to delete this order?")) {
+            const response = await fetch(`/position/holding/sell/order/${id}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+
+            if (response.ok) {
+                alert("Order deleted successfully!");
+                location.reload();
+            } else {
+                alert("Failed to delete order.");
+            }
+        }
+    }
+
+    function editHoldingBuyAction(id) {
+        fetch(`/position/holding/buy/action/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_buy_action_id').value = data.id;
+                document.getElementById('edit_buy_quantity_final').value = data.quantity_final;
+                document.getElementById('edit_buy_price_final').value = data.price_final;
+                document.getElementById('edit_buy_date').value = data.date;
+                var editModal = new bootstrap.Modal(document.getElementById('editHoldingBuyActionModal'));
+                editModal.show();
+            })
+            .catch(error => console.error('Error fetching buy action data:', error));
+    }
+    
+    async function submitEditHoldingBuyAction() {
+        const id = document.getElementById('edit_buy_action_id').value;
+        const quantity_final = document.getElementById('edit_buy_quantity_final').value;
+        const price_final = document.getElementById('edit_buy_price_final').value;
+        const date = document.getElementById('edit_buy_date').value;
+    
+        const response = await fetch(`/position/holding/buy/action/${id}/edit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                quantity_final: quantity_final,
+                price_final: price_final,
+                date: date
+            })
+        });
+    
+        if (response.ok) {
+            alert("Action updated successfully!");
+            location.reload();
+        } else {
+            alert("Failed to update action.");
+        }
+    }
+    
+    async function deleteHoldingBuyAction(id) {
+        if (confirm("Are you sure you want to delete this action?")) {
+            const response = await fetch(`/position/holding/buy/action/${id}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+    
+            if (response.ok) {
+                alert("Action deleted successfully!");
+                location.reload();
+            } else {
+                alert("Failed to delete action.");
+            }
+        }
+    }
+    
+    function editHoldingSellAction(id) {
+        fetch(`/position/holding/sell/action/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_sell_action_id').value = data.id;
+                document.getElementById('edit_sell_quantity_final').value = data.quantity_final;
+                document.getElementById('edit_sell_price_final').value = data.price_final;
+                document.getElementById('edit_sell_date').value = data.date;
+                document.getElementById('edit_sell_commission').value = data.commission;
+                var editModal = new bootstrap.Modal(document.getElementById('editHoldingSellActionModal'));
+                editModal.show();
+            })
+            .catch(error => console.error('Error fetching sell action data:', error));
+    }
+    
+    async function submitEditHoldingSellAction() {
+        const id = document.getElementById('edit_sell_action_id').value;
+        const quantity_final = document.getElementById('edit_sell_quantity_final').value;
+        const price_final = document.getElementById('edit_sell_price_final').value;
+        const date = document.getElementById('edit_sell_date').value;
+        const commission = document.getElementById('edit_sell_commission').value;
+    
+        const response = await fetch(`/position/holding/sell/action/${id}/edit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                quantity_final: quantity_final,
+                price_final: price_final,
+                date: date,
+                commission: commission
+            })
+        });
+    
+        if (response.ok) {
+            alert("Action updated successfully!");
+            location.reload();
+        } else {
+            alert("Failed to update action.");
+        }
+    }
+    
+    async function deleteHoldingSellAction(id) {
+        if (confirm("Are you sure you want to delete this action?")) {
+            const response = await fetch(`/position/holding/sell/action/${id}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+    
+            if (response.ok) {
+                alert("Action deleted successfully!");
+                location.reload();
+            } else {
+                alert("Failed to delete action.");
+            }
+        }
+    }
     ////////////////////////////////////////////// Quote html //////////////////////////////////////////////
     const panels = [
-        'profile', 'chart', 'technical', 'fundamental',
+        'holding', 'profile', 'chart', 'technical', 'fundamental',
         'ratings', 'estimates', 'financials', 'ownership', 'news'
     ];// Hide all panels
 
@@ -680,7 +1465,7 @@
     // Initial adjustment
     updateButtonClasses();
     {#showPanel("profile");#}
-    showPanel("chart");
+    showPanel("holding");
 
 </script>
 {% endblock content %}

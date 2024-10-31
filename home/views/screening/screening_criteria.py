@@ -127,14 +127,24 @@ def stock_screener(request):
 
 def stock_quote(request, symbol):
 
-    symbol = MarketSymbol.objects.select_related(
-        "stock"
-    ).get(symbol=symbol)
-
+    symbol = MarketSymbol.objects.select_related("stock").get(symbol=symbol)
     if symbol is None:
         return render(request, 'accounts/error/404.html')
 
     stock = symbol.stock
+
+    # Retrieve the portfolio related to the symbol
+    portfolio = Portfolio.objects.filter(user=request.user.id, is_default=True).order_by('-portfolio_id').first()
+
+    # Retrieve the holding related to the portfolio
+    holding = Holding.objects.filter(portfolio=portfolio, symbol=symbol).first()
+
+    # Retrieve all holding_buy_order and holding_sell_order records related to the holding
+    holding_buy_orders = HoldingBuyOrder.objects.filter(holding=holding)
+    holding_sell_orders = HoldingSellOrder.objects.filter(holding=holding)
+    # Retrieve holding_buy_action data
+    holding_buy_actions = HoldingBuyAction.objects.filter(holding=holding)
+    holding_sell_actions = HoldingSellAction.objects.filter(holding=holding)
 
     context = {
         'parent': 'pages',
@@ -153,7 +163,11 @@ def stock_quote(request, symbol):
                 "industry":stock.industry,
                 "long_business_summary":stock.long_business_summary,
             }
-        }
+        },
+        'holding_buy_orders': holding_buy_orders,
+        'holding_sell_orders': holding_sell_orders,
+        'holding_buy_actions': holding_buy_actions,
+        'holding_sell_actions': holding_sell_actions,
     }
     return render(request, 'pages/screening/quote.html', context)
 
