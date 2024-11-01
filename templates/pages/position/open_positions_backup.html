@@ -66,7 +66,7 @@
                                     <th>DAY<br/>CHG</th>
 
                                     <th>CURRENT<br/># of SHARES</th>
-
+                                    
                                     <th>Cost /<br/>Share</th>
                                     <th>Market<br/>Value</th>
                                     <th>Total <br/>Chg %</th>
@@ -208,15 +208,15 @@
                                     <td colspan="8">
                                         <!-- Add Transaction Button -->
                                         <div class="row mt-4">
-                                            <button id="addTransactionButton-{{ item.portfolio_item_id }}" type="button" class="btn bg-gradient-info btn-sm w-15 mb-3 toast-btn" onclick="">
+                                            <button id="addTransactionButton-{{ item.portfolio_item_id }}" type="button" class="btn bg-gradient-info btn-sm w-15 mb-3 toast-btn" onclick="toggleAddTransactionForm({{ item.portfolio_item_id }})">
                                                 +&nbsp; Add a Transaction
                                             </button>
                                         </div>
 
                                         <div class="details-content">
                                             <div id="addTransactionForm-{{ item.portfolio_item_id }}" style="display: none; position: relative;">
-                                                <button type="button" class="btn-close bg-primary" onclick="" style="position: absolute; top: 10px; right: 10px;">&times;</button>
-                                                <form id="addTransactionFormContent-{{ item.portfolio_item_id }}" onsubmit="" data-portfolio-id="{{ portfolio.portfolio_id }}" data-portfolio-item-id="{{ item.portfolio_item_id }}">
+                                                <button type="button" class="btn-close bg-primary" onclick="hideAddTransactionForm({{ item.portfolio_item_id }})" style="position: absolute; top: 10px; right: 10px;">&times;</button>
+                                                <form id="addTransactionFormContent-{{ item.portfolio_item_id }}" onsubmit="submitTransaction(event, '{{ item.symbol }}')" data-portfolio-id="{{ portfolio.portfolio_id }}" data-portfolio-item-id="{{ item.portfolio_item_id }}">
                                                     <!-- Form fields for adding a transaction -->
                                                     <div class="row mt-3">
                                                         <div class="col-3">
@@ -438,7 +438,98 @@
                 });
         }
     }
-    
+
+    function toggleAddTransactionForm(itemId) {
+        const form = document.getElementById(`addTransactionForm-${itemId}`);
+        const button = document.getElementById(`addTransactionButton-${itemId}`);
+        form.style.display = 'block';
+        button.onclick = null; // Disable the onclick event
+    }
+
+    function hideAddTransactionForm(itemId) {
+        const form = document.getElementById(`addTransactionForm-${itemId}`);
+        const button = document.getElementById(`addTransactionButton-${itemId}`);
+        form.style.display = 'none';
+        button.onclick = function() { toggleAddTransactionForm(itemId); }; // Re-enable the onclick event
+    }
+
+    function toggleEditTransactionForm(transactionId) {
+        const form = document.getElementById(`editTransactionForm-${transactionId}`);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function loadTransactions(portfolio_id, portfolio_item_id) {
+        fetch(`/portfolio/${portfolio_id}/item/${portfolio_item_id}/transactions/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.transactions.length <= 0) {
+                    return;
+                }
+                const transactionsDiv = document.getElementById(`transactions-${portfolio_item_id}`);
+                transactionsDiv.innerHTML = data.transactions.map(transaction => `
+                    <div class="transaction">
+                        <p>${transaction.date} - ${transaction.transaction_type} - ${transaction.quantity} shares at ${transaction.price}</p>
+                        <button type="button" onclick="toggleEditTransactionForm(${transaction.id})">Edit</button>
+                        <div id="editTransactionForm-${transaction.id}" style="display: none;">
+                            <form onsubmit="submitEditTransaction(event, ${transaction.id})">
+                                <!-- Form fields for editing a transaction -->
+                                <div class="row mt-3">
+                                    <div class="col-3">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm mb-2 px-3 up">Submit</button>
+                                        <button type="reset" class="btn btn-outline-dark btn-sm mb-2 px-3 up">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <label for="type" class="form-label">Transaction Type</label>
+                                        <select class="form-control form-control-sm" name="type" required>
+                                            <option value="buy" ${transaction.transaction_type === 'buy' ? 'selected' : ''}>Buy</option>
+                                            <option value="sell" ${transaction.transaction_type === 'sell' ? 'selected' : ''}>Sell</option>
+                                            <option value="sell Short" ${transaction.transaction_type === 'sell Short' ? 'selected' : ''}>Sell Short</option>
+                                            <option value="buy to cover" ${transaction.transaction_type === 'buy to cover' ? 'selected' : ''}>Buy to Cover</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <label for="date" class="form-label">Trade Date</label>
+                                        <input type="date" class="form-control form-control-sm" name="date" value="${formatToDate(transaction.date)}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="quantity" class="form-label">Shares</label>
+                                        <input type="number" class="form-control form-control-sm" name="quantity" value="${transaction.quantity}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="price" class="form-label">Cost / Share</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" name="price" value="${transaction.price}" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <label for="commission" class="form-label">Commission</label>
+                                        <input type="number" class="form-control form-control-sm" name="commission" value="${transaction.commission !== undefined ? transaction.commission : ''}">
+                                    </div>
+                                    <div class="col-5">
+                                        <label for="notes" class="form-label">Notes</label>
+                                        <input type="text" class="form-control form-control-sm" name="notes" value="${transaction.notes}">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading transactions');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.details-row').forEach(row => {
+            const form = row.querySelector('form');
+            const portfolio_id = form.getAttribute('data-portfolio-id');
+            const portfolio_item_id = form.getAttribute('data-portfolio-item-id');
+            {#loadTransactions(portfolio_id, portfolio_item_id);#}
+        });
+    });
+
 
   </script>
 

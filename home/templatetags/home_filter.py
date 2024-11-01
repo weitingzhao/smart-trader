@@ -17,6 +17,10 @@ def timing_lookup(value, arg):
     # Lookup dictionaries
     return dict(TimingChoices.choices).get(arg)
 
+@register.filter
+def transaction_type_lookup(value, arg):
+    # Lookup dictionaries
+    return dict(TransactionTypeChoices.choices).get(arg)
 
 @register.filter(name='replace_value')
 def replace_value(value, arg):

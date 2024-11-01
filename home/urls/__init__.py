@@ -30,7 +30,8 @@ urlpatterns = [
     # # 8. Settings
     path('settings/', include('home.urls.settings')),
 
-
+    # # 0. Transaction
+    path('transaction/', include('home.urls.transaction')),
 
     ########## Utilities ############$$########
     # Authorization & Authentication

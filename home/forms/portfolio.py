@@ -110,15 +110,6 @@ class UserStaticSettingForm(forms.ModelForm):
             'expect_gain_risk_ratio', 'position_min', 'position_max','total_risk_cap','net_risk_cap']
 
 
-#Obsolete
-class PortfolioItemForm(forms.ModelForm):
-    class Meta:
-        model = PortfolioItem
-        fields = ['symbol', 'quantity', 'average_price']
 
-class TransactionForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        fields = ['transaction_type', 'quantity', 'price', 'date']
 
 

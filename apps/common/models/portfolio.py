@@ -21,6 +21,12 @@ class TimingChoices(models.TextChoices):
     Good_Till_Cancelled     = '2', 'Good Till Cancel'
     GTC_Extended_Hours  = '3', 'GTC Extended Hours'
 
+class TransactionTypeChoices(models.TextChoices):
+    NONE                            = '0', 'None'
+    BUY                                 = '1', 'Buy'
+    SELL                                = '2', 'Sell'
+    DEPOSIT                         = '11', 'Deposit'
+    WITHDRAW                     = '12', 'Withdraw'
 
 class Portfolio(models.Model):
     """
@@ -43,25 +49,6 @@ class Portfolio(models.Model):
         return f"[{self.user.username}] Portfolio:{self.name}"
 
 
-class PortfolioFundTracking(models.Model):
-    """
-    This model is used to track the funds in a portfolio
-    """
-    portfolio_fund_tracking_id = models.AutoField(primary_key=True)
-    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
-    date = models.DateTimeField(null=True, blank=True)
-    amount = models.DecimalField(max_digits=15, decimal_places=2,null=True, blank=True)
-    is_deposit = models.BooleanField(default=False,null=True, blank=True)
-    is_withdraw = models.BooleanField(default=False,null=True, blank=True)
-
-    class Meta:
-        db_table = 'portfolio_fund_tracking'
-
-    def __str__(self):
-        return f"Fund Tracking: {self.portfolio} - {self.amount} on {self.date}"
-
-
-
 class Holding(models.Model):
     """
     This model is used to store the holding of stocks in a portfolio
@@ -78,40 +65,24 @@ class Holding(models.Model):
         return f"Holding: {self.portfolio} - {self.symbol}"
 
 
-class HoldingBuyAction(models.Model):
+class Transaction(models.Model):
     """
     This model is used to store the buy action of a holding
     """
-    holding_buy_action_id = models.AutoField(primary_key=True)
+    transaction_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
-    date = models.DateTimeField(null=True, blank=True)
-    quantity_final = models.IntegerField(null=True, blank=True)
-    price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
-
-    class Meta:
-        db_table = 'holding_buy_action'
-
-    def __str__(self):
-        return f"Holding Buy Action: {self.holding_buy_action_id} for {self.holding}"
-
-
-class HoldingSellAction(models.Model):
-    """
-    This model is used to store the sell action of a holding
-    """
-    holding_sell_action_id = models.AutoField(primary_key=True)
-    holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
+    transaction_type = models.CharField(max_length=20, choices=TransactionTypeChoices.choices, default=TransactionTypeChoices.NONE)
     date = models.DateTimeField(null=True, blank=True)
     quantity_final = models.IntegerField(null=True, blank=True)
     price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
     commission = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
+    is_applied = models.BooleanField(null=True, blank=True)
 
     class Meta:
-        db_table = 'holding_sell_action'
+        db_table = 'transaction'
 
     def __str__(self):
-        return f"Holding Sell Action: {self.holding_sell_action_id} for {self.holding}"
-
+        return f"Transaction: {self.transaction_id} for {self.holding}"
 
 
 class HoldingBuyOrder(models.Model):
@@ -120,7 +91,7 @@ class HoldingBuyOrder(models.Model):
     """
     holding_buy_order_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
-    holding_buy_action = models.ForeignKey(HoldingBuyAction, on_delete=models.CASCADE, null=True, blank=True)
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True, blank=True)
     wishlist = models.ForeignKey(Wishlist, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     action = models.CharField(max_length=20, choices=ActionChoices.choices, default=ActionChoices.NONE, null=True)
@@ -149,7 +120,7 @@ class HoldingSellOrder(models.Model):
     """
     holding_sell_order_id = models.AutoField(primary_key=True)
     holding = models.ForeignKey(Holding, on_delete=models.CASCADE)
-    holding_sell_action = models.ForeignKey(HoldingSellAction, on_delete=models.CASCADE, null=True, blank=True)
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True, blank=True)
 
     action = models.CharField(max_length=20, choices=ActionChoices.choices, default=ActionChoices.NONE)
     timing = models.CharField(max_length=20, choices=TimingChoices.choices, default=TimingChoices.NONE)
@@ -169,51 +140,4 @@ class HoldingSellOrder(models.Model):
     def __str__(self):
         return f"Holding Sell Order: {self.holding_sell_order_id} for {self.holding}"
 
-
-
-# ////obsolete////
-class PortfolioItem(models.Model):
-    portfolio_item_id = models.AutoField(primary_key=True)
-    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
-    symbol = models.ForeignKey(MarketSymbol, on_delete=models.DO_NOTHING)
-    quantity = models.FloatField(null=True)
-    average_price = models.FloatField(null=True)
-
-    class Meta:
-        db_table = 'portfolio_item'
-        unique_together = (('portfolio', 'symbol'),)
-
-    def __str__(self):
-        return f"{self.symbol} - {self.quantity} shares"
-
-class Transaction(models.Model):
-    portfolio_transaction_id = models.AutoField(primary_key=True)
-    portfolio_item = models.ForeignKey(PortfolioItem, on_delete=models.CASCADE)
-    transaction_type = models.CharField(max_length=10,
-                                        choices=[('buy', 'Buy'), ('sell', 'Sell'), ('sell Short', 'Buy'),
-                                                 ('buy', 'Buy')])
-    quantity = models.FloatField()
-    price = models.FloatField()
-    date = models.DateTimeField(null=True)
-    commission = models.FloatField(null=True)
-    notes = models.CharField(max_length=255, null=True, blank=True)
-
-    class Meta:
-        db_table = 'portfolio_transaction'
-
-    def __str__(self):
-        return f"{self.transaction_type} {self.quantity} shares of {self.portfolio_item.symbol} at {self.price}"
-
-class PortfolioPerformance(models.Model):
-    portfolio_performance_id = models.AutoField(primary_key=True)
-    portfolio_item = models.OneToOneField(PortfolioItem, on_delete=models.CASCADE)
-    total_value = models.DecimalField(max_digits=15, decimal_places=2)
-    total_gain_loss = models.DecimalField(max_digits=15, decimal_places=2)
-    last_updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'portfolio_performance'
-
-    def __str__(self):
-        return f"Performance for {self.portfolio.name}"
 

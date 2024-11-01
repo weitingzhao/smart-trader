@@ -135,16 +135,13 @@ def stock_quote(request, symbol):
 
     # Retrieve the portfolio related to the symbol
     portfolio = Portfolio.objects.filter(user=request.user.id, is_default=True).order_by('-portfolio_id').first()
-
     # Retrieve the holding related to the portfolio
     holding = Holding.objects.filter(portfolio=portfolio, symbol=symbol).first()
-
     # Retrieve all holding_buy_order and holding_sell_order records related to the holding
     holding_buy_orders = HoldingBuyOrder.objects.filter(holding=holding)
     holding_sell_orders = HoldingSellOrder.objects.filter(holding=holding)
     # Retrieve holding_buy_action data
-    holding_buy_actions = HoldingBuyAction.objects.filter(holding=holding)
-    holding_sell_actions = HoldingSellAction.objects.filter(holding=holding)
+    transaction = Transaction.objects.filter(holding=holding)
 
     context = {
         'parent': 'pages',
@@ -164,10 +161,10 @@ def stock_quote(request, symbol):
                 "long_business_summary":stock.long_business_summary,
             }
         },
+        'holding': holding,
         'holding_buy_orders': holding_buy_orders,
         'holding_sell_orders': holding_sell_orders,
-        'holding_buy_actions': holding_buy_actions,
-        'holding_sell_actions': holding_sell_actions,
+        'transactions': transaction
     }
     return render(request, 'pages/screening/quote.html', context)
 
