@@ -2,7 +2,7 @@ import pandas as pd
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from home.forms.portfolio import *
 from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
@@ -143,6 +143,9 @@ def stock_quote(request, symbol):
     # Retrieve holding_buy_action data
     transaction = Transaction.objects.filter(holding=holding)
 
+    form_buy_order = HoldingBuyOrderForm()
+    form_sell_order = HoldingSellOrderForm()
+
     context = {
         'parent': 'pages',
         'sub_parent': 'stock',
@@ -161,6 +164,8 @@ def stock_quote(request, symbol):
                 "long_business_summary":stock.long_business_summary,
             }
         },
+        'form_buy_order': form_buy_order,
+        'form_sell_order': form_sell_order,
         'holding': holding,
         'holding_buy_orders': holding_buy_orders,
         'holding_sell_orders': holding_sell_orders,

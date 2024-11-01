@@ -72,9 +72,11 @@ def default(request):
 
         # Step 6. Calculate the total cost & change
         # Calculate total change in value
-        final_df['total_chg_position'] = final_df.apply(lambda row: Decimal(row['market_value']) - Decimal(row['total_cost']), axis=1)
+        final_df['total_chg_position'] = final_df.apply(lambda row: (Decimal(row['market_value']) - Decimal(row['total_cost'])).quantize(Decimal('0.01')), axis=1)
+
         # Calculate total change percentage
-        final_df['total_chg_pct'] = final_df.apply(lambda row: ((row['total_chg_position'] / row['total_cost']) * 100).round(2) if row['total_cost'] != 0 else 0, axis=1)
+        final_df['total_chg_pct'] = final_df.apply(lambda row: (
+            (Decimal(row['total_chg_position']) / Decimal(row['total_cost']) * 100).quantize(Decimal('0.01')) if row['total_cost'] != 0 else Decimal('0.00')), axis=1)
         # Calculate total change trand
         final_df['total_trend'] = final_df['total_chg_position'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
 
@@ -104,8 +106,6 @@ def default(request):
             'portfolio': portfolio,
             'portfolio_items': final_json,
         })
-
-
 
 
 def get_stock_hist_bars(is_day, symbols:list[str], row_num:int):
@@ -166,6 +166,25 @@ def get_holding_buy_order(request, holding_buy_order_id):
     return JsonResponse(data)
 
 @csrf_exempt
+def add_holding_buy_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        buy_order = HoldingBuyOrder.objects.create(
+            holding_id=data['holding_id'],
+            action=data['action'],
+            order_place_date=data['order_place_date'],
+            quantity_target=data['quantity_target'],
+            price_market=data['price_market'],
+            price_stop=data['price_stop'],
+            price_limit=data['price_limit'],
+            is_initial=data['is_initial'],
+            is_additional=data['is_additional'],
+            timing=data['timing']
+        )
+        return JsonResponse({'status': 'success', 'buy_order_id': buy_order.holding_buy_order_id})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
 def edit_holding_buy_order(request, holding_buy_order_id):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -195,6 +214,24 @@ def get_holding_sell_order(request, holding_sell_order_id):
         'order_place_date': order.order_place_date.strftime('%Y-%m-%d')
     }
     return JsonResponse(data)
+
+@csrf_exempt
+def add_holding_sell_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        buy_order = HoldingSellOrder.objects.create(
+            holding_id=data['holding_id'],
+            action=data['action'],
+            order_place_date=data['order_place_date'],
+            quantity_target=data['quantity_target'],
+            price_stop=data['price_stop'],
+            price_limit=data['price_limit'],
+            is_initial=data['is_initial'],
+            good_until=data['good_until'],
+            timing=data['timing']
+        )
+        return JsonResponse({'status': 'success', 'buy_order_id': buy_order.holding_sell_order_id})
+    return JsonResponse({'status': 'failed'}, status=400)
 
 @csrf_exempt
 def edit_holding_sell_order(request, holding_sell_order_id):

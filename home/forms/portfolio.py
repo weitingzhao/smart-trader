@@ -17,34 +17,42 @@ class HoldingForm(forms.ModelForm):
 class HoldingBuyOrderForm(forms.ModelForm):
     holding_symbol = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Holding Symbol'
+        'placeholder': 'Holding Symbol',
+        'id': 'id_buy_holding_symbol'
     }))
 
     order_place_date =  forms.DateTimeField(widget=forms.DateTimeInput(attrs={
         'type': 'date',
-        'class': 'form-control'
+        'class': 'form-control',
+        'id': 'id_buy_order_place_date'
     }))
     quantity_target = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'min': '0'
+        'min': '0',
+        'id': 'id_buy_quantity_target'
     }))
     price_market = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01'
+        'step': '0.01',
+        'id': 'id_buy_price_market'
     }))
     price_stop = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01'
+        'step': '0.01',
+        'id': 'id_buy_price_stop'
     }))
     price_limit = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01'
+        'step': '0.01',
+        'id': 'id_buy_price_limit'
     }))
     is_initial = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={
-        'class': 'form-select'
+        'class': 'form-select',
+        'id': 'id_buy_is_initial'
     }), initial=False)
     is_additional = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={
-        'class': 'form-select'
+        'class': 'form-select',
+        'id': 'id_buy_is_additional'
     }), initial=False)
 
     class Meta:
@@ -60,35 +68,42 @@ class HoldingBuyOrderForm(forms.ModelForm):
 class HoldingSellOrderForm(forms.ModelForm):
     holding_symbol = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Holding Symbol'
+        'placeholder': 'Holding Symbol',
+        'id': 'id_sell_holding_symbol'
     }))
 
     order_place_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
         'type': 'date',
-        'class': 'form-control'
+        'class': 'form-control',
+        'id': 'id_sell_order_place_date'
     }))
 
     quantity_target = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'min': '0'
+        'min': '0',
+        'id': 'id_sell_quantity_target'
     }))
 
     price_stop = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01'
+        'step': '0.01',
+        'id': 'id_sell_price_stop'
     }))
     price_limit = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01'
+        'step': '0.01',
+        'id': 'id_sell_price_limit'
     }))
 
     is_initial = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={
-        'class': 'form-select'
+        'class': 'form-select',
+        'id': 'id_sell_is_initial'
     }), initial=False)
 
     good_until = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
         'type': 'date',
-        'class': 'form-control'
+        'class': 'form-control',
+        'id': 'id_sell_good_until'
     }))
 
     class Meta:
