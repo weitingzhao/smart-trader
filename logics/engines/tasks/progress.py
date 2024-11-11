@@ -11,7 +11,10 @@ class Progress:
         self.log_stream = None
         self.log_flush = None
 
+        self.init = False
+
     def init_progress(self, log_file_path: str):
+        self.init = True
         # step 1. User & log path
         self.log_file_path = log_file_path
 
@@ -39,6 +42,8 @@ class Progress:
         return True
 
     def flush(self):
+        if self.init == False:
+            return True
         if self.log_flush:
             self.log_flush()
         return True

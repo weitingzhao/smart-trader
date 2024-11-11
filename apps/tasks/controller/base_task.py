@@ -56,6 +56,17 @@ class BaseTask(ABC):
         log_file_name = f"{script_base_name}-{current_time}.log"
         return os.path.join(settings.CELERY_LOGS_DIR, log_file_name)
 
+    @staticmethod
+    def extract_param(args, key):
+        # Split the args string by commas
+        parts = args.split(',')
+        # Iterate over the parts to find the key part
+        for part in parts:
+            if part.startswith(f'{key}='):
+                # Extract the value associated with the key
+                value = part.split('=')[1]
+                return value
+        return ""
 
     def run(self):
 
@@ -86,20 +97,28 @@ class BaseTask(ABC):
         logic = Logic("celery task", get_task_logger(__name__), need_progress= True)
 
         # Step 2.b. Base on status of task_result, prepare init load
-        if meta is not None:
-            log_file = meta.get("log_file")
-            log_file_name = os.path.splitext(os.path.basename(log_file))[0]
-        else:
-            log_file = self.get_log_file_path(script_name)
-            log_file_name = os.path.splitext(os.path.basename(log_file))[0]
+        if args and "symbols" in args:   # if Symbols has values, means it's a direct pull
+            symbols = self.extract_param(args,"symbols")
+            leftover = symbols.split('|')  # Convert symbols based on "|" delimiter
             meta = {
                 "input": script_name, "error": "false", "output": "", "status": "STARTED",
-                "log_file": log_file,
-                "initial": "true", "leftover": [], "done": []
+                "initial": "false", "leftover": leftover, "done": []
             }
+        else:
+            if meta is not None:
+                log_file = meta.get("log_file")
+                log_file_name = os.path.splitext(os.path.basename(log_file))[0]
+            else:
+                log_file = self.get_log_file_path(script_name)
+                log_file_name = os.path.splitext(os.path.basename(log_file))[0]
+                meta = {
+                    "input": script_name, "error": "false", "output": "", "status": "STARTED",
+                    "log_file": log_file,
+                    "initial": "true", "leftover": [], "done": []
+                }
+            # Step 2.c Setup logic's progress & logger
+            logic.progress.init_progress(log_file)
 
-        # Step 2.c Setup logic's progress & logger
-        logic.progress.init_progress(log_file)
         logic.logger.info(
             f"==[START] task_id:{self.celery.request.id} "
             f"leftover_count: {len(meta['leftover'])} done_count: {len(meta['done'])} "
@@ -116,14 +135,22 @@ class BaseTask(ABC):
             logic.logger.info(
                 f"==[END] leftover_count: {len(meta['leftover'])} done_count: {len(meta['done'])} "
                 f"cost {(time.time() - self.start_time):2f} seconds=======>")
-            logic.progress.log_flush()
-            logic.engine.notify(user).send(
-                recipient=user,
-                verb=f'{script_name} Job {("done" if is_success else "failed")}!',
-                level=Level.INFO if is_success else Level.ERROR,
-                description=f'click <a href="#" class="text-xs text-danger" '
-                            f'onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
-            )
+            if logic.progress.log_flush is not None:
+                logic.progress.log_flush()
+                logic.engine.notify(user).send(
+                    recipient=user,
+                    verb=f'{script_name} Job {("done" if is_success else "failed")}!',
+                    level=Level.INFO if is_success else Level.ERROR,
+                    description=f'click <a href="#" class="text-xs text-danger" '
+                                f'onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
+                )
+            else:
+                logic.engine.notify(user).send(
+                    recipient=user,
+                    verb=f'{script_name} Job {("done" if is_success else "failed")}!',
+                    level=Level.INFO if is_success else Level.ERROR,
+                    description=f'job finished'
+                )
         try:
             self._worker_run(script_name, logic, task_result, meta, args)
             # Done. sent notification

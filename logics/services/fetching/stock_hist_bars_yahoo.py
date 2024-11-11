@@ -10,6 +10,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
 
     def __init__(self, engine):
         super().__init__(engine)
+        self.symbol_data = None
 
         # Get configure logger
         logger = logging.getLogger('yfinance')
@@ -67,7 +68,6 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
 
     #Simluate for test use only
     def _get_init_load_test(self)->List:
-        self.symbol_data = None
         return ["TTEK"]
         # return ["DMYY-U","DMYY-U"]
         # return ["BKSB", "BKWO", "BLACR"]

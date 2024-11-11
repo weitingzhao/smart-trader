@@ -11,6 +11,9 @@ def default(request):
     except UserStaticSetting.DoesNotExist:
         form_static_risk = UserStaticSettingForm()
 
+    # Get symbols from Holding model
+    holding_symbols = Holding.objects.values_list('symbol', flat=True)
+    symbols = ','.join(holding_symbols)
 
     return render(
         request=request,
@@ -20,6 +23,7 @@ def default(request):
             'segment': 'risk_preferences',
             'static_risk_form': form_static_risk,
             'messages': messages.get_messages(request),
+            'holding_symbols': symbols,  # Add symbols to context
         })
 
 

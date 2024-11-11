@@ -142,9 +142,51 @@
                             <h5>View settings</h5>
                         </div>
                         <div class="card-body pt-0">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="symbolInput" placeholder="Enter symbols separated by commas">
-                                <button class="btn btn-primary" type="button" id="refreshButton">Refresh</button>
+                            <div class="row">
+                                <div class="col-2">
+                                    <label>Period</label>
+                                    <select class="form-select" id="periodSelect">
+                                        <option value="max" >max</option>
+                                        <option value="1d">1d</option>
+                                        <option value="5d" selected>5d</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                        <option value="6mo">6mo</option>
+                                        <option value="1y">1y</option>
+                                        <option value="2y">2y</option>
+                                        <option value="5y">5y</option>
+                                        <option value="10y">10y</option>
+                                        <option value="ytd">ytd</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <label>Interval</label>
+                                    <select class="form-select" id="intervalSelect">
+                                        <option value="1m">1m</option>
+                                        <option value="2m">2m</option>
+                                        <option value="5m">5m</option>
+                                        <option value="15m">15m</option>
+                                        <option value="30m">30m</option>
+                                        <option value="60m">60m</option>
+                                        <option value="90m">90m</option>
+                                        <option value="1h">1h</option>
+                                        <option value="1d" selected>1d</option>
+                                        <option value="5d">5d</option>
+                                        <option value="1wk">1wk</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                  <label>Symbols</label>
+                                  <input type="text" class="form-control" id="symbolInput" placeholder="Enter symbols separated by commas" value="{{ holding_symbols }}">
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-lg-5">
+                                    <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask()">Refresh</button>
+                                </div>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -223,6 +265,38 @@
     });
 
 
+    function refreshTask() {
+        let symbolInput = document.getElementById('symbolInput').value;
+        symbolInput = symbolInput.replace(/,/g, '|'); // Replace commas with pipe characters
+        const period = document.getElementById('periodSelect').value; // Get the selected period
+        const interval = document.getElementById('intervalSelect').value; // Get the selected interval
+        const data = {
+            args: `append=True,delta=2,period='${period}',interval='${interval}',symbols=${symbolInput}`,
+            script_name: "stock-hist-bars",
+        };
+
+        const params = new URLSearchParams();
+        params.append('args', data.args);
+        params.append('script_name', data.script_name);
+
+        fetch('/tasks/tasks/run/no_01_fetching', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: params.toString()
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+
     {% if messages %}
         const currentTime = new Date().toLocaleTimeString();
         {% for message in messages %}
@@ -237,6 +311,10 @@
 
         {% endfor %}
     {% endif %}
+
+
+
+
 </script>
 
 {% endblock extra_js %}

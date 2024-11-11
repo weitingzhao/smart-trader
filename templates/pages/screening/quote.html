@@ -106,7 +106,6 @@
                                           <th>Stop</th>
                                           <th>Limit</th>
 
-                                          <th>Place Date</th>
                                           <th>Status</th>
                                           <th>Type</th>
                                           <th>Purpose</th>
@@ -117,11 +116,10 @@
                                     {% for holding_buy_order in holding_buy_orders %}
                                         <tr>
                                             <td>{{ holding_buy_order.quantity_target }}</td>
-                                            <td>{{ holding_buy_order.price_market }}</td>
-                                            <td>{{ holding_buy_order.price_stop }}</td>
-                                            <td>{{ holding_buy_order.price_limit }}</td>
+                                            <td>{% if holding_buy_order.price_market %}{{ holding_buy_order.price_market }}{% endif %}</td>
+                                            <td>{% if holding_buy_order.price_stop %}{{ holding_buy_order.price_stop }}{% endif %}</td>
+                                            <td>{% if holding_buy_order.price_limit %}{{ holding_buy_order.price_limit }}{% endif %}</td>
 
-                                            <td>{{ holding_buy_order.order_place_date|date:"m-d-Y" }}</td>
                                             <td>
                                                 {% if holding_buy_order.transaction_id %}
                                                     FILLED
@@ -797,9 +795,9 @@
                 <div class="modal-body">
                     <form id="createBuyOrderForm">
                         <div class="row mt-3">
-                              <div class="col-12 col-sm-4">
-                                  <label for="{{ form_buy_order.action.id_for_label }}">Action</label>
-                                  <select class="form-select" id="id_buy_action" name="{{ form_buy_order.action.name }}">
+                            <div class="col-3 col-sm-4">
+                                <label>Action</label>
+                                <select class="form-select" id="id_buy_action" name="{{ form_buy_order.action.name }}">
                                     {% for choice in form_buy_order.action.field.choices %}
                                         {% if choice.0 == '0' or choice.0 == '1'  or choice.0 == '2' %}
                                             <option value="{{ choice.0 }}" {% if choice.0 == form_buy_order.action.value %}selected{% endif %}>
@@ -808,44 +806,44 @@
                                         {% endif %}
                                     {% endfor %}
                                 </select>
-                              </div>
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.order_place_date.id_for_label }}">Order Place Date</label>
-                                  {{ form_buy_order.order_place_date }}
-                              </div>
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.quality_target.id_for_label }}">Quantity target</label>
-                                  {{ form_buy_order.quantity_target }}
-                              </div>
-                          </div>
-                        <div class="row mt-3">
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.price_stop.id_for_label }}">Stop Price</label>
-                                  {{ form_buy_order.price_stop }}
-                              </div>
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.price_limit.id_for_label }}">Limit Price</label>
-                                  {{ form_buy_order.price_limit }}
-                              </div>
-                          </div>
-                        <div class="row mt-3">
-                              <div class="col-12 col-sm-4">
-                                  <label for="{{ form_buy_order.is_initial.id_for_label }}">Is Initial</label>
-                                  {{ form_buy_order.is_initial }}
-                              </div>
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.is_additional.id_for_label }}">Is Additional</label>
-                                  {{ form_buy_order.is_additional }}
-                              </div>
-                              <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                  <label for="{{ form_buy_order.timing.id_for_label }}">Timing</label>
-                                  <select class="form-select" id="id_buy_timing" name="{{ form_buy_order.timing.name }}">
+                            </div>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0">
+                                <label>Quantity target</label>
+                                {{ form_buy_order.quantity_target }}
+                            </div>
+                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                <label>Timing</label>
+                                <select class="form-select" id="id_buy_timing" name="{{ form_buy_order.timing.name }}">
                                     {% for choice in form_buy_order.timing.field.choices %}
                                         <option value="{{ choice.0 }}" {% if choice.0 == form_buy_order.timing.value %}selected{% endif %}>
                                             {{ choice.1 }}
                                         </option>
                                     {% endfor %}
                                 </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0">
+                                <label for="{{ form_buy_order.order_type.id_for_label }}">Order Type</label>
+                                  <select class="form-select" id="id_buy_order_type" name="{{ form_buy_order.order_type.name }}" onchange="toggleBuyPriceFields()">
+                                    {% for choice in form_buy_order.order_type.field.choices %}
+                                        <option value="{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_market">
+                                <label>Market Price</label>
+                                {{ form_buy_order.price_market }}
+                            </div>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_stop">
+                                  <label>Stop Price</label>
+                                  {{ form_buy_order.price_stop }}
+                              </div>
+                              <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_limit">
+                                  <label>Limit Price</label>
+                                  {{ form_buy_order.price_limit }}
                               </div>
                           </div>
                     </form>
@@ -1159,19 +1157,54 @@
 
    ////////////////////////////////////////////// Order js //////////////////////////////////////////////
 
+    function toggleBuyPriceFields(){
+        togglePriceFields('id_buy_order_type', 'lab_holding_buy_price_market', 'lab_holding_buy_price_stop', 'lab_holding_buy_price_limit');
+    }
+    function toggleSellPriceFields(){
+        togglePriceFields('id_sell_order_type', 'lab_holding_sell_price_market', 'lab_holding_sell_price_stop', 'lab_holding_sell_price_limit');
+    }
+
+    function togglePriceFields(
+        id_buy_order_type, id_holding_buy_price_market, id_holding_buy_price_stop, id_holding_buy_price_limit) {
+        const orderType = document.getElementById(id_buy_order_type).value;
+        const marketPriceField = document.getElementById(id_holding_buy_price_market);
+        const stopPriceField = document.getElementById(id_holding_buy_price_stop);
+        const limitPriceField = document.getElementById(id_holding_buy_price_limit);
+
+        marketPriceField.style.display = 'none';
+        stopPriceField.style.display = 'none';
+        limitPriceField.style.display = 'none';
+
+        if (orderType === '1') { // Market
+            marketPriceField.style.display = 'block';
+        } else if (orderType === '3') { // Stop
+            stopPriceField.style.display = 'block';
+        } else if (orderType === '2') { // Limit
+            limitPriceField.style.display = 'block';
+        } else if (orderType === '4') { // Stop Limit
+            stopPriceField.style.display = 'block';
+            limitPriceField.style.display = 'block';
+        }
+    }
+
+    // Call the function on page load to set the initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleBuyPriceFields();
+        toggleSellPriceFields();
+    });
+
     function showCreateBuyOrderModal() {
         new bootstrap.Modal(document.getElementById('createBuyOrderModal')).show();
     }
     async function submitCreateBuyOrder() {
         const action = document.getElementById('id_buy_action').value;
-        const order_place_date = document.getElementById('id_buy_order_place_date').value;
+        const timing = document.getElementById('id_buy_timing').value;
+
+        const order_type = document.getElementById('id_buy_order_type').value;
         const quantity_target = document.getElementById('id_buy_quantity_target').value;
         const price_market = document.getElementById('id_buy_price_market').value;
         const price_stop = document.getElementById('id_buy_price_stop').value;
         const price_limit = document.getElementById('id_buy_price_limit').value;
-        const is_initial = document.getElementById('id_buy_is_initial').value;
-        const is_additional = document.getElementById('id_buy_is_additional').value;
-        const timing = document.getElementById('id_buy_timing').value;
 
         const response = await fetch('/position/holding/buy/order/create/', {
             method: 'POST',
@@ -1182,14 +1215,13 @@
             body: JSON.stringify({
                 holding_id: {{ holding.holding_id }},
                 action: action,
-                order_place_date: order_place_date,
+                timing: timing,
+
+                order_type: order_type,
                 quantity_target: quantity_target,
                 price_market: price_market,
                 price_stop: price_stop,
                 price_limit: price_limit,
-                is_initial: is_initial,
-                is_additional: is_additional,
-                timing: timing
             })
         });
 

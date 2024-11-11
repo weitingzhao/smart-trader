@@ -172,14 +172,13 @@ def add_holding_buy_order(request):
         buy_order = HoldingBuyOrder.objects.create(
             holding_id=data['holding_id'],
             action=data['action'],
-            order_place_date=data['order_place_date'],
+            timing=data['timing'],
+
+            order_type=data['order_type'],
             quantity_target=data['quantity_target'],
-            price_market=data['price_market'],
-            price_stop=data['price_stop'],
-            price_limit=data['price_limit'],
-            is_initial=data['is_initial'],
-            is_additional=data['is_additional'],
-            timing=data['timing']
+            price_market=data['price_market'] if data['price_market'] != '' else None,
+            price_stop= data['price_stop'] if data['price_stop'] != '' else None,
+            price_limit=data['price_limit'] if data['price_limit'] != '' else None,
         )
         return JsonResponse({'status': 'success', 'buy_order_id': buy_order.holding_buy_order_id})
     return JsonResponse({'status': 'failed'}, status=400)
