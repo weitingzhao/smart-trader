@@ -159,9 +159,14 @@ def get_holding_buy_order(request, holding_buy_order_id):
     order = get_object_or_404(HoldingBuyOrder, holding_buy_order_id=holding_buy_order_id)
     data = {
         'id': order.holding_buy_order_id,
+
+        'action': order.action,
+        'order_type': order.order_type,
+
         'quantity_target': order.quantity_target,
         'price_market': order.price_market,
-        'order_place_date': order.order_place_date.strftime('%Y-%m-%d')
+        'price_stop': order.price_stop,
+        'price_limit': order.price_limit
     }
     return JsonResponse(data)
 
@@ -188,9 +193,14 @@ def edit_holding_buy_order(request, holding_buy_order_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         order = HoldingBuyOrder.objects.get(holding_buy_order_id=holding_buy_order_id)
+        order.action = data.get('action')
+        order.order_type = data.get('order_type')
+
         order.quantity_target = data.get('quantity_target')
-        order.price_market = data.get('price_market')
-        order.order_place_date = data.get('order_place_date')
+        order.price_market = data.get('price_market') if data.get('price_market') != '' else None
+        order.price_stop = data.get('price_stop') if data.get('price_stop') != '' else None
+        order.price_limit = data.get('price_limit') if data.get('price_limit') != '' else None
+
         order.save()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)

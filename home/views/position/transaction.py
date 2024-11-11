@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from decimal import Decimal
+from datetime import datetime
 from django.db.models import Sum, F
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -23,11 +24,11 @@ def get(request, transaction_id):
 def add(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        transaction_type = data.get('transaction_type')
+
         holding_id = data.get('holding_id')
         quantity_final = data.get('quantity_final')
         price_final = data.get('price_final')
-        date = data.get('date')
+        date = data.get('date') if data.get('date') != '' else datetime.now().strftime('%Y-%m-%d')
         commission = data.get('commission')
 
         reference = data.get('reference')
@@ -47,10 +48,12 @@ def add(request):
                 commission=commission
             )
 
-            if ref_type == 'Buy':
-                HoldingBuyOrder.objects.filter(holding_buy_order_id=ref_id).update(transaction_id=transaction.transaction_id)
-            elif ref_type == 'Sell':
-                HoldingSellOrder.objects.filter(holding_sell_order_id=ref_id).update(transaction_id=transaction.transaction_id)
+            if ref_type == 'Buy':  # Buy
+                transaction.buy_order_id = ref_id
+            elif ref_type == 'Sell' :  # Sell
+                transaction.sell_order_id = ref_id
+            transaction.save()
+
             return JsonResponse({'status': 'success', 'transaction_id': transaction.transaction_id})
 
     return JsonResponse({'status': 'failed'}, status=400)
