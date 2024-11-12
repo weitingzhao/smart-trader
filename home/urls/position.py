@@ -16,6 +16,10 @@ urlpatterns = [
         position.open_positions.get_holding_buy_order,
         name='get_holding_buy_order'),
 
+    path('holding/buy/order/<int:ref_buy_order_id>/ref_orders/',
+         position.open_positions.get_holding_buy_ref_order,
+         name='get_holding_buy_ref_order'),
+
     path('holding/buy/order/create/',
          position.open_positions.add_holding_buy_order,
          name='add_holding_buy_order'),

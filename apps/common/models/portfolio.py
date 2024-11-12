@@ -5,14 +5,14 @@ from .market import MarketSymbol
 
 class ActionChoices(models.TextChoices):
     NONE                                          = '0', 'None'
-    Active_BUY_Initial                       = '1', 'Active BUY Initial Position'
-    Active_BUY_Additional               = '2', 'Active BUY Additional Position'
+    Active_BUY_Initial                       = '1', 'Active BUY Initial Size'
+    Active_BUY_Additional               = '2', 'Active BUY More Size'
     Active_RAISE_Stop_Bar              = '11', 'Active RAISE Stop Bar'
     Active_LOWER_Stop_Bar            = '15', 'Active LOWER Stop Bar'
-    Passive_SELL_on_Stop_PROFIT  = '21', 'Passive SELL on Stop PROFIT'
-    Passive_SELL_on_Stop_LOST     = '25', 'Passive SELL on Stop LOST'
-    Active_SELL_on_STOP_PROFIT  = '31', 'Active SELL on STOP PROFIT'
-    Active_SELL_on_STOP_LOST     = '35', 'Active SELL on STOP LOST'
+    Passive_SELL_on_Stop_PROFIT  = '21', 'Passive STOP on Profit'
+    Passive_SELL_on_Stop_LOST     = '25', 'Passive STOP get Lost'
+    Active_SELL_on_STOP_PROFIT  = '31', 'Active STOP lock Profit'
+    Active_SELL_on_STOP_LOST     = '35', 'Active STOP take Lost'
 
 
 class TimingChoices(models.TextChoices):
@@ -154,6 +154,7 @@ class HoldingSellOrder(HoldingOrder):
     ref_sell_order = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
 
     is_obsolete = models.BooleanField(default=False, null=True, blank=True)
+    order_place_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'holding_sell_order'

@@ -77,11 +77,6 @@ def update(request, transaction_id):
 def delete(request, transaction_id):
     if request.method == 'DELETE':
         transaction = Transaction.objects.get(transaction_id=transaction_id)
-
-        # Clean up transaction_id in HoldingBuyOrder and HoldingSellOrder
-        HoldingBuyOrder.objects.filter(transaction_id=transaction_id).update(transaction_id=None)
-        HoldingSellOrder.objects.filter(transaction_id=transaction_id).update(transaction_id=None)
-
         # Delete the transaction
         transaction.delete()
         return JsonResponse({'status': 'success'})

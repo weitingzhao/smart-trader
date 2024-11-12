@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db.models import Sum, F
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from home.templatetags.home_filter import order_price
 from pydantic.dataclasses import dataclass
 
 from apps.common.models import *
@@ -159,6 +160,7 @@ def get_holding_buy_order(request, holding_buy_order_id):
     order = get_object_or_404(HoldingBuyOrder, holding_buy_order_id=holding_buy_order_id)
     data = {
         'id': order.holding_buy_order_id,
+        'ref_order_id': order.ref_buy_order_id,
 
         'action': order.action,
         'order_type': order.order_type,
@@ -170,12 +172,49 @@ def get_holding_buy_order(request, holding_buy_order_id):
     }
     return JsonResponse(data)
 
+def get_holding_buy_ref_order(request, ref_buy_order_id):
+    orders = HoldingBuyOrder.objects.filter(ref_buy_order_id=ref_buy_order_id)
+    data = [
+        {
+            'id': order.holding_buy_order_id,
+            'ref_order_id': order.ref_buy_order_id,
+
+            'action': order.action,
+            'order_type': order.order_type,
+
+            'quantity_target': order.quantity_target,
+            'price_market': order.price_market,
+            'price_stop': order.price_stop,
+            'price_limit': order.price_limit,
+            'price': order_price(None,order)
+        }
+        for order in orders
+    ]
+    return JsonResponse(data, safe=False)
+
+
 @csrf_exempt
 def add_holding_buy_order(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+
+        trade_id = None
+        ref_buy_order_id = None
+        if data['action'] == '1':
+            trade = Trade.objects.create(
+                profit_actual=0,
+                profit_actual_ratio=0,
+            )
+            trade_id = trade.trade_id
+        elif data['action'] == '2':
+            ref_buy_order_id = data['ref_order_id']
+            trade_id = HoldingBuyOrder.objects.get(holding_buy_order_id=ref_buy_order_id).trade_id
+
         buy_order = HoldingBuyOrder.objects.create(
             holding_id=data['holding_id'],
+            trade_id=trade_id,
+            ref_buy_order_id=ref_buy_order_id,
+
             action=data['action'],
             timing=data['timing'],
 
@@ -189,13 +228,36 @@ def add_holding_buy_order(request):
     return JsonResponse({'status': 'failed'}, status=400)
 
 @csrf_exempt
+def add_holding_sell_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        buy_order = HoldingSellOrder.objects.create(
+            holding_id=data['holding_id'],
+
+            action=data['action'],
+            timing=data['timing'],
+
+            order_type=data['order_type'],
+            quantity_target=data['quantity_target'],
+            price_market=data['price_market'] if data['price_market'] != '' else None,
+            price_stop= data['price_stop'] if data['price_stop'] != '' else None,
+            price_limit=data['price_limit'] if data['price_limit'] != '' else None,
+
+            order_place_date=data['order_place_date'],
+        )
+        return JsonResponse({'status': 'success', 'sell_order_id': buy_order.holding_sell_order_id})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+
+@csrf_exempt
 def edit_holding_buy_order(request, holding_buy_order_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         order = HoldingBuyOrder.objects.get(holding_buy_order_id=holding_buy_order_id)
         order.action = data.get('action')
-        order.order_type = data.get('order_type')
 
+        order.order_type = data.get('order_type')
         order.quantity_target = data.get('quantity_target')
         order.price_market = data.get('price_market') if data.get('price_market') != '' else None
         order.price_stop = data.get('price_stop') if data.get('price_stop') != '' else None
@@ -217,39 +279,33 @@ def get_holding_sell_order(request, holding_sell_order_id):
     order = get_object_or_404(HoldingSellOrder, holding_sell_order_id=holding_sell_order_id)
     data = {
         'id': order.holding_sell_order_id,
+
+        'action': order.action,
+        'order_type': order.order_type,
+
         'quantity_target': order.quantity_target,
+        'price_market': order.price_market,
         'price_stop': order.price_stop,
         'price_limit': order.price_limit,
+
         'order_place_date': order.order_place_date.strftime('%Y-%m-%d')
     }
     return JsonResponse(data)
 
-@csrf_exempt
-def add_holding_sell_order(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        buy_order = HoldingSellOrder.objects.create(
-            holding_id=data['holding_id'],
-            action=data['action'],
-            order_place_date=data['order_place_date'],
-            quantity_target=data['quantity_target'],
-            price_stop=data['price_stop'],
-            price_limit=data['price_limit'],
-            is_initial=data['is_initial'],
-            good_until=data['good_until'],
-            timing=data['timing']
-        )
-        return JsonResponse({'status': 'success', 'buy_order_id': buy_order.holding_sell_order_id})
-    return JsonResponse({'status': 'failed'}, status=400)
 
 @csrf_exempt
 def edit_holding_sell_order(request, holding_sell_order_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         order = HoldingSellOrder.objects.get(holding_sell_order_id=holding_sell_order_id)
+        order.action = data.get('action')
+
+        order.order_type = data.get('order_type')
         order.quantity_target = data.get('quantity_target')
-        order.price_stop = data.get('price_stop')
-        order.price_limit = data.get('price_limit')
+        order.price_market = data.get('price_market') if data.get('price_market') != '' else None
+        order.price_stop = data.get('price_stop') if data.get('price_stop') != '' else None
+        order.price_limit = data.get('price_limit') if data.get('price_limit') != '' else None
+
         order.order_place_date = data.get('order_place_date')
         order.save()
         return JsonResponse({'status': 'success'})

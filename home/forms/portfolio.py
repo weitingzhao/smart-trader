@@ -1,4 +1,5 @@
 from django import forms
+import datetime
 from apps.common.models import *
 
 class PortfolioForm(forms.ModelForm):
@@ -89,17 +90,18 @@ class HoldingSellOrderForm(HoldingOrderForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['id'] = f'id_sell_{field_name}'
 
-    is_obsolete = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={
-        'class': 'form-select',
-        'id': 'id_holding_sell_is_obsolete'
-    }), initial=False)
+    order_place_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
+        'class': 'form-control',
+        'type': 'date',
+        'id': 'id_order_place_date',
+    }), required=False, initial=datetime.date.today().strftime('%Y-%m-%d'))
 
     class Meta:
         model = HoldingSellOrder
         fields = [
             'holding_symbol', 'action', 'timing', 'order_type',
             'quantity_target','price_market', 'price_stop', 'price_limit',
-            'is_obsolete'
+            'is_obsolete', 'order_place_date'
         ]
 
 

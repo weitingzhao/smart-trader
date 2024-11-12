@@ -35,6 +35,24 @@ def to_json(value):
     except (ValueError, TypeError):
         return {}
 
+@register.filter
+def order_name(value, order):
+    price = order_price(None, order)
+    return f"{order.quantity_target} @ {price}"
+
+@register.filter
+def order_price(value, order):
+    if order.order_type == '1': #market
+        return f"{order.price_market} Market"
+    elif order.order_type == '2':  # limit
+        return f"{order.price_limt} Limit"
+    elif order.order_type == '3':  # limit
+        return f"{order.price_stop} Stop"
+    elif order.order_type == '4': #stop limit
+        return f"{order.price_stop} / {order.price_limit} Stop Limit"
+    else:
+        return f""
+
 @register.simple_tag
 def round_by_digits(value, digits, template :str, need_plus=True):
     """Rounds the value to the given number of digits"""
