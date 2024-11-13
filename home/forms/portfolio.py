@@ -74,7 +74,7 @@ class HoldingBuyOrderForm(HoldingOrderForm):
         'class': 'form-control',
         'min': '0',
         'id': 'id_holding_buy_wishlist'
-    }))
+    }), required=False)
 
     class Meta:
         model = HoldingBuyOrder

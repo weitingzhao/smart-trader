@@ -63,10 +63,11 @@ def update(request, transaction_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         action = Transaction.objects.get(transaction_id=transaction_id)
+
         action.date = data.get('date')
-        action.quantity_final = data.get('quantity_final')
-        action.price_final = data.get('price_final')
-        action.commission = data.get('commission')
+        action.quantity_final = data.get('quantity_final') if data.get('quantity_final') != '' else None
+        action.price_final = data.get('price_final') if data.get('price_final') != '' else None
+        action.commission = data.get('commission') if data.get('commission') != '' else None
         action.save()
         return JsonResponse({'status': 'success', 'action': 'updated'})
 

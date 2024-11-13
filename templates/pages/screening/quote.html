@@ -802,7 +802,7 @@
                             </div>
                             <div class="col-3 col-sm-4" id="lab_ref_buy_order">
                                 <label for="ref_buy_order_id">Reference Buy Order</label>
-                                <select class="form-select" id="id_ref_buy_order">
+                                <select class="form-select" id="ref_buy_order_id">
                                     {% for order in holding_buy_orders %}
                                         <option value="{{ order.holding_buy_order_id }}">Buy {{ segment|order_name:order }}</option>
                                     {% endfor %}
@@ -833,14 +833,6 @@
                                         <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
                                             {{ choice.1 }}
                                         </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-3 col-sm-4">
-                                <label for="ref_buy_order_id">Reference Buy Order</label>
-                                <select class="form-select">
-                                    {% for order in holding_buy_orders %}
-                                        <option value="{{ order.holding_buy_order_id }}">Buy {{ segment|order_name:order }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
