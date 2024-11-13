@@ -101,8 +101,7 @@
                                 <table class="table table-flush table-hover" id="buy_order_table">
                                     <thead class="thead-light">
                                       <tr>
-                                          <th>Trade</th>
-                                          <th>Order</th>
+                                          <th>T.O.ID</th>
 
                                           <th>Quantity</th>
                                           <th>Detail</th>
@@ -115,26 +114,25 @@
                                     <tbody>
                                     {% for holding_buy_order in holding_buy_orders %}
                                         <tr>
-                                            <td>{{ holding_buy_order.trade_id }}</td>
-                                            <td>{{ holding_buy_order.holding_buy_order_id }}</td>
+                                            <td>{{ holding_buy_order.trade_id }}-{{ holding_buy_order.holding_buy_order_id }}</td>
 
                                             <td><strong>{{ holding_buy_order.quantity_target }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_buy_order}}</strong></td>
 
                                             <td>
                                                 {% if holding_buy_order.transaction_id %}
-                                                    FILLED
+                                                    <span class="text-success">Filled</span>
                                                 {% else %}
-                                                    OPEN
+                                                    <span class="text-primary">Open</span>
                                                 {%endif %}
                                             </td>
                                             <td>{{ segment|action_lookup:holding_buy_order.action }}</td>
                                             <td>
-                                                <a href="javascript:showBuyTransaction('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
-                                                    <i class="fas fa-pen text-secondary"></i>
+                                                <a href="javascript:showBuyOrderFill('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                    <i class="fas fa-pen text-primary"></i>
                                                 </a>
                                                 <a href="javascript:editHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
-                                                    <i class="fas fa-user-edit text-secondary"></i>
+                                                    <i class="fas fa-user-edit text-info"></i>
                                                 </a>
                                                 <a href="javascript:deleteHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
@@ -163,8 +161,7 @@
                             <table class="table table-flush table-hover" id="sell_order_table">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>Trade</th>
-                                        <th>Order</th>
+                                        <th>T.O.ID</th>
 
                                         <th>Quantity</th>
                                         <th>Detail</th>
@@ -178,27 +175,35 @@
                                 <tbody>
                                     {% for holding_sell_order in holding_sell_orders %}
                                         <tr>
-                                            <td>{{ holding_sell_order.trade_id }}</td>
-                                            <td>{{ holding_sell_order.holding_sell_order_id }}</td>
+                                            <td>{{ holding_sell_order.trade_id }} - {{ holding_sell_order.holding_sell_order_id }}</td>
+
                                             <td><strong>{{ holding_sell_order.quantity_target }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_sell_order}}</strong></td>
-                                            <td>{{ holding_sell_order.price_limit }}</td>
 
-                                            <td>{{ holding_sell_order.order_place_date|date:"m-d-Y" }}</td>
+                                            <td class="text-dark">{{ holding_sell_order.order_place_date|date:"m-d-Y" }}</td>
                                             <td>
-                                                {% if holding_sell_order.transaction_id %}
-                                                    FILLED
+                                                {% if not holding_sell_order.is_obsolete %}
+                                                    <span class="text-secondary">Obsolete</span>
                                                 {% else %}
-                                                    OPEN
-                                                {%endif %}
+                                                    {% if holding_sell_order.transaction_id %}
+                                                        <span class="text-success">Filled</span>
+                                                    {% else %}
+                                                        <span class="text-primary">Open</span>
+                                                    {%endif %}
+                                                {% endif %}
                                             </td>
                                             <td>{{ segment|action_lookup:holding_sell_order.action }}</td>
                                             <td>
-                                                <a href="javascript:showSellTransaction('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
-                                                    <i class="fas fa-pen text-secondary"></i>
+                                                {% if not holding_sell_order.is_obsolete %}
+                                                <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                    <i class="fas fa-pen text-primary"></i>
                                                 </a>
+                                                <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
+                                                    <i class="fas fa-sliders text-primary"></i>
+                                                </a>
+                                                {%endif %}
                                                 <a href="javascript:editHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
-                                                    <i class="fas fa-user-edit text-secondary"></i>
+                                                    <i class="fas fa-user-edit text-info"></i>
                                                 </a>
                                                 <a href="javascript:deleteHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
@@ -224,7 +229,7 @@
                                 <table class="table table-flush table-hover" id="buy_action_table">
                                     <thead class="thead-light">
                                       <tr>
-                                          <th>Trade</th>
+                                          <th>T.O.T.ID</th>
                                           <th>Action</th>
                                           <th>Quantity</th>
                                           <th>Price</th>
@@ -236,15 +241,15 @@
                                     <tbody>
                                     {% for transaction in transactions %}
                                         <tr>
-                                            <td></td>
+                                            <td>{{ transaction.trade_id }}-{{ transaction.order_id }}-{{ transaction.transaction_id }}</td>
                                             <td>{{ segment|transaction_type_lookup:transaction.transaction_type }}</td>
                                             <td>{{ transaction.quantity_final }}</td>
                                             <td>{{ transaction.price_final }}</td>
-                                            <td>{{ transaction.commission }}</td>
+                                            <td>{{ transaction.commission|default_if_none:"" }}</td>
                                             <td>{{ transaction.date|date:"m-d-Y" }}</td>
                                             <td>
                                                 <a href="javascript:editTransaction('{{ transaction.transaction_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
-                                                    <i class="fas fa-user-edit text-secondary"></i>
+                                                    <i class="fas fa-user-edit text-info"></i>
                                                 </a>
                                                 <a href="javascript:deleteTransaction('{{ transaction.transaction_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
@@ -795,9 +800,9 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3 col-sm-4" id="lab_ref_buy_order_id">
+                            <div class="col-3 col-sm-4" id="lab_ref_buy_order">
                                 <label for="ref_buy_order_id">Reference Buy Order</label>
-                                <select class="form-select" id="ref_buy_order_id">
+                                <select class="form-select" id="id_ref_buy_order">
                                     {% for order in holding_buy_orders %}
                                         <option value="{{ order.holding_buy_order_id }}">Buy {{ segment|order_name:order }}</option>
                                     {% endfor %}
@@ -828,6 +833,14 @@
                                         <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
                                             {{ choice.1 }}
                                         </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4">
+                                <label for="ref_buy_order_id">Reference Buy Order</label>
+                                <select class="form-select">
+                                    {% for order in holding_buy_orders %}
+                                        <option value="{{ order.holding_buy_order_id }}">Buy {{ segment|order_name:order }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -863,20 +876,42 @@
                 </div>
                 <div class="modal-body">
                     <form id="createSellOrderForm">
-                      <div class="row mt-3">
-                          <div class="col-12 col-sm-4">
-                              <label for="{{ form_sell_order.action.id_for_label }}">Action</label>
-                              <select class="form-select" id="id_sell_action" name="{{ form_sell_order.action.name }}">
-                                {% for choice in form_sell_order.action.field.choices %}
-                                    {% if choice.0 == '0' or choice.0 == '1' or choice.0 == '11' or choice.0 == '15' %}
-                                        <option value="{{ choice.0 }}" {% if choice.0 == form_sell_order.action.value %}selected{% endif %}>
-                                            {{ choice.1 }}
-                                        </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                          </div>
-                          <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-4">
+                                <label for="{{ form_sell_order.action.id_for_label }}">Action</label>
+                                <select class="form-select" id="id_sell_action" name="{{ form_sell_order.action.name }}" onchange="toggleRefSellOrderField()">
+                                    {% for choice in form_sell_order.action.field.choices %}
+                                        {% if choice.0 == '0' or choice.0 == '1' or choice.0 == '11' or choice.0 == '15' %}
+                                            <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
+                                                {{ choice.1 }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-4" id="lab_sell_trade">
+                                <label for="trade_id">Trade ID</label>
+                                <select class="form-select" id="id_sell_trade">
+                                    {% for trade in trade_ids %}
+                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4" id="lab_ref_sell_order">
+                                <label for="ref_sell_order_id">Reference Sell Order</label>
+                                <select class="form-select" id="id_ref_sell_order">
+                                    {% for order in holding_sell_orders %}
+                                        <option value="{{ order.holding_sell_order_id }}">Buy {{ segment|order_name:order }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                <label for="{{ form_sell_order.quality_target.id_for_label }}">Quantity</label>
+                                {{ form_sell_order.quantity_target }}
+                            </div>
+                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
                               <label for="{{ form_sell_order.timing.id_for_label }}">Timing</label>
                               <select class="form-select" id="id_sell_timing" name="{{ form_sell_order.timing.name }}">
                                 {% for choice in form_sell_order.timing.field.choices %}
@@ -885,10 +920,6 @@
                                     </option>
                                 {% endfor %}
                             </select>
-                          </div>
-                          <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                              <label for="{{ form_sell_order.quality_target.id_for_label }}">Quantity target</label>
-                              {{ form_sell_order.quantity_target }}
                           </div>
                       </div>
                       <div class="row mt-3">
@@ -930,12 +961,12 @@
             </div>
         </div>
     </div>
-    <!-- Edit Holding Buy Order Modal -->
-    <div class="modal fade" id="editHoldingBuyOrderModal" tabindex="-1" aria-labelledby="editHoldingBuyOrderModalLabel" aria-hidden="true">
+    <!-- Edit Buy Order Modal -->
+    <div class="modal fade" id="editBuyOrderModal" tabindex="-1" aria-labelledby="editBuyOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editHoldingBuyOrderModalLabel">Edit Buy Order</h5>
+                    <h5 class="modal-title" id="editBuyOrderModalLabel">Edit Buy Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -996,17 +1027,17 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingBuyOrder()">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditBuyOrder()">Save changes</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Edit Holding Sell Order Modal -->
-    <div class="modal fade" id="editHoldingSellOrderModal" tabindex="-1" aria-labelledby="editHoldingSellOrderModalLabel" aria-hidden="true">
+    <!-- Edit Sell Order Modal -->
+    <div class="modal fade" id="editSellOrderModal" tabindex="-1" aria-labelledby="editSellOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editHoldingSellOrderModalLabel">Edit Sell Order</h5>
+                    <h5 class="modal-title" id="editSellOrderModalLabel">Edit Sell Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1014,7 +1045,8 @@
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4">
                                 <label>Action</label>
-                                <select class="form-select" id="edit_sell_action" name="{{ form_sell_order.action.name }}">
+                                <select class="form-select" id="edit_sell_action" name="{{ form_sell_order.action.name }}"
+                                onchange="toggleEditRefSellOrderField()">
                                     {% for choice in form_sell_order.action.field.choices %}
                                         {% if choice.0 == '0' or choice.0 == '1' or choice.0 == '11' or choice.0 == '15' %}
                                             <option value="{{ choice.0 }}">
@@ -1024,6 +1056,26 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            <div class="col-12 col-sm-4" id="lab_edit_sell_trade">
+                                <label for="edit_sell_trade">Trade ID</label>
+                                <select class="form-select" id="edit_sell_trade">
+                                    <option value="">--------------</option>
+                                    {% for trade in trade_ids %}
+                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4" id="lab_ref_edit_sell_order">
+                                <label for="ref_edit_sell_order">Reference Sell Order</label>
+                                <select class="form-select" id="ref_edit_sell_order">
+                                    <option value="">--------------</option>
+                                    {% for order in holding_sell_orders %}
+                                        <option value="{{ order.holding_sell_order_id }}">Buy {{ segment|order_name:order }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
                             <div class="col-3 mb-3">
                                 <label for="edit_sell_quantity_target" class="form-label">Quantity</label>
                                 <input type="number" class="form-control" id="edit_sell_quantity_target" required>
@@ -1064,7 +1116,41 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitEditHoldingSellOrder()">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditSellOrder()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Sell Order Modal -->
+    <div class="modal fade" id="adjustSellOrderModal" tabindex="-1" aria-labelledby="adjustSellOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adjustSellOrderModalLabel">Adjust Sell Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adjustHoldingSellOrderForm">
+                        <div class="row mt-3">
+                            <div class="col-3 mb-3">
+                                <label for="adjust_sell_quantity" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="adjust_sell_quantity" required>
+                            </div>
+                            <div class="col-3 mb-3">
+                                <label for="adjust_sell_price_stop" class="form-label">Stop</label>
+                                <input type="number" class="form-control" id="adjust_sell_price_stop" step="0.01">
+                            </div>
+                            <div class="col-3 mb-3">
+                                <label for="adjust_sell_price_limit" class="form-label">Limit</label>
+                                <input type="number" class="form-control" id="adjust_sell_price_limit" step="0.01">
+                            </div>
+                        </div>
+                        <input type="hidden" id="adjust_sell_order_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAdjustSellOrder()">Save changes</button>
                 </div>
             </div>
         </div>
@@ -1107,7 +1193,7 @@
     }
 
     ////////////////////////////////////////////// Transaction js //////////////////////////////////////////////
-    function showBuyTransaction(holding_buy_order_Id, price_market, order_place_date, quantity_target) {
+    function showBuyOrderFill(holding_buy_order_Id, price_market, order_place_date, quantity_target) {
         // Set the order ID in the hidden input field
         document.getElementById('buy_order_Id').value = holding_buy_order_Id;
         // Set the values in the modal input fields
@@ -1117,7 +1203,7 @@
         // Show the modal
         new bootstrap.Modal(document.getElementById('buyTransactionModal')).show();
     }
-    function showSellTransaction(holding_sell_order_id, price_limit, order_place_date, quantity_target) {
+    function showSellOrderFill(holding_sell_order_id, price_limit, order_place_date, quantity_target) {
         // Set the order ID in the hidden input field
         document.getElementById('sell_order_id').value = holding_sell_order_id;
         // Set the values in the modal input fields
@@ -1142,19 +1228,6 @@
         const date = document.getElementById('sell_date').value;
         const commission = document.getElementById('sell_commission').value;
         addTransaction('Sell', sell_order_Id, quantityFinal, priceFinal, date, commission);
-    }
-    function editTransaction(id) {
-        fetch(`/transaction/${id}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('edit_action_id').value = data.id;
-                document.getElementById('edit_quantity_final').value = data.quantity_final;
-                document.getElementById('edit_price_final').value = data.price_final;
-                document.getElementById('edit_date').value = data.date;
-                document.getElementById('edit_commission').value = data.commission;
-                new bootstrap.Modal(document.getElementById('editTransactionModal')).show();
-            })
-            .catch(error => console.error('Error fetching buy action data:', error));
     }
 
     async function addTransaction(type, order_Id, quantityFinal, priceFinal, date, commission) {
@@ -1183,6 +1256,19 @@
         } else {
             alert("Failed to execute order.");
         }
+    }
+    function editTransaction(id) {
+        fetch(`/transaction/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_action_id').value = data.id;
+                document.getElementById('edit_quantity_final').value = data.quantity_final;
+                document.getElementById('edit_price_final').value = data.price_final;
+                document.getElementById('edit_date').value = data.date;
+                document.getElementById('edit_commission').value = data.commission;
+                new bootstrap.Modal(document.getElementById('editTransactionModal')).show();
+            })
+            .catch(error => console.error('Error fetching buy action data:', error));
     }
     async function updateTransaction() {
         const id = document.getElementById('edit_action_id').value;
@@ -1234,16 +1320,33 @@
 
 
     function toggleRefBuyOrderField(){
-        toggleRefOrderField('id_buy_action', 'lab_ref_buy_order_id');
+        const action = document.getElementById('id_buy_action').value;
+        const ref_order = document.getElementById('lab_ref_buy_order');
+
+        if (action == '1' || action == '0' ){
+            ref_order.style.display = 'none';
+        } else {
+            ref_order.style.display = 'block';
+        }
     }
 
-    function toggleRefOrderField(action_element, ref_order_element) {
-        const ref_order = document.getElementById(ref_order_element);
-        const buy_action = document.getElementById(action_element).value;
-        if (buy_action == '2') {
-            ref_order.style.display = 'block';
-        } else {
+    function toggleRefSellOrderField(){
+        toggleRefSellOrder('id_sell_action', 'lab_sell_trade', 'lab_ref_sell_order');
+    }
+    function toggleEditRefSellOrderField(){
+        toggleRefSellOrder('edit_sell_action', 'lab_edit_sell_trade', 'lab_ref_edit_sell_order');
+    }
+    function toggleRefSellOrder(id_sell_action, lab_sell_trade,lab_ref_sell_order){
+        const action = document.getElementById(id_sell_action).value;
+        const ref_trade = document.getElementById(lab_sell_trade);
+        const ref_order = document.getElementById(lab_ref_sell_order);
+
+        if (action == '1' || action == '0' ){
+            ref_trade.style.display = 'block';
             ref_order.style.display = 'none';
+        } else {
+            ref_trade.style.display = 'none';
+            ref_order.style.display = 'block';
         }
     }
 
@@ -1293,6 +1396,7 @@
         new bootstrap.Modal(document.getElementById('createBuyOrderModal')).show();
     }
     function showCreateSellOrderModal() {
+        toggleRefSellOrderField();
         new bootstrap.Modal(document.getElementById('createSellOrderModal')).show();
     }
 
@@ -1327,7 +1431,7 @@
 
                 fetchRefOrders(data.id); // Fetch and display reference orders
 
-                var editModal = new bootstrap.Modal(document.getElementById('editHoldingBuyOrderModal'));
+                var editModal = new bootstrap.Modal(document.getElementById('editBuyOrderModal'));
                 editModal.show();
                 toggleBuyEditFields();
             });
@@ -1340,6 +1444,8 @@
 
                 document.getElementById('edit_sell_action').value = data.action;
 
+                document.getElementById('edit_sell_trade').value = data.trade_id|| "";
+                document.getElementById('ref_edit_sell_order').value = data.ref_order_id|| "";
                 document.getElementById('edit_sell_order_type').value = data.order_type;
                 document.getElementById('edit_sell_quantity_target').value = data.quantity_target;
                 document.getElementById('edit_sell_price_market').value = data.price_market;
@@ -1348,9 +1454,10 @@
 
                 document.getElementById('edit_sell_order_place_date').value = data.order_place_date;
 
-                var editModal = new bootstrap.Modal(document.getElementById('editHoldingSellOrderModal'));
-                editModal.show();
+                var editModal = new bootstrap.Modal(document.getElementById('editSellOrderModal'));
+                toggleEditRefSellOrderField();
                 toggleSellEditFields();
+                editModal.show();
             })
             .catch(error => console.error('Error fetching sell order data:', error));
     }
@@ -1396,6 +1503,9 @@
     async function submitCreateSellOrder() {
         const action = document.getElementById('id_sell_action').value;
         const timing = document.getElementById('id_sell_timing').value;
+        const trade_id = document.getElementById('id_sell_trade').value;
+        const ref_order_id = document.getElementById('id_ref_sell_order').value;
+
 
         const order_type = document.getElementById('id_sell_order_type').value;
         const quantity_target = document.getElementById('id_sell_quantity_target').value;
@@ -1416,6 +1526,9 @@
                 action: action,
                 timing: timing,
 
+                trade_id: trade_id,
+                ref_order_id: ref_order_id,
+
                 order_type: order_type,
                 quantity_target: quantity_target,
                 price_market: price_market,
@@ -1434,7 +1547,7 @@
         }
     }
 
-    async function submitEditHoldingBuyOrder() {
+    async function submitEditBuyOrder() {
         const id = document.getElementById('edit_buy_order_id').value;
 
         const action = document.getElementById('edit_buy_action').value;
@@ -1469,10 +1582,12 @@
             alert("Failed to update order.");
         }
     }
-    async function submitEditHoldingSellOrder() {
+    async function submitEditSellOrder() {
         const id = document.getElementById('edit_sell_order_id').value;
 
         const action = document.getElementById('edit_sell_action').value;
+        const trade_id = document.getElementById('edit_sell_trade').value;
+        const ref_order_id = document.getElementById('ref_edit_sell_order').value;
 
         const order_type = document.getElementById('edit_sell_order_type').value;
         const quantity_target = document.getElementById('edit_sell_quantity_target').value;
@@ -1489,6 +1604,8 @@
             },
             body: JSON.stringify({
                 action: action,
+                trade_id: trade_id,
+                ref_order_id: ref_order_id,
 
                 order_type: order_type,
                 quantity_target: quantity_target,
@@ -1505,6 +1622,46 @@
             location.reload();
         } else {
             alert("Failed to update order.");
+        }
+    }
+
+    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit) {
+        // Set the order ID in the hidden input field
+        document.getElementById('adjust_sell_order_id').value = holding_sell_order_id;
+        // Set the values in the modal input fields
+        document.getElementById('adjust_sell_quantity').value = quantity_target;
+        document.getElementById('adjust_sell_price_stop').value = price_stop;
+        document.getElementById('adjust_sell_price_limit').value = price_limit;
+        // Show the modal
+        new bootstrap.Modal(document.getElementById('adjustSellOrderModal')).show();
+    }
+    async function submitAdjustSellOrder() {
+        const sell_order_id = document.getElementById('adjust_sell_order_id').value;
+
+        const quantity_target = document.getElementById('adjust_sell_quantity').value;
+        const price_stop = document.getElementById('adjust_sell_price_stop').value;
+        const price_limit = document.getElementById('adjust_sell_price_limit').value;
+
+        const response = await fetch(`/position/holding/sell/order/${sell_order_id}/adjust/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                sell_order_id: sell_order_id,
+
+                quantity_target: quantity_target,
+                price_stop: price_stop,
+                price_limit: price_limit,
+            })
+        });
+
+        if (response.ok) {
+            alert("Order adjust successfully!");
+            location.reload();
+        } else {
+            alert("Failed to adjust order.");
         }
     }
 

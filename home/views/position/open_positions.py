@@ -237,6 +237,9 @@ def add_holding_sell_order(request):
             action=data['action'],
             timing=data['timing'],
 
+            trade_id=data['trade_id'],
+            ref_sell_order_id=data['ref_order_id'],
+
             order_type=data['order_type'],
             quantity_target=data['quantity_target'],
             price_market=data['price_market'] if data['price_market'] != '' else None,
@@ -281,8 +284,10 @@ def get_holding_sell_order(request, holding_sell_order_id):
         'id': order.holding_sell_order_id,
 
         'action': order.action,
-        'order_type': order.order_type,
+        'trade_id': order.trade_id,
+        'ref_order_id': order.ref_sell_order_id,
 
+        'order_type': order.order_type,
         'quantity_target': order.quantity_target,
         'price_market': order.price_market,
         'price_stop': order.price_stop,
@@ -298,7 +303,10 @@ def edit_holding_sell_order(request, holding_sell_order_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         order = HoldingSellOrder.objects.get(holding_sell_order_id=holding_sell_order_id)
+
         order.action = data.get('action')
+        order.trade_id = data.get('trade_id')
+        order.ref_sell_order_id = data.get('ref_order_id')
 
         order.order_type = data.get('order_type')
         order.quantity_target = data.get('quantity_target')
@@ -309,6 +317,45 @@ def edit_holding_sell_order(request, holding_sell_order_id):
         order.order_place_date = data.get('order_place_date')
         order.save()
         return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+@csrf_exempt
+def adjust_holding_sell_order(request, holding_sell_order_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Retrieve the existing sell order and mark it as obsolete
+        existing_order = HoldingSellOrder.objects.get(holding_sell_order_id=data['sell_order_id'])
+        existing_order.is_obsolete = True
+        existing_order.save()
+
+        # Create a new sell order with the provided details
+        if existing_order.price_stop is not None and data['price_stop'] != '':
+            if float(data['price_stop']) >= float(existing_order.price_stop):
+                action = ActionChoices.Active_RAISE_Stop_Bar
+            else:
+                action = ActionChoices.Active_LOWER_Stop_Bar
+        else:
+            action = ActionChoices.NONE
+
+        new_order = HoldingSellOrder.objects.create(
+            holding_id=existing_order.holding_id,
+            trade_id=existing_order.trade_id,
+            ref_sell_order_id=existing_order.holding_sell_order_id,
+
+            action=action,
+            timing=existing_order.timing,
+
+            order_type=existing_order.order_type,
+            quantity_target=data['quantity_target'],
+            price_stop=data['price_stop'] if data['price_stop'] != '' else None,
+            price_limit=data['price_limit'] if data['price_limit'] != '' else None,
+
+            order_place_date=existing_order.order_place_date,
+            is_obsolete=False
+        )
+
+        return JsonResponse({'status': 'success', 'new_sell_order_id': new_order.holding_sell_order_id})
     return JsonResponse({'status': 'failed'}, status=400)
 
 @csrf_exempt

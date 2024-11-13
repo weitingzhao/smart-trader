@@ -6,7 +6,7 @@ from home.forms.portfolio import *
 from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
-from django.db.models import F
+from django.db.models import F,Case, When, Value, IntegerField
 import json
 
 from logics.utilities.dates import Dates
@@ -28,7 +28,23 @@ def default(request, symbol):
     holding_buy_orders = HoldingBuyOrder.objects.filter(holding=holding)
     holding_sell_orders = HoldingSellOrder.objects.filter(holding=holding)
     # Retrieve holding_buy_action data
-    transaction = Transaction.objects.filter(holding=holding)
+    transaction = Transaction.objects.filter(holding=holding).annotate(
+        trade_id=Case(
+            When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
+            When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
+            default=Value(None),
+            output_field=IntegerField()
+        ),
+        order_id = Case(
+            When(buy_order_id__isnull=False, then=F('buy_order_id')),
+            When(sell_order_id__isnull=False, then=F('sell_order_id')),
+            default=Value(None),
+            output_field=IntegerField()
+        )
+    )
+
+    # Retrieve distinct trader_id from holding_buy_order based on holding_id
+    trade_ids = HoldingBuyOrder.objects.filter(holding=holding).values('trade_id').distinct()
 
     form_buy_order = HoldingBuyOrderForm()
     form_sell_order = HoldingSellOrderForm()
@@ -56,6 +72,7 @@ def default(request, symbol):
         'holding': holding,
         'holding_buy_orders': holding_buy_orders,
         'holding_sell_orders': holding_sell_orders,
-        'transactions': transaction
+        'transactions': transaction,
+        'trade_ids': trade_ids
     }
     return render(request, 'pages/screening/quote.html', context)
