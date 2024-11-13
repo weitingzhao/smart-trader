@@ -6,7 +6,7 @@ from home.forms.portfolio import *
 from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
-from django.db.models import F,Case, When, Value, IntegerField
+from django.db.models import F,Case, When, Value, IntegerField, Sum, FloatField, Q
 import json
 
 from logics.utilities.dates import Dates
@@ -25,8 +25,24 @@ def default(request, symbol):
     # Retrieve the holding related to the portfolio
     holding = Holding.objects.filter(portfolio=portfolio, symbol=symbol).first()
     # Retrieve all holding_buy_order and holding_sell_order records related to the holding
-    holding_buy_orders = HoldingBuyOrder.objects.filter(holding=holding)
-    holding_sell_orders = HoldingSellOrder.objects.filter(holding=holding)
+    holding_buy_orders = (HoldingBuyOrder.objects.filter(holding=holding).annotate(
+        filled_quantity=Sum(
+            'transaction__quantity_final',
+            filter=Q(transaction__buy_order_id=F('holding_buy_order_id')),
+            output_field=FloatField()
+        ),
+        filled_rate=F('filled_quantity') / F('quantity_target') * 100
+    ).order_by('-holding_buy_order_id'))
+
+    holding_sell_orders = (HoldingSellOrder.objects.filter(holding=holding).annotate(
+        filled_quantity=Sum(
+            'transaction__quantity_final',
+            filter=Q(transaction__sell_order_id=F('holding_sell_order_id')),
+            output_field=FloatField()
+        ),
+        filled_rate=F('filled_quantity') / F('quantity_target') * 100
+    ).order_by('-holding_sell_order_id'))
+
     # Retrieve holding_buy_action data
     transaction = Transaction.objects.filter(holding=holding).annotate(
         trade_id=Case(
@@ -41,7 +57,7 @@ def default(request, symbol):
             default=Value(None),
             output_field=IntegerField()
         )
-    )
+    ).order_by('-transaction_id')
 
     # Retrieve distinct trader_id from holding_buy_order based on holding_id
     trade_ids = HoldingBuyOrder.objects.filter(holding=holding).values('trade_id').distinct()

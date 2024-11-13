@@ -351,7 +351,7 @@ def adjust_holding_sell_order(request, holding_sell_order_id):
             price_stop=data['price_stop'] if data['price_stop'] != '' else None,
             price_limit=data['price_limit'] if data['price_limit'] != '' else None,
 
-            order_place_date=existing_order.order_place_date,
+            order_place_date=data['order_place_date'] if data['order_place_date'] != '' else existing_order.order_place_date,
             is_obsolete=False
         )
 

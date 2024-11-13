@@ -116,14 +116,16 @@
                                         <tr>
                                             <td>{{ holding_buy_order.trade_id }}-{{ holding_buy_order.holding_buy_order_id }}</td>
 
-                                            <td><strong>{{ holding_buy_order.quantity_target }}</strong></td>
+                                            <td><strong>{{ holding_buy_order.quantity_target }} / {{ holding_buy_order.filled_quantity }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_buy_order}}</strong></td>
 
                                             <td>
-                                                {% if holding_buy_order.transaction_id %}
-                                                    <span class="text-success">Filled</span>
-                                                {% else %}
-                                                    <span class="text-primary">Open</span>
+                                                {% if holding_buy_order.filled_rate == 0 %}
+                                                    <span class="text-primary fw-bold">Open</span>
+                                                {% elif holding_buy_order.filled_rate == 100 %}
+                                                    <span class="text-success fw-bold">Filled</span>
+                                                {%else %}
+                                                    Fill <strong>{{ holding_buy_order.filled_rate|floatformat:2 }}%</strong>
                                                 {%endif %}
                                             </td>
                                             <td>{{ segment|action_lookup:holding_buy_order.action }}</td>
@@ -177,20 +179,25 @@
                                         <tr>
                                             <td>{{ holding_sell_order.trade_id }} - {{ holding_sell_order.holding_sell_order_id }}</td>
 
-                                            <td><strong>{{ holding_sell_order.quantity_target }}</strong></td>
+                                            <td><strong>{{ holding_sell_order.quantity_target }} / {{ holding_sell_order.filled_quantity }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_sell_order}}</strong></td>
 
                                             <td class="text-dark">{{ holding_sell_order.order_place_date|date:"m-d-Y" }}</td>
                                             <td>
-                                                {% if not holding_sell_order.is_obsolete %}
+                                                {% if holding_sell_order.is_obsolete %}
                                                     <span class="text-secondary">Obsolete</span>
                                                 {% else %}
-                                                    {% if holding_sell_order.transaction_id %}
-                                                        <span class="text-success">Filled</span>
-                                                    {% else %}
-                                                        <span class="text-primary">Open</span>
+                                                     {% if holding_sell_order.filled_rate == 0 %}
+                                                        <span class="text-primary fw-bold">Open</span>
+                                                    {% elif holding_sell_order.filled_rate == 100 %}
+                                                        <span class="text-success fw-bold">Filled</span>
+                                                    {%else %}
+                                                        Fill <strong>{{ holding_sell_order.filled_rate|floatformat:2 }}%</strong>
                                                     {%endif %}
                                                 {% endif %}
+
+
+
                                             </td>
                                             <td>{{ segment|action_lookup:holding_sell_order.action }}</td>
                                             <td>
@@ -198,7 +205,7 @@
                                                 <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
                                                     <i class="fas fa-pen text-primary"></i>
                                                 </a>
-                                                <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
+                                                <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}','{{ holding_sell_order.order_place_date|date:"Y-m-d" }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
                                                     <i class="fas fa-sliders text-primary"></i>
                                                 </a>
                                                 {%endif %}
@@ -242,9 +249,9 @@
                                     {% for transaction in transactions %}
                                         <tr>
                                             <td>{{ transaction.trade_id }}-{{ transaction.order_id }}-{{ transaction.transaction_id }}</td>
-                                            <td>{{ segment|transaction_type_lookup:transaction.transaction_type }}</td>
-                                            <td>{{ transaction.quantity_final }}</td>
-                                            <td>{{ transaction.price_final }}</td>
+                                            <td><strong>{{ segment|transaction_type_lookup:transaction.transaction_type }}</strong></td>
+                                            <td><strong>{{ transaction.quantity_final }}</strong></td>
+                                            <td><strong>{{ transaction.price_final }}</strong></td>
                                             <td>{{ transaction.commission|default_if_none:"" }}</td>
                                             <td>{{ transaction.date|date:"m-d-Y" }}</td>
                                             <td>
@@ -1136,6 +1143,10 @@
                                 <label for="adjust_sell_price_limit" class="form-label">Limit</label>
                                 <input type="number" class="form-control" id="adjust_sell_price_limit" step="0.01">
                             </div>
+                            <div class="col-3 mb-3">
+                                <label for="adjust_order_place_date" class="form-label">Order Place Date</label>
+                                <input type="date" class="form-control" id="adjust_order_place_date" required>
+                            </div>
                         </div>
                         <input type="hidden" id="adjust_sell_order_id">
                     </form>
@@ -1445,6 +1456,7 @@
                 document.getElementById('edit_sell_price_limit').value = data.price_limit;
 
                 document.getElementById('edit_sell_order_place_date').value = data.order_place_date;
+                {#console.log("edit->"+data.order_place_date);#}
 
                 var editModal = new bootstrap.Modal(document.getElementById('editSellOrderModal'));
                 toggleEditRefSellOrderField();
@@ -1617,13 +1629,15 @@
         }
     }
 
-    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit) {
+    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit, order_place_date) {
         // Set the order ID in the hidden input field
         document.getElementById('adjust_sell_order_id').value = holding_sell_order_id;
         // Set the values in the modal input fields
         document.getElementById('adjust_sell_quantity').value = quantity_target;
         document.getElementById('adjust_sell_price_stop').value = price_stop;
         document.getElementById('adjust_sell_price_limit').value = price_limit;
+        {#console.log("order_place_date->"+order_place_date);#}
+        document.getElementById('adjust_order_place_date').value = order_place_date;
         // Show the modal
         new bootstrap.Modal(document.getElementById('adjustSellOrderModal')).show();
     }
@@ -1633,6 +1647,8 @@
         const quantity_target = document.getElementById('adjust_sell_quantity').value;
         const price_stop = document.getElementById('adjust_sell_price_stop').value;
         const price_limit = document.getElementById('adjust_sell_price_limit').value;
+        const order_place_date = document.getElementById('adjust_order_place_date').value;
+
 
         const response = await fetch(`/position/holding/sell/order/${sell_order_id}/adjust/`, {
             method: 'POST',
@@ -1646,6 +1662,7 @@
                 quantity_target: quantity_target,
                 price_stop: price_stop,
                 price_limit: price_limit,
+                order_place_date: order_place_date,
             })
         });
 
