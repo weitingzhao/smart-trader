@@ -35,6 +35,11 @@ class OrderTypeChoices(models.TextChoices):
     STOP = '3', 'Stop'
     STOP_LIMIT = '4', 'Stop Limit'
 
+class FundingTypeChoices(models.TextChoices):
+    NONE =  '0', 'None'
+    WITHDRAW = '1', 'Withdraw'
+    DEPOSIT = '2', 'Deposit'
+
 
 class Portfolio(models.Model):
     """
@@ -55,6 +60,23 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"[{self.user.username}] Portfolio:{self.name}"
+
+
+class Funding(models.Model):
+    """
+    This model is used to store the funding of a portfolio
+    """
+    funding_id = models.AutoField(primary_key=True)
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    completion_date = models.DateTimeField(null=True, blank=True)
+    funding_type = models.CharField(max_length=20, choices=FundingTypeChoices.choices, default=FundingTypeChoices.NONE)
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+
+    class Meta:
+        db_table = 'funding'
+
+    def __str__(self):
+        return f"Funding: {self.funding_id} for {self.portfolio}"
 
 
 class Holding(models.Model):

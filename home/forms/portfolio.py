@@ -104,7 +104,25 @@ class HoldingSellOrderForm(HoldingOrderForm):
             'is_obsolete', 'order_place_date'
         ]
 
+class FundingForm(forms.ModelForm):
 
+    funding_type = forms.ChoiceField(choices=FundingTypeChoices.choices, widget=forms.Select(attrs={
+        'class': 'form-select',
+    }), initial=FundingTypeChoices.NONE)
+
+    completion_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
+        'class': 'form-control',
+        'type': 'date',
+    }), required=False, initial=datetime.date.today().strftime('%Y-%m-%d'))
+
+    amount = forms.DecimalField(widget=forms.NumberInput(attrs={
+        'class': 'form-control',
+        'step': '1',
+    }))
+
+    class Meta:
+        model = Funding
+        fields = ['portfolio', 'completion_date', 'funding_type', 'amount']
 
 
 

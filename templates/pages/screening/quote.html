@@ -1455,43 +1455,43 @@
     }
 
     async function submitCreateBuyOrder() {
-    const action = document.getElementById('id_buy_action').value;
-    const timing = document.getElementById('id_buy_timing').value;
-    const ref_order_id = document.getElementById('ref_buy_order_id').value;
+        const action = document.getElementById('id_buy_action').value;
+        const timing = document.getElementById('id_buy_timing').value;
+        const ref_order_id = document.getElementById('ref_buy_order_id').value;
 
-    const order_type = document.getElementById('id_buy_order_type').value;
-    const quantity_target = document.getElementById('id_buy_quantity_target').value;
-    const price_market = document.getElementById('id_buy_price_market').value;
-    const price_stop = document.getElementById('id_buy_price_stop').value;
-    const price_limit = document.getElementById('id_buy_price_limit').value;
+        const order_type = document.getElementById('id_buy_order_type').value;
+        const quantity_target = document.getElementById('id_buy_quantity_target').value;
+        const price_market = document.getElementById('id_buy_price_market').value;
+        const price_stop = document.getElementById('id_buy_price_stop').value;
+        const price_limit = document.getElementById('id_buy_price_limit').value;
 
-    const response = await fetch('/position/holding/buy/order/create/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({
-            holding_id: {{ holding.holding_id }},
-            action: action,
-            timing: timing,
-            ref_order_id: ref_order_id,
+        const response = await fetch('/position/holding/buy/order/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                holding_id: {{ holding.holding_id }},
+                action: action,
+                timing: timing,
+                ref_order_id: ref_order_id,
 
-            order_type: order_type,
-            quantity_target: quantity_target,
-            price_market: price_market,
-            price_stop: price_stop,
-            price_limit: price_limit,
-        })
-    });
+                order_type: order_type,
+                quantity_target: quantity_target,
+                price_market: price_market,
+                price_stop: price_stop,
+                price_limit: price_limit,
+            })
+        });
 
-    if (response.ok) {
-        alert("Buy Order created successfully!");
-        location.reload();
-    } else {
-        alert("Failed to create Buy Order.");
+        if (response.ok) {
+            alert("Buy Order created successfully!");
+            location.reload();
+        } else {
+            alert("Failed to create Buy Order.");
+        }
     }
-}
     async function submitCreateSellOrder() {
         const action = document.getElementById('id_sell_action').value;
         const timing = document.getElementById('id_sell_timing').value;
@@ -1809,7 +1809,7 @@
                 name: 'Price'
             };
         }
-        
+
         // Add SMA lines
         sma50Trace = {
             x: stockData.time,
@@ -1819,7 +1819,7 @@
             name: 'SMA 50',
             line: {color: 'blue'}
         };
-    
+
         sma200Trace = {
             x: stockData.time,
             y: stockData.SMA_200,

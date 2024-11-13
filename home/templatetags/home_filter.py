@@ -18,6 +18,11 @@ def timing_lookup(value, arg):
     return dict(TimingChoices.choices).get(arg)
 
 @register.filter
+def funding_lookup(value, arg):
+    # Lookup dictionaries
+    return dict(FundingTypeChoices.choices).get(arg)
+
+@register.filter
 def transaction_type_lookup(value, arg):
     # Lookup dictionaries
     return dict(TransactionTypeChoices.choices).get(arg)
