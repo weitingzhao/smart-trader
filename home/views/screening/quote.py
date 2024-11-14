@@ -6,7 +6,8 @@ from home.forms.portfolio import *
 from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
-from django.db.models import F,Case, When, Value, IntegerField, Sum, FloatField, Q
+from django.db.models import F,Case, When, Value, IntegerField, Sum, FloatField, Q, BooleanField
+from django.db.models.functions import Cast
 import json
 
 from logics.utilities.dates import Dates
@@ -31,7 +32,15 @@ def default(request, symbol):
             filter=Q(transaction__buy_order_id=F('holding_buy_order_id')),
             output_field=FloatField()
         ),
-        filled_rate=F('filled_quantity') / F('quantity_target') * 100
+        filled_rate=F('filled_quantity') / Cast(F('quantity_target'), FloatField()) * 100,
+        is_filled=Case(
+            When(
+                Q(filled_rate__isnull=True) | Q(filled_rate__lt=100),
+                then=Value(True)
+            ),
+            default=Value(False),
+            output_field=BooleanField()
+        )
     ).order_by('-holding_buy_order_id'))
 
     holding_sell_orders = (HoldingSellOrder.objects.filter(holding=holding).annotate(
@@ -40,7 +49,15 @@ def default(request, symbol):
             filter=Q(transaction__sell_order_id=F('holding_sell_order_id')),
             output_field=FloatField()
         ),
-        filled_rate=F('filled_quantity') / F('quantity_target') * 100
+        filled_rate=F('filled_quantity') / Cast(F('quantity_target'), FloatField()) * 100,
+        is_filled=Case(
+            When(
+                Q(is_obsolete=False) & (Q(filled_rate__isnull=True) | Q(filled_rate__lt=100)),
+                then=Value(True)
+            ),
+            default=Value(False),
+            output_field=BooleanField()
+        )
     ).order_by('-holding_sell_order_id'))
 
     # Retrieve holding_buy_action data
@@ -60,7 +77,8 @@ def default(request, symbol):
     ).order_by('-transaction_id')
 
     # Retrieve distinct trader_id from holding_buy_order based on holding_id
-    trade_ids = HoldingBuyOrder.objects.filter(holding=holding).values('trade_id').distinct()
+    trade_ids = (HoldingBuyOrder.objects.filter(holding=holding)
+                 .values('trade_id').distinct().order_by('-trade_id'))
 
     form_buy_order = HoldingBuyOrderForm()
     form_sell_order = HoldingSellOrderForm()

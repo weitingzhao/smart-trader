@@ -125,14 +125,18 @@
                                                 {% elif holding_buy_order.filled_rate == 100 %}
                                                     <span class="text-success fw-bold">Filled</span>
                                                 {%else %}
+                                                    <span class="text-secondary fw-bold">
                                                     Fill <strong>{{ holding_buy_order.filled_rate|floatformat:2 }}%</strong>
+                                                    </span>
                                                 {%endif %}
                                             </td>
                                             <td>{{ segment|action_lookup:holding_buy_order.action }}</td>
                                             <td>
-                                                <a href="javascript:showBuyOrderFill('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
-                                                    <i class="fas fa-pen text-primary"></i>
-                                                </a>
+                                                {% if holding_buy_order.is_filled %}
+                                                    <a href="javascript:showBuyOrderFill('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                        <i class="fas fa-pen text-primary"></i>
+                                                    </a>
+                                                {%endif%}
                                                 <a href="javascript:editHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>
                                                 </a>
@@ -187,7 +191,7 @@
                                                 {% if holding_sell_order.is_obsolete %}
                                                     <span class="text-secondary">Obsolete</span>
                                                 {% else %}
-                                                     {% if holding_sell_order.filled_rate == 0 %}
+                                                     {% if holding_sell_order.filled_rate is None or holding_sell_order.filled_rate == 0 %}
                                                         <span class="text-primary fw-bold">Open</span>
                                                     {% elif holding_sell_order.filled_rate == 100 %}
                                                         <span class="text-success fw-bold">Filled</span>
@@ -195,19 +199,16 @@
                                                         Fill <strong>{{ holding_sell_order.filled_rate|floatformat:2 }}%</strong>
                                                     {%endif %}
                                                 {% endif %}
-
-
-
                                             </td>
                                             <td>{{ segment|action_lookup:holding_sell_order.action }}</td>
                                             <td>
-                                                {% if not holding_sell_order.is_obsolete %}
-                                                <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
-                                                    <i class="fas fa-pen text-primary"></i>
-                                                </a>
-                                                <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}','{{ holding_sell_order.order_place_date|date:"Y-m-d" }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
-                                                    <i class="fas fa-sliders text-primary"></i>
-                                                </a>
+                                                {% if holding_sell_order.is_filled %}
+                                                    <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                        <i class="fas fa-pen text-primary"></i>
+                                                    </a>
+                                                    <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}','{{ holding_sell_order.order_place_date|date:"Y-m-d" }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
+                                                        <i class="fas fa-sliders text-primary"></i>
+                                                    </a>
                                                 {%endif %}
                                                 <a href="javascript:editHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>
@@ -811,7 +812,7 @@
                                 <label for="ref_buy_order_id">Reference Buy Order</label>
                                 <select class="form-select" id="ref_buy_order_id">
                                     {% for order in holding_buy_orders %}
-                                        <option value="{{ order.holding_buy_order_id }}">Buy {{ segment|order_name:order }}</option>
+                                        <option value="{{ order.holding_buy_order_id }}">[{{ order.holding_buy_order_id }}]: Buy {{ segment|order_name:order }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
