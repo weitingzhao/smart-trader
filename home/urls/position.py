@@ -58,4 +58,8 @@ urlpatterns = [
         position.adjust_stop_limits.default,
         name='adjust_stop_limits'),
 
+    ####### position.trade #######
+    path('trade/<int:trade_id>/calculate/',
+         position.open_positions.trade_calculate,
+         name='trade_calculate'),
 ]

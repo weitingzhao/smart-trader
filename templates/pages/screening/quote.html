@@ -114,7 +114,11 @@
                                     <tbody>
                                     {% for holding_buy_order in holding_buy_orders %}
                                         <tr>
-                                            <td>{{ holding_buy_order.trade_id }}-{{ holding_buy_order.holding_buy_order_id }}</td>
+                                            <td>
+                                                <a href="javascript:void(0);" onclick="calculateTrade({{ holding_buy_order.trade_id }})">
+                                                    <span class="form-label fw-bold fs-6 {% if holding_buy_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ holding_buy_order.trade_id }}</span>
+                                                </a>-{{ holding_buy_order.holding_buy_order_id }}
+                                            </td>
 
                                             <td><strong>{{ holding_buy_order.quantity_target }} / {{ holding_buy_order.filled_quantity }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_buy_order}}</strong></td>
@@ -181,7 +185,11 @@
                                 <tbody>
                                     {% for holding_sell_order in holding_sell_orders %}
                                         <tr>
-                                            <td>{{ holding_sell_order.trade_id }} - {{ holding_sell_order.holding_sell_order_id }}</td>
+                                            <td>
+                                                <a href="javascript:void(0);" onclick="calculateTrade({{ holding_sell_order.trade_id }})">
+                                                    <span class="form-label fw-bold fs-6 {% if holding_sell_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ holding_sell_order.trade_id }}</span>
+                                                </a>-{{ holding_sell_order.holding_sell_order_id }}
+                                            </td>
 
                                             <td><strong>{{ holding_sell_order.quantity_target }} / {{ holding_sell_order.filled_quantity }}</strong></td>
                                             <td><strong>{{ segment|order_price:holding_sell_order}}</strong></td>
@@ -249,7 +257,10 @@
                                     <tbody>
                                     {% for transaction in transactions %}
                                         <tr>
-                                            <td>{{ transaction.trade_id }}-{{ transaction.order_id }}-{{ transaction.transaction_id }}</td>
+                                            <td>
+                                                <a href="javascript:void(0);" onclick="calculateTrade({{ transaction.trade_id }})">
+                                                    <span class="form-label fw-bold fs-6 {% if transaction.is_finished %}text-success{% else %}text-black{% endif %}">{{ transaction.trade_id }}</span>
+                                                </a>-{{ transaction.order_id }}-{{ transaction.transaction_id }}</td>
                                             <td><strong>{{ segment|transaction_type_lookup:transaction.transaction_type }}</strong></td>
                                             <td><strong>{{ transaction.quantity_final }}</strong></td>
                                             <td><strong>{{ transaction.price_final }}</strong></td>
@@ -1707,6 +1718,23 @@
             } else {
                 alert("Failed to delete order.");
             }
+        }
+    }
+
+    async function calculateTrade(tradeId) {
+        const response = await fetch(`/position/trade/${tradeId}/calculate/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`Trade calculation completed. Is Finished: ${data.is_finished}`);
+        } else {
+            alert("Failed to calculate trade.");
         }
     }
 

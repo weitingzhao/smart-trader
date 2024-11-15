@@ -3,6 +3,7 @@ import json
 from django import template
 import random
 import string
+from datetime import datetime
 from apps.common.models import *
 
 register = template.Library()
@@ -57,6 +58,18 @@ def order_price(value, order):
         return f"{order.price_stop} / {order.price_limit} Stop Limit"
     else:
         return f""
+
+@register.filter
+def format_date(value, date_format):
+    """Parses a date string and formats it according to the given parameter."""
+    try:
+        # Remove the 'Z' character if present
+        if value.endswith('Z'):
+            value = value[:-1]
+        date_obj = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+        return date_obj.strftime(date_format)
+    except (ValueError, TypeError):
+        return value
 
 @register.simple_tag
 def round_by_digits(value, digits, template :str, need_plus=True):

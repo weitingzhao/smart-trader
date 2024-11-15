@@ -40,7 +40,8 @@ def default(request, symbol):
             ),
             default=Value(False),
             output_field=BooleanField()
-        )
+        ),
+        is_finished=F('trade__is_finished')
     ).order_by('-holding_buy_order_id'))
 
     holding_sell_orders = (HoldingSellOrder.objects.filter(holding=holding).annotate(
@@ -57,7 +58,8 @@ def default(request, symbol):
             ),
             default=Value(False),
             output_field=BooleanField()
-        )
+        ),
+        is_finished=F('trade__is_finished')
     ).order_by('-holding_sell_order_id'))
 
     # Retrieve holding_buy_action data
@@ -73,6 +75,12 @@ def default(request, symbol):
             When(sell_order_id__isnull=False, then=F('sell_order_id')),
             default=Value(None),
             output_field=IntegerField()
+        ),
+        is_finished=Case(
+            When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
+            When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
+            default=Value(False),
+            output_field=BooleanField()
         )
     ).order_by('-transaction_id')
 

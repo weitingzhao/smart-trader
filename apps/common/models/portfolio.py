@@ -102,6 +102,7 @@ class Trade(models.Model):
     trade_id = models.AutoField(primary_key=True)
     profit_actual = models.DecimalField(max_digits=15, decimal_places=2)
     profit_actual_ratio = models.DecimalField(max_digits=5, decimal_places=2)
+    is_finished = models.BooleanField(null=True, blank=True)
 
     class Meta:
         db_table = 'trade'
@@ -121,7 +122,6 @@ class Transaction(models.Model):
     quantity_final = models.IntegerField(null=True, blank=True)
     price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
     commission = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
-    is_applied = models.BooleanField(null=True, blank=True)
 
     buy_order = models.ForeignKey('HoldingBuyOrder', on_delete=models.SET_NULL, null=True, blank=True)
     sell_order = models.ForeignKey('HoldingSellOrder', on_delete=models.SET_NULL, null=True, blank=True)

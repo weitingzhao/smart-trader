@@ -1,11 +1,10 @@
 import json
 import pandas as pd
 from decimal import Decimal
-from django.db.models import Sum, F
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from home.templatetags.home_filter import order_price
-from pydantic.dataclasses import dataclass
+from django.db.models import F,Case, When, Value, IntegerField, Sum, Max, FloatField, Q, BooleanField,Subquery, OuterRef
 
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
@@ -42,6 +41,31 @@ def default(request):
         # Convert holdings to DataFrame
         holdings_df = pd.DataFrame(list(holdings.values()))
 
+        # Step 1. Query to get initial sell orders (action = 1) for each holding_id
+        # Subquery to get the maximum holding_sell_order_id for each holding_id
+        max_id_subquery = HoldingSellOrder.objects.filter(
+            holding_id=OuterRef('holding_id'),
+            action=1
+        ).order_by('-holding_sell_order_id').values('holding_sell_order_id')[:1]
+
+        # Query to get initial sell orders (action=1) for each holding_id based on the subquery
+        initial_sell_orders = HoldingSellOrder.objects.filter(
+            holding_sell_order_id__in=Subquery(max_id_subquery)
+        ).values(
+            'holding_id', 'order_place_date', 'price_stop', 'price_limit'
+        )
+
+        # Convert the query result to a DataFrame
+        initial_sell_orders_df = pd.DataFrame(list(initial_sell_orders))
+        # Rename columns for clarity
+        initial_sell_orders_df.rename(columns={
+            'order_place_date': 'initial_order_place_date',
+            'price_stop': 'initial_stop',
+            'price_limit': 'initial_limit'
+        }, inplace=True)
+        # Merge the initial sell orders data into holdings_df
+        holdings_df = pd.merge(holdings_df, initial_sell_orders_df, on='holding_id', how='left')
+
         # Step 2. Calculate dataframes
         # Merge the DataFrames on the 'symbol' column
         merged_df = pd.merge(latest_bar_df, benchmark_df, on='symbol', suffixes=('', '_bk'))
@@ -50,13 +74,33 @@ def default(request):
 
         # Fetch and sum the quantity_final from transaction
         transaction = (Transaction.objects.filter(holding__in=holdings)
+                        .annotate(
+                           trade_id=Case(
+                               When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
+                               When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
+                               default=Value(None),
+                               output_field=IntegerField()
+                           ),
+                           is_finished=Case(
+                               When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
+                               When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
+                               default=Value(None),
+                               output_field=BooleanField()
+                           )
+                       )
+                       .filter(Q(is_finished=False) | Q(is_finished__isnull=True))
                        .annotate(amount=F('quantity_final') * F('price_final'))
                        .values('holding_id')
-                       .annotate(quantity=Sum('quantity_final'), total_cost=Sum('amount')))
-        transaction_df = pd.DataFrame(list(transaction), columns=['holding_id', 'quantity', 'total_cost'])
+                       .annotate(
+                            quantity=Sum('quantity_final'),
+                            total_cost=Sum('amount'),
+                            average_price=Sum('amount') / Sum('quantity_final')
+                       ))
+        transaction_df = pd.DataFrame(list(transaction),
+                                      columns=['holding_id', 'quantity', 'total_cost', 'average_price'])
 
         # Merge action_df with final_df
-        final_df = pd.merge(final_df, transaction_df, left_on='holding_id', right_on='holding_id', how='left').fillna(0)
+        final_df = pd.merge(final_df, transaction_df, left_on='holding_id', right_on='holding_id', how='inner').fillna(0)
 
         # Step 3. Calculate the total cost & market value
         final_df['market_value'] = final_df['quantity'] * final_df['close']
@@ -94,7 +138,7 @@ def default(request):
         final_df['total_chg_pct'] = final_df['total_chg_pct'].apply(format)
 
         # Convert the DataFrame to JSON
-        final_json = final_df.to_json(orient='records')
+        final_json = final_df.to_json(orient='records', date_format='iso')
     else:
         final_json = []
 
@@ -366,5 +410,31 @@ def delete_holding_sell_order(request, holding_sell_order_id):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 
+def trade_calculate(request, trade_id):
+    trade = get_object_or_404(Trade, trade_id=trade_id)
+    # Get all buy and sell orders for the trade
+    buy_orders = HoldingBuyOrder.objects.filter(trade_id=trade_id)
+    sell_orders = HoldingSellOrder.objects.filter(trade_id=trade_id)
 
+    # Get all transactions related to the buy and sell orders
+    buy_transactions = Transaction.objects.filter(buy_order_id__in=buy_orders.values_list('holding_buy_order_id', flat=True))
+    sell_transactions = Transaction.objects.filter(sell_order_id__in=sell_orders.values_list('holding_sell_order_id', flat=True))
 
+    # Sum the quantity_final for buy and sell transactions
+    buy_quantity_sum = buy_transactions.aggregate(total=Sum('quantity_final'))['total'] or 0
+    sell_quantity_sum = sell_transactions.aggregate(total=Sum('quantity_final'))['total'] or 0
+
+    # Calculate the net quantity
+    net_quantity = buy_quantity_sum - sell_quantity_sum
+
+    # Update the trade's is_finished status
+    trade.is_finished = (net_quantity == 0)
+    trade.save()
+
+    data = {
+        'id': trade.trade_id,
+        'profit_actual': trade.profit_actual,
+        'profit_actual_ratio': trade.profit_actual_ratio,
+        'is_finished': trade.is_finished,
+    }
+    return JsonResponse(data)

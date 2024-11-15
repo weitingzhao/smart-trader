@@ -9,6 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
 
+from home.views import position
+
+
 def get(request, transaction_id):
     transaction = get_object_or_404(Transaction, transaction_id=transaction_id)
     data = {
@@ -50,9 +53,16 @@ def add(request):
 
             if ref_type == 'Buy':  # Buy
                 transaction.buy_order_id = ref_id
+                holding_order = HoldingBuyOrder.objects.get(holding_buy_order_id=ref_id)
             elif ref_type == 'Sell' :  # Sell
                 transaction.sell_order_id = ref_id
+                holding_order = HoldingSellOrder.objects.get(holding_sell_order_id=ref_id)
             transaction.save()
+
+            # Get trade_id and call trade_calculate method
+            if holding_order is not None:
+                trade_id = holding_order.trade_id
+                position.open_positions.trade_calculate(None, trade_id)
 
             return JsonResponse({'status': 'success', 'transaction_id': transaction.transaction_id})
 

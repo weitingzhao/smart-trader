@@ -59,26 +59,28 @@
                             <table class="table table-flush table-hover text-end" id="summary-list">
                                 <thead class="thead-light">
                                 <tr class="main-header">
-                                    <th>SYMBOL</th>
-                                    <th>CURRENT<br/>PRICE</th>
-                                    <th>CHANGE</th>
-                                    <th>DAY <br/>CHG %</th>
-                                    <th>DAY<br/>CHG</th>
+                                    <th class="bg-info text-white">SYMBOL</th>
+                                    <th class="bg-info text-white">CURRENT<br/>PRICE</th>
+                                    <th class="bg-info text-white">CHANGE</th>
+                                    <th class="bg-info text-white">DAY <br/>CHG %</th>
+                                    <th class="bg-info text-white">DAY<br/>CHG</th>
 
-                                    <th>CURRENT<br/># of SHARES</th>
+                                    <th class="bg-primary text-white">ENTRY<br/>DATE</th>
+                                    <th class="bg-primary text-white"># of<br/>SHARES</th>
+                                    <th class="bg-primary text-white">$ TOTAL<br/>AMOUNT</th>
+                                    <th class="bg-primary text-white">$ INITIAL<br/>STOP LIMIT</th>
+                                    <th class="bg-primary text-white">$ INITIAL<br/>BUY PRICE</th>
 
-                                    <th>Cost /<br/>Share</th>
+
                                     <th>Market<br/>Value</th>
-                                    <th>Total <br/>Chg %</th>
-                                    <th>Total <br/>Chg</th>
+                                    <th>% Total<br/>Chg</th>
+                                    <th>$ Total<br/>Chg</th>
                                     <th>52-Wk Range</th>
-                                    <th>Day Range</th>
-                                    <th>Day Chart</th>
                                 </tr>
                                 <tr class="subheader">
-                                    <th colspan="5">MARKET</th>
-                                    <th>CURRENT POSITION</th>
-                                    <th>Sub-Title 3</th>
+                                    <th colspan="5" class="bg-info text-white">MARKET</th>
+                                    <th colspan="5" class="bg-primary text-white">INITIAL POSITION</th>
+                                    <th colspan="3" class="bg-secondary text-white">REFERENCE</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -93,8 +95,13 @@
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg 2 '{0}'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_pct 2 '{0}%'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.chg_position 2 '{0}'%}</b></td>
-                                    <td class="text-md mb-0 text-dark">{%round_by_digits item.quantity 0 '{0}' False%}</td>
-                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.average_price 2 '{0}' False%}</b></td>
+
+                                    <td class="text-md mb-0 bg-light text-dark">{{ item.initial_order_place_date|format_date:'%m/%d/%Y' }}</td>
+                                    <td class="text-md mb-0 bg-light text-dark"><b>{%round_by_digits item.quantity 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 bg-light text-dark">{%round_by_digits item.total_cost 0 '{0}' False%}</td>
+                                    <td class="text-md mb-0 bg-light text-dark">{%round_by_digits item.initial_stop 2 '{0}' False%} / {%round_by_digits item.initial_limit 2 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 bg-light text-dark">{%round_by_digits item.average_price 2 '{0}' False%}</td>
+
                                     <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.market_value 2 '{0}' False%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_pct 2 '{0}%'%}</b></td>
                                     <td class="text-md mb-0" style="color:{% if item.total_trend == 'UP' %}#007560{% elif item.total_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.total_chg_position 2 '{0}'%}</b></td>
@@ -102,11 +109,6 @@
                                         <!-- Range slider container -->
                                         <div id="sliderDouble"></div>
                                     </td>
-                                    <td class="text-md">
-                                        <!-- Range slider container -->
-                                        <div id="sliderDouble"></div>
-                                    </td>
-                                    <td class="text-sm"></td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>
