@@ -4,7 +4,6 @@ from typing import List
 from logics.service import Service
 from logics.researchs.base_research import BaseResearch
 
-
 class SymbolResearch(BaseResearch):
 
     def __init__(self, service: Service):
@@ -85,3 +84,5 @@ class SymbolResearch(BaseResearch):
             symbols_sector = data.get("detail", {})
             full_symbols = [symbol for symbols in symbols_sector.values() for symbol in symbols]
         return full_symbols
+
+

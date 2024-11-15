@@ -12,7 +12,7 @@ class Research(researchs.BaseResearch):
     def category(self)  -> researchs.CategoryResearch:
         return researchs.CategoryResearch(self.service)
 
-    def treading(self, args: ArgumentParser) -> researchs.TradingResearch:
+    def treading(self, args: ArgumentParser = None) -> researchs.TradingResearch:
         return researchs.TradingResearch(self.service, args)
 
     def symbols(self) -> researchs.SymbolResearch:

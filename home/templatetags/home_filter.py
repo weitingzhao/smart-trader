@@ -68,7 +68,7 @@ def format_date(value, date_format):
             value = value[:-1]
         date_obj = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
         return date_obj.strftime(date_format)
-    except (ValueError, TypeError):
+    except:
         return value
 
 @register.simple_tag

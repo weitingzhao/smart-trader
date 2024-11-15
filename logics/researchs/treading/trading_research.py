@@ -1,12 +1,13 @@
 import json
 import importlib
+import pandas as pd
 import concurrent
 from tqdm import tqdm
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from concurrent.futures import Future
-
+from apps.common.models import *
 from logics.researchs.treading.patterns import pattern
 from logics.service import Service
 from logics.researchs.base_research import BaseResearch
@@ -24,13 +25,14 @@ class TradingResearch(BaseResearch):
         self.PatternDetector = PatternDetector(self.logger)
 
         # Dynamically initialize the loader
-        loader_name = self.config.__dict__.get("LOADER", "trading_csv_loader:TradingCsvLoader")
-        module_name, class_name = loader_name.split(":")
-        loader_module = importlib.import_module(f"src.services.loading.loader.{module_name}")
-        self.loader = getattr(loader_module, class_name)(
-            config=self.config.__dict__,
-            tf=args.tf,
-            end_date=args.date)
+        if args is not None:
+            loader_name = self.config.__dict__.get("LOADER", "csv_engine:CsvEngine")
+            module_name, class_name = loader_name.split(":")
+            loader_module = importlib.import_module(f"src.services.loading.loader.{module_name}")
+            self.loader = getattr(loader_module, class_name)(
+                config=self.config.__dict__,
+                tf=args.tf,
+                end_date=args.date)
 
     def _cleanup(self, loader: AbstractLoader, futures: List[concurrent.futures.Future]):
         if futures:
@@ -240,3 +242,99 @@ class TradingResearch(BaseResearch):
             self._cleanup(self.loader, futures)
             self.logger.info("User exit")
             exit()
+
+
+    def get_stock_hist_bars(self, is_day, symbols: list[str], row_num: int):
+        table_name = 'day' if is_day else 'min'
+        with connection.cursor() as cursor:
+            cursor.execute(f"""
+    SELECT
+        mk.symbol,
+        mk.name as symbol_name,
+        sub.date,
+        main_start.open,
+        main_end.close,
+        sub.volume,
+        sub.*
+    FROM
+        market_symbol mk
+        LEFT JOIN LATERAL(
+            SELECT
+                symbol,
+                ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY MAX(DATE(time)) DESC) AS row_num,
+                MAX(DATE(time)) AS max_date,
+                DATE(time) AS date,
+                MIN(time) AS start_min,
+                MAX(time) AS end_min,
+                SUM(volume) AS volume
+            FROM
+                market_stock_hist_bars_{table_name}_ts
+            WHERE
+                symbol IN ('{"', '".join(symbols)}')
+            GROUP BY
+                symbol, DATE(time)
+        ) sub ON sub.symbol = mk.symbol
+        LEFT JOIN market_stock_hist_bars_{table_name}_ts main_start 
+            ON main_start.symbol = sub.symbol AND main_start.time = sub.start_min
+        LEFT JOIN market_stock_hist_bars_{table_name}_ts main_end 
+            ON main_end.symbol = sub.symbol AND main_end.time = sub.end_min
+    WHERE
+        sub.row_num = {row_num} AND mk.symbol IN ('{"', '".join(symbols)}')
+                """)
+            latest_rows = cursor.fetchall()
+
+            # Convert the fetched rows into a list of dictionaries
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in latest_rows]
+
+    def get_stock_prices(self, symbol_date_pairs: List[Tuple[str, str]], row_delta: int = 0) -> pd.DataFrame:
+        """
+        Retrieve stock prices from market_stock_hist_bars_day_ts based on symbol and date.
+
+        :param symbol_date_pairs: List of tuples containing symbol and date.
+        :param row_delta: Integer to adjust the row number for fetching the bar record.
+        :return: DataFrame with stock prices.
+        """
+        # Extract unique symbols from symbol_date_pairs
+        symbols = list(set(symbol for symbol, _ in symbol_date_pairs))
+
+        dates = [pd.to_datetime(date) for _, date in symbol_date_pairs]
+        # Determine the earliest and latest dates
+        earliest_date = min(dates) - timedelta(days=5)
+        latest_date = max(dates) + timedelta(days=5)
+
+        with connection.cursor() as cursor:
+            # Retrieve all records for the given symbols
+            cursor.execute(f"""
+                SELECT 
+                       ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY time) AS row_num, symbol, time, open, high, low, close, volume
+                FROM market_stock_hist_bars_day_ts
+                WHERE symbol IN ({','.join(f"'{symbol}'" for symbol in symbols)})
+                    AND time BETWEEN %s AND %s
+            """, [earliest_date, latest_date])
+            rows = cursor.fetchall()
+            if not rows:
+                return pd.DataFrame()
+            # Convert the fetched rows into a DataFrame
+            columns = [col[0] for col in cursor.description]
+            df = pd.DataFrame([dict(zip(columns, row)) for row in rows])
+
+        stock_prices = []
+
+        # Group by symbol and apply the logic
+        for symbol, group in df.groupby('symbol'):
+            for _, date in filter(lambda x: x[0] == symbol, symbol_date_pairs):
+                # Locate the row number based on the date
+                row_num = group.loc[group['time'].dt.date == pd.to_datetime(date).date(), 'row_num'].values[0]
+
+                # Calculate the final index using row_delta
+                final_row_num = row_num + row_delta
+
+                if 0 <= final_row_num < len(group):
+                    row_data = group[group['row_num'] == final_row_num].iloc[0].to_dict()
+                    row_data['symbol'] = symbol
+                    row_data['date'] = date
+                    stock_prices.append(row_data)
+
+        # Convert the list of dictionaries to a DataFrame
+        return pd.DataFrame(stock_prices)

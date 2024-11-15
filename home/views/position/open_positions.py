@@ -4,12 +4,15 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from home.templatetags.home_filter import order_price
-from django.db.models import F,Case, When, Value, IntegerField, Sum, Max, FloatField, Q, BooleanField,Subquery, OuterRef
-
+from django.db.models import (
+    F,Case, When, Value, IntegerField, Sum, Max,
+    FloatField, Q, BooleanField,Subquery, OuterRef)
+from logics.logic import Logic
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
 
-
+# Create your views here.
+instance = Logic()
 
 def default(request):
     user_id = request.user.id  # Assuming you have the user_id from the request
@@ -25,7 +28,7 @@ def default(request):
 
     if len(symbols) > 0:
         # get current time previous day benchmark
-        benchmark = get_stock_hist_bars(True, symbols, 2)
+        benchmark = instance.research.treading().get_stock_hist_bars(True, symbols, 2)
 
         # current time is base on current time is stock market open hour or close hour
         # if is close hour.
@@ -33,7 +36,7 @@ def default(request):
         #       I.  if min data is not available, need use api, directly pull.
         #       II. if min data is available, need use min data.
         #   b. if day data is available, need use day data.
-        latest_bar = get_stock_hist_bars(True, symbols, 1)
+        latest_bar = instance.research.treading().get_stock_hist_bars(True, symbols, 1)
 
         # Convert the fetched rows into pandas DataFrames
         benchmark_df = pd.DataFrame(benchmark)
@@ -47,14 +50,10 @@ def default(request):
             holding_id=OuterRef('holding_id'),
             action=1
         ).order_by('-holding_sell_order_id').values('holding_sell_order_id')[:1]
-
         # Query to get initial sell orders (action=1) for each holding_id based on the subquery
         initial_sell_orders = HoldingSellOrder.objects.filter(
             holding_sell_order_id__in=Subquery(max_id_subquery)
-        ).values(
-            'holding_id', 'order_place_date', 'price_stop', 'price_limit'
-        )
-
+        ).values('holding_id', 'order_place_date', 'price_stop', 'price_limit')
         # Convert the query result to a DataFrame
         initial_sell_orders_df = pd.DataFrame(list(initial_sell_orders))
         # Rename columns for clarity
@@ -151,54 +150,6 @@ def default(request):
             'portfolio': portfolio,
             'portfolio_items': final_json,
         })
-
-
-def get_stock_hist_bars(is_day, symbols:list[str], row_num:int):
-    table_name = 'day' if is_day else 'min'
-
-    with connection.cursor() as cursor:
-        cursor.execute(f"""
-SELECT
-    mk.symbol,
-    mk.name as symbol_name,
-    sub.date,
-    main_start.open,
-    main_end.close,
-    sub.volume,
-    sub.*
-FROM
-    market_symbol mk
-    LEFT JOIN LATERAL(
-        SELECT
-            symbol,
-            ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY MAX(DATE(time)) DESC) AS row_num,
-            MAX(DATE(time)) AS max_date,
-            DATE(time) AS date,
-            MIN(time) AS start_min,
-            MAX(time) AS end_min,
-            SUM(volume) AS volume
-        FROM
-            market_stock_hist_bars_{table_name}_ts
-        WHERE
-            symbol IN ('{"', '".join(symbols)}')
-        GROUP BY
-            symbol, DATE(time)
-    ) sub ON sub.symbol = mk.symbol
-    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_start 
-        ON main_start.symbol = sub.symbol AND main_start.time = sub.start_min
-    LEFT JOIN market_stock_hist_bars_{table_name}_ts main_end 
-        ON main_end.symbol = sub.symbol AND main_end.time = sub.end_min
-WHERE
-    sub.row_num = {row_num} AND mk.symbol IN ('{"', '".join(symbols)}')
-            """)
-        latest_rows = cursor.fetchall()
-
-        # Convert the fetched rows into a list of dictionaries
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in latest_rows]
-
-
-
 
 def get_holding_buy_order(request, holding_buy_order_id):
     order = get_object_or_404(HoldingBuyOrder, holding_buy_order_id=holding_buy_order_id)
