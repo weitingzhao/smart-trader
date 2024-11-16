@@ -19,11 +19,17 @@ urlpatterns = [
         name='daily_logs'),
 
     ####### performance.portfolio_performance #######
-    # Portfolio Performance -> Default
+    # Default
     path(
         'portfolio_performance/',
         performance.portfolio_performance.default,
         name='portfolio_performance'),
+
+    # get_balance_history
+    path(
+        'portfolio_balance_history/',
+        performance.portfolio_performance.get_balance_history,
+        name='portfolio_balance_history'),
 
     ####### performance.trade_history #######
     # Trade History -> Default
