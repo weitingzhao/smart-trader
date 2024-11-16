@@ -14,6 +14,25 @@ function getCookie(name) {
     return cookieValue;
 }
 
+//////////////////////////////// SimpleDatatables /////////////////////////////////////
+function pagination(element_id, per_page=12) {
+    if (document.getElementById(element_id)) {
+        const dataTableSearch = new simpleDatatables.DataTable(`#${element_id}`, {
+            searchable: true,
+            fixedHeight: false,
+            perPage: per_page,
+        });
+        document.querySelectorAll(".export").forEach(function (el) {
+            el.addEventListener("click", function (e) {
+                let type = el.dataset.type;
+                let data = { type: type, filename: "soft-ui-" + type, };
+                if (type === "csv") { data.columnDelimiter = "|"; }
+                dataTableSearch.export(data);
+            });
+        });
+    }
+}
+
 ////////////////////////////////Symbol Reminder/////////////////////////////////////
 let currentIndex = -1;
 let currentPortfolioIndex = -1;

@@ -99,8 +99,8 @@ class NotificationManagersTest(TestCase):
         self.to_user = User.objects.create(username="to2", password="pwd", email="example@example.com")
         self.to_group = Group.objects.create(name="to2_g")
         self.to_user_list = User.objects.all()
-        self.to_group.user_set.add(self.to_user)
-        self.to_group.user_set.add(self.other_user)
+        self.to_group.user_set.add_funding(self.to_user)
+        self.to_group.user_set.add_funding(self.other_user)
 
         for _ in range(self.message_count):
             notify.send(self.from_user, recipient=self.to_user, verb='commented', action_object=self.from_user)

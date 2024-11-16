@@ -11,12 +11,16 @@ urlpatterns = [
         cash_flow.cash_overview.default,
         name='cash_overview'),
 
-    path('create/', cash_flow.cash_overview.add, name='cash_add_funding'),
+    # wire
+    path('funding/create/', cash_flow.cash_overview.add_funding, name='add_funding'),
+    path('funding/<int:funding_id>/', cash_flow.cash_overview.get_funding, name='get_funding'),
+    path('funding/<int:funding_id>/edit/', cash_flow.cash_overview.edit_funding, name='edit_funding'),
+    path('funding/<int:funding_id>/delete/', cash_flow.cash_overview.delete_funding, name='delete_funding'),
 
-    path('<int:funding_id>/', cash_flow.cash_overview.get_funding, name='cash_get_funding'),
-
-    path('<int:funding_id>/edit/', cash_flow.cash_overview.edit_funding, name='cash_edit_funding'),
-    path('<int:funding_id>/delete/', cash_flow.cash_overview.delete_funding, name='delete_funding'),
+    path('balance/create/', cash_flow.cash_overview.add_cash_balance, name='add_cash_balance'),
+    path('balance/<int:balance_id>/', cash_flow.cash_overview.get_cash_balance, name='get_cash_balance'),
+    path('balance/<int:balance_id>/edit/', cash_flow.cash_overview.edit_cash_balance, name='edit_cash_balance'),
+    path('balance/<int:balance_id>/delete/', cash_flow.cash_overview.delete_cash_balance, name='delete_cash_balance'),
 
     ####### cash_flow.cash_flow_history #######
     # Saved Screeners -> Default

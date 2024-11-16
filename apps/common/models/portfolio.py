@@ -61,7 +61,6 @@ class Portfolio(models.Model):
     def __str__(self):
         return f"[{self.user.username}] Portfolio:{self.name}"
 
-
 class Funding(models.Model):
     """
     This model is used to store the funding of a portfolio
@@ -78,7 +77,6 @@ class Funding(models.Model):
     def __str__(self):
         return f"Funding: {self.funding_id} for {self.portfolio}"
 
-
 class Holding(models.Model):
     """
     This model is used to store the holding of stocks in a portfolio
@@ -93,7 +91,6 @@ class Holding(models.Model):
 
     def __str__(self):
         return f"Holding: {self.portfolio} - {self.symbol}"
-
 
 class Trade(models.Model):
     """
@@ -110,6 +107,21 @@ class Trade(models.Model):
     def __str__(self):
         return f"Trade: {self.trade_id} - Profit: {self.profit_actual} - Ratio: {self.profit_actual_ratio}"
 
+class CashBalance(models.Model):
+    """
+    This model is used to store the cash balance information
+    """
+    cash_balance_id = models.AutoField(primary_key=True)
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.DO_NOTHING, null=True, blank=True)
+    money_market = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, null=True)
+    cash = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, null=True)
+    as_of_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'cash_balance'
+
+    def __str__(self):
+        return f"CashBalance: {self.cash_balance_id} as of {self.as_of_date}"
 
 class Transaction(models.Model):
     """
@@ -166,7 +178,6 @@ class HoldingBuyOrder(HoldingOrder):
 
     def __str__(self):
         return f"Holding Buy Order: {self.holding_buy_order_id} for {self.holding}"
-
 
 class HoldingSellOrder(HoldingOrder):
     """

@@ -124,7 +124,24 @@ class FundingForm(forms.ModelForm):
         model = Funding
         fields = ['portfolio', 'completion_date', 'funding_type', 'amount']
 
+class CashBalanceForm(forms.ModelForm):
 
+    as_of_date = forms.DateField(widget=forms.DateInput(format='%Y-%m-%d', attrs={
+        'class': 'form-control',
+        'type': 'date'
+    }))
+    money_market = forms.DecimalField(widget=forms.NumberInput(attrs={
+        'class': 'form-control',
+        'step': '0.01'
+    }))
+    cash = forms.DecimalField(widget=forms.NumberInput(attrs={
+        'class': 'form-control',
+        'step': '0.01'
+    }))
+
+    class Meta:
+        model = CashBalance
+        fields = ['portfolio', 'money_market', 'cash', 'as_of_date']
 
 
 
