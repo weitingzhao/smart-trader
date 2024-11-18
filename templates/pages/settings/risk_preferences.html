@@ -21,9 +21,15 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link text-body" data-scroll="" href="#view">
+                              <a class="nav-link text-body" data-scroll="" href="#index">
                                   <i class="fas fa-table me-2"></i>
-                                  <span class="text-sm">View Settings</span>
+                                  <span class="text-sm">Index Data Refresh</span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#portfolio">
+                                  <i class="fas fa-table me-2"></i>
+                                  <span class="text-sm">Portfolio Data Refresh</span>
                               </a>
                           </li>
                           <li class="nav-item">
@@ -132,20 +138,24 @@
                         </form>
                       </div>
                   </div>
-
-
               </div>
-                  <!--view settings-->
-                  <div class="card mt-4" id="screener">
-                    <div class="card mt-4" id="screener">
-                        <div class="card-header">
-                            <h5>View settings</h5>
-                        </div>
-                        <div class="card-body pt-0">
+                  <!--index settings-->
+                  <div class="card mt-4" id="index">
+                      <div class="card-header">
+                          <div class="row">
+                              <div class="col-2">
+                                  <h5>Index refresh</h5>
+                              </div>
+                              <div class="col-2">
+                                  <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask('index_input','index_period_select', 'index_interval_select')">Refresh</button>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="card-body pt-0">
                             <div class="row">
                                 <div class="col-2">
                                     <label>Period</label>
-                                    <select class="form-select" id="periodSelect">
+                                    <select class="form-select" id="index_period_select">
                                         <option value="max" >max</option>
                                         <option value="1d">1d</option>
                                         <option value="5d" selected>5d</option>
@@ -161,7 +171,7 @@
                                 </div>
                                 <div class="col-2">
                                     <label>Interval</label>
-                                    <select class="form-select" id="intervalSelect">
+                                    <select class="form-select" id="index_interval_select">
                                         <option value="1m">1m</option>
                                         <option value="2m">2m</option>
                                         <option value="5m">5m</option>
@@ -179,21 +189,67 @@
                                 </div>
                                 <div class="col-8">
                                   <label>Symbols</label>
-                                  <input type="text" class="form-control" id="symbolInput" placeholder="Enter symbols separated by commas" value="{{ holding_symbols }}">
+                                  <input type="text" class="form-control" id="index_input" placeholder="Enter symbols separated by commas" value="^IXIC,^DJI,^GSPC,NQ=F">
                                 </div>
                             </div>
-                            <div class="row mt-4">
-                                <div class="col-lg-5">
-                                    <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask()">Refresh</button>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
+                      </div>
                   </div>
-
+                  <!--portfolio settings-->
+                  <div class="card mt-4" id="portfolio">
+                      <div class="card-header">
+                          <div class="row">
+                              <div class="col-2">
+                                  <h5>Portfolio data refresh</h5>
+                              </div>
+                              <div class="col-2">
+                                  <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask('portfolio_input','period_select', 'interval_select')">Refresh</button>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="card-body pt-0">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label>Period</label>
+                                    <select class="form-select" id="period_select">
+                                        <option value="max" >max</option>
+                                        <option value="1d">1d</option>
+                                        <option value="5d" selected>5d</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                        <option value="6mo">6mo</option>
+                                        <option value="1y">1y</option>
+                                        <option value="2y">2y</option>
+                                        <option value="5y">5y</option>
+                                        <option value="10y">10y</option>
+                                        <option value="ytd">ytd</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <label>Interval</label>
+                                    <select class="form-select" id="interval_select">
+                                        <option value="1m">1m</option>
+                                        <option value="2m">2m</option>
+                                        <option value="5m">5m</option>
+                                        <option value="15m">15m</option>
+                                        <option value="30m">30m</option>
+                                        <option value="60m">60m</option>
+                                        <option value="90m">90m</option>
+                                        <option value="1h">1h</option>
+                                        <option value="1d" selected>1d</option>
+                                        <option value="5d">5d</option>
+                                        <option value="1wk">1wk</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                  <label>Symbols</label>
+                                  <input type="text" class="form-control" id="portfolio_input" placeholder="Enter symbols separated by commas" value="{{ holding_symbols }}">
+                                </div>
+                            </div>
+                      </div>
+                  </div>
               </div>
-              risk
           </div>
       </div>
     {% include 'includes/footer.html' %}
@@ -265,13 +321,13 @@
     });
 
 
-    function refreshTask() {
-        let symbolInput = document.getElementById('symbolInput').value;
+    function refreshTask(input,period_select,interval_select) {
+        let symbolInput = document.getElementById(input).value;
         symbolInput = symbolInput.replace(/,/g, '|'); // Replace commas with pipe characters
-        const period = document.getElementById('periodSelect').value; // Get the selected period
-        const interval = document.getElementById('intervalSelect').value; // Get the selected interval
+        const period = document.getElementById(period_select).value; // Get the selected period
+        const interval = document.getElementById(interval_select).value; // Get the selected interval
         const data = {
-            args: `append=True,delta=2,period='${period}',interval='${interval}',symbols=${symbolInput}`,
+            args: `append=True,delta=2,period='${period}',interval='${interval}',symbols=${encodeURIComponent(symbolInput)}`,
             script_name: "stock-hist-bars",
         };
 

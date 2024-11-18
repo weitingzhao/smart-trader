@@ -1,5 +1,6 @@
 import re
 import json
+import urllib.parse
 from typing import List
 from abc import ABC, abstractmethod
 from django_celery_results.models import TaskResult
@@ -41,7 +42,7 @@ class TaskFetchingWorker(ABC):
         if args:
             pattern = re.compile(r"(\w+)=['\"]?([^,'\"]+)['\"]?")
             matches = pattern.findall(args)
-            self.args = {key: value for key, value in matches}
+            self.args = {key: urllib.parse.unquote(value) for key, value in matches}
         else:
             self.args = {}
 

@@ -1,3 +1,4 @@
+import urllib.parse
 import logging, re
 import yfinance as yf
 from typing import List

@@ -627,15 +627,12 @@
     </div>
 
 {% endblock content %}
-
-<!-- Specific JS goes HERE -->
 <!-- Specific JS goes HERE -->
 {% block extra_js %}
 
 <script src="{% static 'assets/js/plugins/chartjs.min.js' %}"></script>
 <script src="{% static 'assets/js/plugins/threejs.js' %}"></script>
 <script>
-
     var ctx2 = document.getElementById("performance-chart").getContext("2d");
     var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
     gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');

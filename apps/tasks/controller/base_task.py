@@ -1,5 +1,6 @@
 import json
 import time
+import urllib.parse
 import os, datetime
 from typing import List
 from logics.logic import Logic
@@ -64,7 +65,7 @@ class BaseTask(ABC):
         for part in parts:
             if part.startswith(f'{key}='):
                 # Extract the value associated with the key
-                value = part.split('=')[1]
+                value = part.split('=', 1)[1]
                 return value
         return ""
 
@@ -98,6 +99,7 @@ class BaseTask(ABC):
 
         # Step 2.b. Base on status of task_result, prepare init load
         if args and "symbols" in args:   # if Symbols has values, means it's a direct pull
+            args = urllib.parse.unquote(args)
             symbols = self.extract_param(args,"symbols")
             leftover = symbols.split('|')  # Convert symbols based on "|" delimiter
             meta = {
