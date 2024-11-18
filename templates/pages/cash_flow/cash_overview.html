@@ -125,8 +125,8 @@
                                         <tr>
                                             <td>{{ cash_balance.cash_balance_id }}</td>
                                             <td><strong>{{ cash_balance.as_of_date|date:"m/d/Y" }}</strong></td>
-                                            <td>$ <strong>{%round_by_digits cash_balance.money_market 0 '{0}' False%}</strong></td>
-                                            <td>$ <strong>{%round_by_digits cash_balance.cash 0 '{0}' False%}</strong></td>
+                                            <td>$ <strong>{%round_by_digits cash_balance.money_market 2 '{0}' False%}</strong></td>
+                                            <td>$ <strong>{%round_by_digits cash_balance.cash 2 '{0}' False%}</strong></td>
                                             <td>
                                                 <a href="javascript:editBalance('{{ cash_balance.cash_balance_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>

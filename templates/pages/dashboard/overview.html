@@ -269,7 +269,7 @@
             </div>
             <div class="card-body p-3">
               <div class="chart">
-                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                <canvas id="performance-chart" class="chart-canvas" height="400"></canvas>
               </div>
             </div>
           </div>
@@ -636,7 +636,7 @@
 <script src="{% static 'assets/js/plugins/threejs.js' %}"></script>
 <script>
 
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
+    var ctx2 = document.getElementById("performance-chart").getContext("2d");
     var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
     gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
     gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
@@ -647,6 +647,10 @@
     gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
     gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
 
+    var gradientStrokeGreen = ctx2.createLinearGradient(0, 58, 201, 113);
+    gradientStrokeGreen.addColorStop(1, 'rgba(0,255,0,0.2)');
+    gradientStrokeGreen.addColorStop(0.2, 'rgba(0,128,0,0.0)');
+    gradientStrokeGreen.addColorStop(0, 'rgba(0,255,0,0)'); // green colors
 
     async function fetchPortfolioBalanceHistory(linear_gradients) {
         try {
@@ -672,8 +676,8 @@
     }
 
     (async function() {
-        const portfolio_balance_data = await fetchPortfolioBalanceHistory([gradientStroke1, gradientStroke2]);
-        console.log(portfolio_balance_data)
+        const portfolio_balance_data = await fetchPortfolioBalanceHistory(
+            [gradientStroke1, gradientStroke2, gradientStrokeGreen]);
         const config = {
             type: "line",
             data: portfolio_balance_data,
@@ -682,7 +686,7 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false,
+                        display: true,// Enable legend display
                     }
                 },
                 interaction: { intersect: false, mode: 'index' },
@@ -733,8 +737,8 @@
         var balance_chart = new Chart(ctx2, config);
     })();
 
+    
     var ctx = document.getElementById("chart-bars").getContext("2d");
-
     new Chart(ctx, {
     type: "bar",
     data: {
