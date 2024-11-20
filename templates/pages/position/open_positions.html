@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% load static home_filter %}
+{% load static home_filter admin_soft%}
 {% block content %}
     <div class="container-fluid">
         <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
@@ -7,24 +7,50 @@
         </div>
         <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
           <div class="row gx-4">
-            <div class="col-auto">
-              <div class="avatar avatar-xl position-relative">
-                <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+              <div class="col-auto">
+                  <div class="avatar avatar-xl position-relative">
+                      <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                  </div>
               </div>
+              <div class="col-auto my-auto">
+                  <div class="h-100">
+                      <h5 class="mb-1">
+                          Open Positions
+                      </h5>
+                      <p class="mb-0 font-weight-bold text-sm">
+                          <a href="javascript:void(0);" onclick="refreshSymbol('{{ summary.holding_symbols }}','5d', '1d','{{ csrf_token }}');">
+                              {{ portfolio.name }}
+                          </a>
+                      </p>
+                  </div>
+              </div>
+              <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                <div class="nav-wrapper position-relative end-0">
+                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                        <li class="nav-item">
+                            <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
+                                <span class="ms-1">Summary</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                <span class="ms-1">My Holdings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                <span class="ms-1">Fundamentals</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="col-auto my-auto">
-              <div class="h-100">
-                <h5 class="mb-1">
-                    Open Positions
-                </h5>
-                <p  class="mb-0 font-weight-bold text-sm text-primary">{{ portfolio.name }}</p>
-              </div>
             </div>
           </div>
         </div>
     </div>
     <div class="container-fluid py-3">
-        <div class="row">
+        <div class="row py-3">
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
             <div class="card-body p-3">
@@ -120,30 +146,7 @@
           </div>
         </div>
         </div>
-    </div>
-    <div class="container-fluid py-3">
         <div class="row">
-            <div id="detail_panel" class="col-lg-6 col-md-10 col-12">
-                <div class="nav-wrapper position-relative end-0">
-                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-                        <li class="nav-item">
-                            <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
-                                <span class="ms-1">Summary</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
-                                <span class="ms-1">My Holdings</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
-                                <span class="ms-1">Fundamentals</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
             <div id="summary_panel" class="col-12">
                 <div class="card">
                     <div class="card-body px-0 pb-0">
@@ -198,42 +201,45 @@
                                     </td>
                                     <td class="text-start">
                                         {%round_by_digits item.close 2 '{0}' False%}<br>
-                                        <b  style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                        <b  style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
                                             {%round_by_digits item.chg 2 '{0}'%}</b>
                                     </td>
-                                    <td class="text-start" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                    <td class="text-start" style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
                                         <b>{%round_by_digits item.chg_pct 2 '{0}%'%}</b>
                                     </td>
-                                    <td class="text-start" style="color:{% if item.trend == 'UP' %}#007560{% elif item.trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                    <td class="text-start" style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
                                         <b>{%round_by_digits item.chg_position 0 '{0}'%}</b>
                                     </td>
                                     <!-- Entry Action -->
-                                    <td class="text-md mb-0 bg-light text-dark">{{ item.init_order_place_date|format_date:'%m/%d/%Y' }}</td>
-                                    <td class="text-md mb-0 bg-light text-dark"><b>{%round_by_digits item.init_inv 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 bg-light text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
+                                    <td class="text-md mb-0 bg-light text-dark">{%round_by_digits item.init_invest 0 '{0}' False%}</td>
                                     <td class="text-md mb-0 bg-light text-dark">
-                                        {%round_by_digits item.average_price 2 '{0}' False%} @ {%round_by_digits item.init_quantity 0 '{0}' False%} <br>
-                                        <b>{%round_by_digits item.init_stop 2 '{0}' False%} / {%round_by_digits item.init_limit 2 '{0}' False%}</b>
+                                        {%round_by_digits item.price 2 '{0}' False%} @ {%round_by_digits item.init_quantity 0 '{0}' False%} <br>
+                                        {%round_by_digits item.init_stop 2 '{0}' False%} / {%round_by_digits item.init_limit 2 '{0}' False%}
                                     </td>
                                     <!-- Current Status -->
-                                    <td class="text-md mb-0 text-primary"><b>{%round_by_digits item.total_cost 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-primary"><b>{%round_by_digits item.invest 0 '{0}' False%}</b></td>
                                     <td class="text-md mb-0 text-primary">
-                                        {%round_by_digits item.average_price 2 '{0}' False%}<br>@ {%round_by_digits item.quantity 0 '{0}' False%}
+                                        {%round_by_digits item.price 2 '{0}' False%}<br>@ {%round_by_digits item.quantity 0 '{0}' False%}
                                     </td>
-                                    <td class="text-md mb-0 text-primary"><b>{%round_by_digits item.current_stop 2 '{0} /' False%} <br> {%round_by_digits item.current_limit 2 '/ {0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-primary">
+                                        <b>{%round_by_digits item.stop 2 '{0}' False%}</b> /<br>/
+                                        <b>{%round_by_digits item.limit 2 '{0}' False%}</b></td>
                                     <!-- Risk vs Margin -->
-                                    <td class="text-md mb-0"><b>{%round_by_digits item.dist 0 '{0}' False%}</b></td>
-                                    <td class="text-md mb-0"><b>{%round_by_digits item.dist_pct 2 '{0}%' False%}</b></td>
-                                    <td class="text-md mb-0" style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.risk_pct 2 '{0}%' False%}</b></td>
-                                    <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.gain_pct 2 '{0}%' False%}</b></td>
-                                    <td class="text-md mb-0" style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.risk 0 '{0}' False%}</b></td>
-                                    <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}"><b>{%round_by_digits item.gain 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-info"><b>{%round_by_digits item.dist 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-info"><b>{%round_by_digits item.dist_pct 2 '{0}%' False%}</b></td>
+                                    <td class="text-md mb-0" style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{%round_by_digits item.risk_pct 2 '{0}%' False%}</td>
+                                    <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{%round_by_digits item.gain_pct 2 '{0}%' False%}</td>
+                                    <td class="text-md mb-0" style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{%round_by_digits item.risk 0 '{0}' False%}</td>
+                                    <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{%round_by_digits item.gain 0 '{0}' False%}</td>
                                     <!-- Goal -->
                                     <td class="text-md mb-0"></td>
                                     <td class="text-md mb-0">
-                                        <b>{%round_by_digits item.init_risk_pct 2 '{0}%' False%}<br>{%round_by_digits item.init_risk 0 '{0}' False%}</b>
+                                        <b>{%round_by_digits item.init_risk_pct 2 '{0}%' False%}
+                                            <br>{%round_by_digits item.init_risk 0 '{0}' False%}</b>
                                     </td>
                                     <!-- Statistics -->
-                                    <td class="text-md mb-0 text-dark"><b>{%round_by_digits item.market_value 0 '{0}' False%}</b></td>
+                                    <td class="text-md mb-0 text-dark">{%round_by_digits item.market_value 0 '{0}' False%}</td>
                                         <!--<div id="sliderDouble"></div>-->
                                 </tr>
                                 {% endfor %}
@@ -427,33 +433,8 @@
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
-  <script src="{% static 'assets/js/plugins/nouislider.min.js' %}"></script>
   <script>
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var slider = document.getElementById('sliderDouble');
-
-        noUiSlider.create(slider, {
-            start: [20, 80], // Initial values
-            connect: true, // Display a colored bar between the handles
-            range: {
-                'min': 0,
-                'max': 100
-            },
-            step: 1, // Increment step
-            tooltips: true, // Show tooltips
-            format: {
-                to: function (value) {
-                    return value.toFixed(0);
-                },
-                from: function (value) {
-                    return Number(value);
-                }
-            }
-        });
-        // Make the slider readonly
-        slider.setAttribute('disabled', true);
-    });
     
     function pagination(element_id, per_page=12) {
         if (document.getElementById(element_id)) {
@@ -566,6 +547,15 @@
                 });
         }
     }
+
+    function refreshTask(input,period_select,interval_select) {
+        let symbolInput = document.getElementById(input).value;
+        symbolInput = symbolInput.replace(/,/g, '|'); // Replace commas with pipe characters
+        const period = document.getElementById(period_select).value; // Get the selected period
+        const interval = document.getElementById(interval_select).value; // Get the selected interval
+        refreshSymbol(symbolInput,period,interval, '{{ csrf_token }}')
+    }
+
     
 
   </script>

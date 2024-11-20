@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
+from logics import researchs
 from logics.service import Service
-from  logics import researchs
 from logics.researchs.treading.patterns import pattern
 
 class Research(researchs.BaseResearch):
@@ -17,6 +17,9 @@ class Research(researchs.BaseResearch):
 
     def symbols(self) -> researchs.SymbolResearch:
         return researchs.SymbolResearch(self.service)
+
+    def position(self) -> researchs.PositionResearch:
+        return researchs.PositionResearch(self.service)
 
     # patterns
     def pattern_list(self) -> list:

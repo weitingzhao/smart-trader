@@ -326,30 +326,7 @@
         symbolInput = symbolInput.replace(/,/g, '|'); // Replace commas with pipe characters
         const period = document.getElementById(period_select).value; // Get the selected period
         const interval = document.getElementById(interval_select).value; // Get the selected interval
-        const data = {
-            args: `append=True,delta=2,period='${period}',interval='${interval}',symbols=${encodeURIComponent(symbolInput)}`,
-            script_name: "stock-hist-bars",
-        };
-
-        const params = new URLSearchParams();
-        params.append('args', data.args);
-        params.append('script_name', data.script_name);
-
-        fetch('/tasks/tasks/run/no_01_fetching', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: params.toString()
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        refreshSymbol(symbolInput,period,interval, '{{ csrf_token }}')
     }
 
 

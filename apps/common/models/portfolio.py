@@ -40,6 +40,11 @@ class FundingTypeChoices(models.TextChoices):
     WITHDRAW = '1', 'Withdraw'
     DEPOSIT = '2', 'Deposit'
 
+class TradePhaseChoices(models.TextChoices):
+    NONE =  '0', 'None'
+    BEFORE_BO = '1', 'Before Break Out'
+    BREAKING = '2', 'Breaking'
+    AFTER_BO = '3', 'After Break Out'
 
 class Portfolio(models.Model):
     """
@@ -100,6 +105,7 @@ class Trade(models.Model):
     profit_actual = models.DecimalField(max_digits=15, decimal_places=2)
     profit_actual_ratio = models.DecimalField(max_digits=5, decimal_places=2)
     is_finished = models.BooleanField(null=True, blank=True)
+    trade_phase = models.CharField(max_length=20, choices=TradePhaseChoices.choices, default=TradePhaseChoices.NONE)
 
     class Meta:
         db_table = 'trade'

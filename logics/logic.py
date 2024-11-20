@@ -23,6 +23,5 @@ class Logic:
         # Tier 3. Base on Engine init Service
         self.service = logics.Service(self.engine)
 
-        # Step 4. Base on Service init Analyze
+        # Step 4. Base on Service init Research
         self.research = logics.Research(self.service)
-

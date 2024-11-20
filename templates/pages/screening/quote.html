@@ -214,7 +214,7 @@
                                                     <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
                                                         <i class="fas fa-pen text-primary"></i>
                                                     </a>
-                                                    <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}','{{ holding_sell_order.order_place_date|date:"Y-m-d" }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
+                                                    <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
                                                         <i class="fas fa-sliders text-primary"></i>
                                                     </a>
                                                 {%endif %}
@@ -1641,7 +1641,7 @@
         }
     }
 
-    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit, order_place_date) {
+    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit) {
         // Set the order ID in the hidden input field
         document.getElementById('adjust_sell_order_id').value = holding_sell_order_id;
         // Set the values in the modal input fields
@@ -1649,7 +1649,8 @@
         document.getElementById('adjust_sell_price_stop').value = price_stop;
         document.getElementById('adjust_sell_price_limit').value = price_limit;
         {#console.log("order_place_date->"+order_place_date);#}
-        document.getElementById('adjust_order_place_date').value = order_place_date;
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('adjust_order_place_date').value = today;
         // Show the modal
         new bootstrap.Modal(document.getElementById('adjustSellOrderModal')).show();
     }

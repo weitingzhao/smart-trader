@@ -191,6 +191,32 @@ function symbolFocus(reminder) {
 }
 
 
+////////////////////////////////Symbol task /////////////////////////////////////
+function refreshSymbol(symbols,period,interval, csrf_token) {
+    const data = {
+        args: `append=True,delta=2,period='${period}',interval='${interval}',symbols=${encodeURIComponent(symbols)}`,
+        script_name: "stock-hist-bars",
+    };
+
+    const params = new URLSearchParams();
+    params.append('args', data.args);
+    params.append('script_name', data.script_name);
+
+    fetch('/tasks/tasks/run/no_01_fetching', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrf_token
+        },
+        body: params.toString()
+    })
+        .then(response =>
+        console.log(response)
+        )
+        .then(data => {})
+        .catch((error) => {});
+}
+
 ////////////////////////////////Notification/////////////////////////////////////
 // Create a container for the toasts if it doesn't exist
 let toastContainer = document.getElementById('toast-container');

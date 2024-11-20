@@ -2,13 +2,10 @@ import json
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, date
-from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from home.templatetags.home_filter import order_price
-from django.db.models import (
-    F,Case, When, Value, IntegerField, Sum, Max,Min,
-    FloatField, Q, BooleanField,Subquery, OuterRef)
+from django.db.models import (Sum)
 from logics.logic import Logic
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
@@ -23,203 +20,30 @@ def default(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    holdings = Holding.objects.filter(portfolio=portfolio)
-    # Extract symbols from portfolio items
-    symbols = [item.symbol.symbol for item in holdings]
-    # Retrieve the UserStaticSetting record for the given user_id
-    user_static_setting = get_object_or_404(UserStaticSetting, user_id=user_id)
-    expect_gain_risk_ratio = user_static_setting.expect_gain_risk_ratio
+    final_df, max_date = instance.research.position().Open().Position(portfolio)
 
-    if len(symbols) > 0:
-        # get current time previous day benchmark
-        benchmark = instance.research.treading().get_stock_hist_bars(True, symbols, 2)
-        # current time is base on current time is stock market open hour or close hour
-        # if is close hour.
-        #   a. if day data is not available, need use min data.
-        #       I.  if min data is not available, need use api, directly pull.
-        #       II. if min data is available, need use min data.
-        #   b. if day data is available, need use day data.
-        latest_bar = instance.research.treading().get_stock_hist_bars(True, symbols, 1)
-
-        # Convert the fetched rows into pandas DataFrames
-        benchmark_df = pd.DataFrame(benchmark)
-        latest_bar_df = pd.DataFrame(latest_bar)
-        # Convert holdings to DataFrame
-        holdings_df = pd.DataFrame(list(holdings.values()))
-
-        # Step 1. Query to get initial sell orders (action = 1) for each holding_id
-        # Subquery to get the maximum holding_sell_order_id for each holding_id
-        max_id_subquery = HoldingSellOrder.objects.filter(
-            holding_id=OuterRef('holding_id'),
-            action=1
-        ).order_by('-holding_sell_order_id').values('holding_sell_order_id')[:1]
-        # Query to get initial sell orders (action=1) for each holding_id based on the subquery
-        initial_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=Subquery(max_id_subquery)
-        ).values('holding_id', 'order_place_date', 'price_stop', 'price_limit')
-        # Convert the query result to a DataFrame
-        initial_sell_orders_df = pd.DataFrame(list(initial_sell_orders))
-        # Rename columns for clarity
-        initial_sell_orders_df.rename(columns={
-            'order_place_date': 'init_order_place_date',
-            'price_stop': 'init_stop',
-            'price_limit': 'init_limit'
-        }, inplace=True)
-        # Merge the initial sell orders data into holdings_df
-        holdings_df = pd.merge(holdings_df, initial_sell_orders_df, on='holding_id', how='left')
-
-        # Step 2. Get the last sell orders for each holding
-        # Subquery to get the maximum trade_id for each holding_id
-        max_trade_id_subquery = (
-            HoldingSellOrder.objects.filter(holding_id=OuterRef('holding_id'))
-            .order_by('-trade_id').values('trade_id'))[:1]
-        # Query to get holding_sell_order where trade_id is in the previous trade_id list
-        sell_orders_with_max_trade_id = (
-            HoldingSellOrder.objects.filter(trade_id__in=Subquery(max_trade_id_subquery)))
-        # Subquery to get the maximum holding_sell_order_id for each trade_id
-        max_sell_order_id_subquery = (
-            sell_orders_with_max_trade_id
-            .values('trade_id')
-            .annotate(max_sell_order_id=Max('holding_sell_order_id'))
-            .values('max_sell_order_id'))
-        # Query to get all holding_sell_order in the previous holding_sell_order_id list
-        last_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=Subquery(max_sell_order_id_subquery)
-        ).values('holding_id', 'order_place_date', 'price_stop', 'price_limit')
-        # Convert the query result to a DataFrame
-        last_sell_orders_df = pd.DataFrame(list(last_sell_orders))
-        # Rename columns for clarity
-        last_sell_orders_df.rename(columns={
-            'order_place_date': 'current_order_place_date',
-            'price_stop': 'current_stop',
-            'price_limit': 'current_limit'
-        }, inplace=True)
-        # Merge the last sell orders data into holdings_df
-        holdings_df = pd.merge(holdings_df, last_sell_orders_df, on='holding_id', how='left')
-
-        # Step 3. Calculate dataframes
-        # Merge the DataFrames on the 'symbol' column
-        merged_df = pd.merge(latest_bar_df, benchmark_df, on='symbol', suffixes=('', '_bk'))
-        # Merge items DataFrame with merged_df on 'symbol'
-        final_df = pd.merge(holdings_df, merged_df, left_on='symbol_id', right_on='symbol')
-
-        # Fetch and sum the quantity_final from transaction
-        transaction = (Transaction.objects.filter(holding__in=holdings)
-            .annotate(
-               trade_id=Case(
-                   When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
-                   When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
-                   default=Value(None),
-                   output_field=IntegerField()
-               ),
-               is_finished=Case(
-                   When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
-                   When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
-                   default=Value(None),
-                   output_field=BooleanField()
-               )
-           )
-           .filter(Q(is_finished=False) | Q(is_finished__isnull=True))
-           .annotate(amount=F('quantity_final') * F('price_final'))
-           .values('holding_id')
-           .annotate(
-                init_transaction_id = Min('transaction_id'),
-                quantity=Sum('quantity_final'),
-                total_cost=Sum('amount'),
-                average_price=Sum('amount') / Sum('quantity_final')
-           ))
-        transaction_df = pd.DataFrame(list(transaction),
-            columns=['holding_id', 'init_transaction_id', 'quantity', 'total_cost', 'average_price'])
-        # Retrieve the transaction record
-        init_transaction_ids = transaction_df['init_transaction_id'].tolist()
-        initial_transactions = (
-            Transaction.objects.filter(transaction_id__in=init_transaction_ids)
-            .values('holding_id', 'quantity_final', 'price_final')
-        )
-
-        # Convert the query result to a DataFrame and rename fields
-        initial_transactions_df = pd.DataFrame(list(initial_transactions))
-        initial_transactions_df.rename(columns={'quantity_final': 'init_quantity','price_final': 'init_price'}, inplace=True)
-        initial_transactions_df['init_inv'] = initial_transactions_df['init_quantity'] * initial_transactions_df['init_price']
-        # Merge action_df with final_df
-        final_df = pd.merge(final_df, transaction_df, left_on='holding_id', right_on='holding_id', how='inner').fillna(0)
-        final_df = pd.merge(final_df, initial_transactions_df, on='holding_id', how='left')
-
-        # Step 4. Calculate the total cost & market value
-        final_df['market_value'] = final_df['quantity'] * final_df['close']
-
-        # Step 5. Calculate daily change in position & percent
-        final_df['chg'] = final_df['close'] - final_df['close_bk']
-        final_df['chg_pct'] = ((final_df['chg'] / final_df['close_bk']) * 100).round(2)
-        final_df['trend'] = final_df['chg'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
-
-        # Step 6. Get real Chg_position Filter transactions by today's date and calculate the sum
-        final_df['chg_position'] = final_df['quantity'] * final_df['chg']
-
-        max_date = final_df['date'].max()
-        max_date = datetime.combine(max_date, datetime.min.time())
-        max_date = timezone.make_aware(max_date, timezone.get_current_timezone())
-        today_transactions = Transaction.objects.filter(date=max_date)
-        if today_transactions.exists():
-            today_transactions_df = pd.DataFrame(list(today_transactions.values('holding_id', 'quantity_final', 'price_final')))
-            today_transactions_df.rename(columns={'price_final': 'today_price', 'quantity_final': 'today_quantity'}, inplace=True)
-            final_df = pd.merge(final_df, today_transactions_df, on='holding_id', how='left').fillna(0)
-            final_df['today_delta'] = final_df['today_quantity'] * (final_df['close_bk'].astype(float) - final_df['today_price'].astype(float))
-            # Sum the delta by holding_id
-            final_df['chg_position'] = final_df['chg_position'] + final_df['today_delta']
-        else:
-            final_df['today_delta'] = 0
-
-
-        # Step 6. Calculate Risk vs Margin
-        # Gain
-        final_df['gain_pct'] =(final_df['close'].apply(float) - final_df['average_price'].apply(float)) / final_df['average_price'].apply(float) * 100
-        final_df['gain'] = final_df['average_price'].apply(float) * final_df['quantity'].apply(float) * final_df['gain_pct'] / 100
-        final_df['gain_trend'] = final_df['gain'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
-        # Risk
-        final_df['risk_pct'] = ((final_df['current_stop'].apply(float) + final_df['current_limit'].apply(float)) / 2 - final_df['average_price'].apply(float)) / final_df['average_price'].apply(float) * 100
-        final_df['risk'] = final_df['average_price'].apply(float) * final_df['quantity'].apply(float) * final_df['risk_pct'] / 100
-        final_df['risk_trend'] = final_df['risk'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
-        # Distance
-        final_df['dist'] = final_df['gain'] - final_df['risk']
-        final_df['dist_pct'] = final_df['dist'].apply(float) / final_df['total_cost'].apply(float) * 100
-
-        # Step 7. Calculate Goal
-        final_df['init_risk'] = final_df['init_quantity'] * (final_df['init_price'] - (final_df['init_stop'] + final_df['init_limit']) / 2)
-        final_df['init_risk_pct'] = final_df['init_risk'] / final_df['init_inv'] * 100
-
-        # *expect_gain_risk_ratio
-
+    if final_df is not None:
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
 
+
         ##### Calculate the summary tab##############3
-        # calculate Market Value change
-        final_df['market_value_bk'] = final_df['close_bk'] * final_df['quantity']
-        mv = final_df['market_value'].sum() + final_df['today_delta'].sum()
-        mv_bk = final_df['market_value_bk'].sum()
+
+        # Extract symbols from portfolio items
+        symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
+
+        # Step 1. calculate Market Value change
+        mv = final_df['market'].sum() + final_df['delta'].sum()
+        mv_bk = final_df['bk_market'].sum()
         mv_chg = mv - mv_bk
         mv_chg_pct = mv_chg / mv_bk * 100
 
-        # Step 1. calculate Assets change
-        earliest_date = CashBalance.objects.filter(as_of_date__lt=max_date - timedelta(days=1)).order_by('-as_of_date').first().as_of_date
-        now = date(max_date.year, max_date.month, max_date.day)
-        # Ensure earliest_date and max_date are timezone-naive
-        # Step 2: Get all CashBalance records with as_of_date >= earliest_date
-        cash_balances = CashBalance.objects.filter(as_of_date__gte=earliest_date).values('as_of_date', 'money_market', 'cash')
-        cash_balance_df = pd.DataFrame(list(cash_balances))
-        cash_balance_df['as_of_date'] = pd.to_datetime(cash_balance_df['as_of_date']).dt.date
-        cash_balance_df = cash_balance_df.rename(columns={'as_of_date': 'cash_date'})
-        cash_balance_df['cash_mm'] = cash_balance_df['money_market'] + cash_balance_df['cash']
-        # Create a date range from earliest_date to max_date
-        date_range = pd.date_range(start=earliest_date, end=now)
-        # Reindex cash_balance_df to the date range
-        cash_balance_df = cash_balance_df.set_index('cash_date').reindex(date_range).rename_axis('cash_date').reset_index()
-        cash_balance_df['cash_mm'] = cash_balance_df['cash_mm'].replace(0, np.nan).ffill().fillna(0)
-
+        # Step 2. calculate Assets change
         # Merge cash_balance_df with final_df on date and date_bk
         max_date = pd.to_datetime(final_df['date'].max())
-        max_date_bk = pd.to_datetime(final_df['date_bk'].max())
+        max_date_bk = pd.to_datetime(final_df['bk_date'].max())
+
+        cash_balance_df = instance.research.position().Open().get_cash_balance_by_date(max_date)
 
         today_cash_mm = cash_balance_df[cash_balance_df['cash_date'] == max_date]['cash_mm'].values[0]
         today_cash_bk = cash_balance_df[cash_balance_df['cash_date'] == max_date_bk]['cash_mm'].values[0]
@@ -229,7 +53,10 @@ def default(request):
         assets_chg = assets - assets_bk
         assets_chg_pct = assets_chg / assets_bk * 100
 
+        # Join symbols with a comma separator
         summary = {
+            # Holding Symbols
+            'holding_symbols': '|'.join(symbols),
             # Market Value
             'mv': mv,
             'mv_chg': mv_chg,
