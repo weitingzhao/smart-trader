@@ -35,7 +35,8 @@
                     <h5 class="font-weight-bolder mb-0">
                         {%round_by_digits summary.mv 2 '$ {0}' False%}
                         <span class="{% if summary.mv_chg_pct > 0 %}text-success{% elif summary.mv_chg_pct < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                            {%round_by_digits summary.mv_chg_pct 2 '{0} %'%}
+                            {%round_by_digits summary.mv_chg_pct 2 '{0}%'%}
+                            {%round_by_digits summary.mv_chg 0 ' / {0}' False%}
                         </span>
                     </h5>
                   </div>
@@ -55,10 +56,13 @@
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Users</p>
+                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Assets</p>
                     <h5 class="font-weight-bolder mb-0">
-                      x,xxx
-                      <span class="text-success text-sm font-weight-bolder">+xx%</span>
+                        {%round_by_digits summary.assets 2 '$ {0}' False%}
+                        <span class="{% if summary.assets_chg > 0 %}text-success{% elif summary.assets_chg < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                            {%round_by_digits summary.assets_chg_pct 2 '{0}%'%}
+                            {%round_by_digits summary.assets_chg  0 ' / {0}' False%}
+                        </span>
                     </h5>
                   </div>
                 </div>
