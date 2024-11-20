@@ -1,6 +1,7 @@
 import json
 import pandas as pd
-from decimal import Decimal
+from datetime import datetime
+from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from home.templatetags.home_filter import order_price
@@ -134,6 +135,7 @@ def default(request):
             Transaction.objects.filter(transaction_id__in=init_transaction_ids)
             .values('holding_id', 'quantity_final', 'price_final')
         )
+
         # Convert the query result to a DataFrame and rename fields
         initial_transactions_df = pd.DataFrame(list(initial_transactions))
         initial_transactions_df.rename(columns={'quantity_final': 'init_quantity','price_final': 'init_price'}, inplace=True)
@@ -147,9 +149,26 @@ def default(request):
 
         # Step 5. Calculate daily change in position & percent
         final_df['chg'] = final_df['close'] - final_df['close_bk']
-        final_df['chg_position'] = final_df['quantity'] * final_df['chg']
         final_df['chg_pct'] = ((final_df['chg'] / final_df['close_bk']) * 100).round(2)
         final_df['trend'] = final_df['chg'].apply(lambda x: "UP" if x > 0 else ("DOWN" if x < 0 else "-"))
+
+        # Step 6. Get real Chg_position Filter transactions by today's date and calculate the sum
+        final_df['chg_position'] = final_df['quantity'] * final_df['chg']
+
+        max_date = final_df['date'].max()
+        max_date = datetime.combine(max_date, datetime.min.time())
+        max_date = timezone.make_aware(max_date, timezone.get_current_timezone())
+        today_transactions = Transaction.objects.filter(date=max_date)
+        if today_transactions.exists():
+            today_transactions_df = pd.DataFrame(list(today_transactions.values('holding_id', 'quantity_final', 'price_final')))
+            today_transactions_df.rename(columns={'price_final': 'today_price', 'quantity_final': 'today_quantity'}, inplace=True)
+            final_df = pd.merge(final_df, today_transactions_df, on='holding_id', how='left').fillna(0)
+            final_df['today_delta'] = final_df['today_quantity'] * (final_df['close_bk'].astype(float) - final_df['today_price'].astype(float))
+            # Sum the delta by holding_id
+            final_df['chg_position'] = final_df['chg_position'] + final_df['today_delta']
+        else:
+            final_df['today_delta'] = 0
+
 
         # Step 6. Calculate Risk vs Margin
         # Gain
@@ -176,7 +195,7 @@ def default(request):
         # Assuming final_df is already defined and populated
         final_df['market_value_bk'] = final_df['close_bk'] * final_df['quantity']
 
-        mv = final_df['market_value'].sum()
+        mv = final_df['market_value'].sum() + final_df['today_delta'].sum()
         mv_bk = final_df['market_value_bk'].sum()
 
         mv_chg_pct = (mv - mv_bk) / mv_bk * 100
