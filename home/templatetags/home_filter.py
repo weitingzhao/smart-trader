@@ -9,6 +9,10 @@ from apps.common.models import *
 register = template.Library()
 
 @register.filter
+def yes_no(value, arg):
+    return "Yes" if  arg else "No"
+
+@register.filter
 def action_lookup(value, arg):
     # Lookup dictionaries
     return dict(ActionChoices.choices).get(arg)

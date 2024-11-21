@@ -25,11 +25,19 @@ urlpatterns = [
         performance.portfolio_performance.default,
         name='portfolio_performance'),
 
+    ####### performance.portfolio_balance #######
+
     # get_balance_history
     path(
-        'portfolio_balance_history/',
+        'portfolio_balance/history/',
         performance.portfolio_performance.get_balance_history,
         name='portfolio_balance_history'),
+
+    # get_balance_history
+    path(
+        'portfolio_balance/calendar/',
+        performance.portfolio_performance.get_balance_calendar,
+        name='portfolio_balance_calendar'),
 
     ####### performance.trade_history #######
     # Trade History -> Default

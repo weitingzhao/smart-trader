@@ -62,6 +62,50 @@ class Portfolio(PositionBase):
 
         return balance_df
 
+    def balance_calendar(self, portfolio: Portfolio) -> pd.DataFrame:
+
+        balance_df = self.balance_history(portfolio)
+        # Step 1.
+        # calculate margin
+        balance_df['margin'] = balance_df['total_market'] - balance_df['total_asset'] + balance_df['funding']
+        balance_df['margin_diff'] = balance_df['margin'].diff()
+        balance_df['margin_diff_pct'] = (balance_df['margin_diff'] / balance_df['total_market'].shift(1)) * 100
+
+        # Calculate asset growth percentage
+        balance_df['asset_growth_pct'] = (balance_df['margin'] / balance_df['total_asset']) * 100
+        # Calculate invest growth percentage
+        balance_df['invest_growth_pct'] = (balance_df['margin'] / balance_df['total_invest']) * 100
+
+        # Step 2.
+        # compare with index
+        # Determine the date range
+        start_date = (balance_df['date'].min() - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+        end_date = balance_df['date'].max().strftime('%Y-%m-%d')
+
+        # Define the benchmarks
+        benchmarks = ['^IXIC', '^DJI', '^GSPC']
+        # Get stock index bars for the benchmarks
+        benchmark_data = self.TradingResearch.get_stock_hist_bars_by_date(benchmarks, start_date, end_date)
+        # Convert time to date and remove the time part
+        benchmark_data['date'] = pd.to_datetime(benchmark_data['time']).dt.date
+        # Pivot benchmark_data by date to get the close prices for each symbol
+        benchmark_data_pivot = benchmark_data.pivot(index='date', columns='symbol', values='close').reset_index()
+        # Calculate the difference and percentage change for each benchmark
+        for benchmark in ['^DJI', '^GSPC', '^IXIC']:
+            benchmark_data_pivot[f'{benchmark}_diff'] = benchmark_data_pivot[benchmark].diff()
+            benchmark_data_pivot[f'{benchmark}_diff_pct'] = (
+                benchmark_data_pivot[f'{benchmark}_diff'] / benchmark_data_pivot[benchmark].shift(1)) * 100
+
+        # Merge benchmark data with balance_df
+        balance_df = pd.merge(balance_df, benchmark_data_pivot, on='date', how='left')
+
+        if balance_df is None:
+            return None
+
+
+
+        return balance_df
+
 
     def get_transactions(self, holding_df: DataFrame ) -> pd.DataFrame:
 
@@ -132,6 +176,7 @@ class Portfolio(PositionBase):
         ]
         # Reset index to make 'date' a column again
         transactions_df = transactions_df.reset_index()
+        pd.set_option('future.no_silent_downcasting', True)
         transactions_df = transactions_df.fillna(0).infer_objects(copy=False)
         return transactions_df
 
@@ -166,6 +211,6 @@ class Portfolio(PositionBase):
         # balance_df['funding']
         # Calculate total capital and market value
         balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily']
-        balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily']
+        balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily'] + balance_df['funding']
         balance_df['total_invest'] = balance_df['balance_holding']
         return balance_df

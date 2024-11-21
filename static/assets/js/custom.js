@@ -1,3 +1,24 @@
+//////////////////////////////// Get Json /////////////////////////////////////
+async function fetchJson(url, csrf_token) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf_token
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+}
+
+//////////////////////////////// Cookie /////////////////////////////////////
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

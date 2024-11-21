@@ -243,6 +243,32 @@ class TradingResearch(BaseResearch):
             self.logger.info("User exit")
             exit()
 
+    def get_stock_hist_bars_by_date(self, symbols: List[str], start_date: str, end_date: str) -> pd.DataFrame:
+        """
+        Retrieve stock historical bars data based on symbols and date range.
+
+        :param symbols: List of stock symbols.
+        :param start_date: Start date in 'YYYY-MM-DD' format.
+        :param end_date: End date in 'YYYY-MM-DD' format.
+        :return: DataFrame with stock historical bars data.
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(f"""
+                SELECT
+                    symbol, time, open, high, low, close, volume
+                FROM market_stock_hist_bars_day_ts
+                WHERE symbol IN ({','.join(f"'{symbol}'" for symbol in symbols)})
+                    AND time BETWEEN %s AND %s
+            """, [start_date, end_date])
+            rows = cursor.fetchall()
+
+            if not rows:
+                return pd.DataFrame()
+
+            # Convert the fetched rows into a DataFrame
+            columns = [col[0] for col in cursor.description]
+            return pd.DataFrame([dict(zip(columns, row)) for row in rows])
+
 
     def get_stock_hist_bars(self, is_day, symbols: list[str], row_num: int):
         table_name = 'day' if is_day else 'min'

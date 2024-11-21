@@ -40,7 +40,7 @@ class OpenPosition(PositionBase):
         final_df = pd.merge(final_df, self.get_current_position(holdings), left_on='holding_id', right_on='holding_id', how='inner').fillna(0)
         final_df = pd.merge(final_df, self.get_init_position(final_df['init_tran_id'].tolist()), on='holding_id', how='left')
         # Step 1.e Attach today_delta
-        max_date = self.attach_today_delta(final_df)
+        final_df, max_date = self.attach_today_delta(final_df)
 
         # Step 2. Calculate
         # Step 2.a Calculate market value
@@ -187,7 +187,7 @@ class OpenPosition(PositionBase):
 
         return init_transactions_df
 
-    def attach_today_delta(self, final_df: pd.DataFrame) -> date:
+    def attach_today_delta(self, final_df: pd.DataFrame) -> (pd.DataFrame, date):
         max_date = final_df['date'].max()
         max_date = datetime.combine(max_date, datetime.min.time())
         max_date = timezone.make_aware(max_date, timezone.get_current_timezone())
@@ -198,8 +198,8 @@ class OpenPosition(PositionBase):
             final_df = pd.merge(final_df, today_transactions_df, on='holding_id', how='left').fillna(0)
             final_df['delta'] = final_df['today_quantity'] * (final_df['bk_close'].astype(float) - final_df['today_price'].astype(float))
         else:
-            final_df['delta'] = 0
-        return max_date
+            final_df['delta'] = (0).astype(float)
+        return final_df, max_date
 
     def calc_market_value_trand(self, final_df: pd.DataFrame):
 

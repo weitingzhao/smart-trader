@@ -1,19 +1,260 @@
-{% extends 'layouts/../layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %}
+{% load static home_filter%}
 
 {% block content %}
 
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
+        <div class="page-header min-height-100 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+          <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+          <div class="row gx-4">
+            <div class="col-auto">
+              <div class="avatar avatar-xl position-relative">
+                <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+              </div>
+            </div>
+            <div class="col-auto my-auto">
+              <div class="h-100">
+                <h5 class="mb-1">
+                    Trade History
+                </h5>
+                <p class="mb-0 font-weight-bold text-sm">
+                    A detailed breakdown of all past trades, showing profit/loss, holding periods, and other metrics.
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+              <div class="nav-wrapper position-relative end-0">
+                <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                    <li class="nav-item" role="tab" >
+                    <a id="transaction_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:" aria-selected="true">
+                      <span class="ms-1">Transaction</span>
+                    </a>
+                  </li>
+                  <li class="nav-item" role="tab" >
+                    <a id="buy_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
+                      <span class="ms-1">Buy Order</span>
+                    </a>
+                  </li>
+                  <li class="nav-item" role="tab" >
+                    <a id="sell_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
+                      <span class="ms-1">Sell Order</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div id="transaction_panel" class="container-fluid py-4" style="display: none;">
+        <div class="row mt-3">
+            <div class="col-12 col-lg-12">
+                <div class="card mb-4">
+                     <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Transaction</h6>
+                            <p class="text-sm">Buy / Sell</p>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="transaction_table">
+                                    <thead class="thead-light">
+                                      <tr>
+                                          <th>Tran ID</th>
+                                          <th>Trade</th>
+                                          <th>Symbol</th>
+                                          <th>Action</th>
 
-        Trade History
-    
-        A detailed breakdown of all past trades, showing profit/loss, holding periods, and other metrics.
+                                          <th>Quantity @ Price</th>
+                                          <th>Amount</th>
 
+                                          <th>Completion Date</th>
+                                          <th>Fee</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for tran in transaction_data %}
+                                        <tr>
+                                            <td>{{ tran.transaction_id }}</td>
+                                            <td>{%round_by_digits tran.trade_id 0 '{0}' False%}</td>
+                                            <td><b>{{ tran.holding.symbol_id }}</b></td>
+                                            <td><strong>{{ segment|transaction_type_lookup:tran.transaction_type }}</strong></td>
+
+                                            <td>
+                                                {%round_by_digits tran.quantity_final 0 '{0}' False%}
+                                                    @ ${%round_by_digits tran.price_final 0 '{0}' False%}
+                                            </td>
+                                            <td>$ <strong>{{ tran.amount|floatformat:2 }}</strong></td>
+
+                                            <td><strong>{{ tran.date|date:"m/d/Y" }}</strong></td>
+                                            <td>
+                                                {% if tran.commission %}
+                                                    $ {%round_by_digits tran.commission 2 '{0}' False%}
+                                                {% endif %}
+                                            </td>
+                                      </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="buy_order_panel" class="container-fluid py-4">
+        <div class="row mt-3">
+            <div class="col-12 col-lg-12">
+                <div class="card mb-4">
+                     <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Buy Order</h6>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="buy_order_table">
+                                    <thead class="thead-light">
+                                      <tr>
+                                          <th>Order Id</th>
+                                          <th>Trade Id</th>
+                                          <th>Symbol</th>
+
+                                          <th>Quantity</th>
+                                          <th>Market</th>
+                                          <th>Stop</th>
+                                          <th>Limit</th>
+
+                                          <th>Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for buy_order in holding_buy_orders %}
+                                        <tr>
+                                            <td>{{ buy_order.holding_buy_order_id }}</td>
+                                            <td><b>{{ buy_order.trade_id }}</b></td>
+                                            <td><b>{{ buy_order.symbol_id }}</b></td>
+
+                                            <td>{%round_by_digits buy_order.quantity_target 0 '{0}' False%}</td>
+                                            <td>$ {%round_by_digits buy_order.price_market 2 '{0}' False%}</td>
+                                            <td>$ {%round_by_digits buy_order.price_stop 2 '{0}' False%}</td>
+                                            <td>$ {%round_by_digits buy_order.price_limit 2 '{0}' False%}</td>
+
+                                            <td><strong>{{ segment|action_lookup:buy_order.action }}</strong></td>
+                                      </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="sell_order_panel" class="container-fluid py-4">
+        <div class="row mt-3">
+            <div class="col-12 col-lg-12">
+                <div class="card mb-4">
+                     <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sell Order</h6>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="sell_order_table">
+                                    <thead class="thead-light">
+                                      <tr>
+                                          <th>Order Id</th>
+                                          <th>Trade Id</th>
+                                          <th>Symbol</th>
+
+                                          <th>Quantity</th>
+                                          <th>Stop</th>
+                                          <th>Limit</th>
+
+                                          <th>Place Date</th>
+                                          <th>Obsolete?</th>
+                                          <th>Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for sell_order in holding_sell_orders %}
+                                        <tr>
+                                            <td>{{ sell_order.holding_sell_order_id }}</td>
+                                            <td><b>{{ sell_order.trade_id }}</b></td>
+                                            <td><b>{{ sell_order.symbol_id }}</b></td>
+
+                                            <td>{%round_by_digits sell_order.quantity_target 0 '{0}' False%}</td>
+                                            <td>$ {%round_by_digits sell_order.price_stop 2 '{0}' False%}</td>
+                                            <td>$ {%round_by_digits sell_order.price_limit 2 '{0}' False%}</td>
+
+                                            <td><strong>{{ sell_order.order_place_date|date:"m/d/Y" }}</strong></td>
+                                            <td><strong>{{ segment|yes_no:sell_order.is_obsolete }}</strong></td>
+                                            <td><strong>{{ segment|action_lookup:sell_order.action }}</strong></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock content %}
 
 <!-- Specific JS goes HERE --> 
-{% block scripts %}
+{% block extra_js %}
+<script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
+<script>
+    ////////////////////////////////////////////// Table //////////////////////////////////////////////
+    pagination('transaction_table',20);
+    pagination('buy_order_table',20);
+    pagination('sell_order_table',20);
 
-{% endblock scripts %}
+    ////////////////////////////////////////////// Quote html //////////////////////////////////////////////
+    const panels = [
+        'transaction', 'buy_order','sell_order',
+    ];// Hide all panels
+
+    panels.forEach(panel => {
+        document.getElementById(panel + "_btn").addEventListener('click', function() {
+            showPanel(panel);
+        });
+    });
+
+    function showPanel(panelId) {
+        panels.forEach(panel => {
+            document.getElementById(panel + "_panel").style.display = 'none';
+            document.getElementById(panel + "_btn").classList.remove('active');
+        });
+        // Show the selected panel
+        const selectedPanel = document.getElementById(panelId + "_panel");
+        if (selectedPanel) {
+            selectedPanel.style.display = 'block';
+            document.getElementById(panelId + "_btn").classList.add('active');
+           if ("chart" === panelId) {
+                renderChart('{{ symbol }}', currentChartType, currentInterval);
+            }
+        }
+    }
+
+
+    ////////////////////////////////////////////// init Setup Chart Panel //////////////////////////////////////////////
+    {#showPanel("profile");#}
+    showPanel("transaction");
+
+
+</script>
+{% endblock extra_js %}
