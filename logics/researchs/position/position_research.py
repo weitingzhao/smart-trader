@@ -2,7 +2,7 @@ from logics.service import Service
 from logics.researchs.base_research import BaseResearch
 from .close_position import ClosePosition
 from .open_position import OpenPosition
-
+from .portfolio import Portfolio
 
 class PositionResearch(BaseResearch):
 
@@ -15,4 +15,6 @@ class PositionResearch(BaseResearch):
     def Close(self) -> ClosePosition:
         return ClosePosition(self.service)
 
+    def Portfolio(self) -> Portfolio:
+        return Portfolio(self.service)
 

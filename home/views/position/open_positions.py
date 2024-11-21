@@ -14,21 +14,21 @@ from django.shortcuts import render, get_object_or_404
 instance = Logic()
 
 def default(request):
+
     user_id = request.user.id  # Assuming you have the user_id from the request
     portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
+    ##### Calculate Open Position ##############
     final_df, max_date = instance.research.position().Open().Position(portfolio)
 
     if final_df is not None:
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
 
-
-        ##### Calculate the summary tab##############3
-
+        ##### Calculate the summary tab##############
         # Extract symbols from portfolio items
         symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
 
