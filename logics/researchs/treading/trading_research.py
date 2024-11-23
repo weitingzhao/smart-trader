@@ -252,6 +252,9 @@ class TradingResearch(BaseResearch):
         :param end_date: End date in 'YYYY-MM-DD' format.
         :return: DataFrame with stock historical bars data.
         """
+        # Adjust end_date by adding 12 hours
+        end_date_with_time = f"{end_date} 12:00:00"
+
         with connection.cursor() as cursor:
             cursor.execute(f"""
                 SELECT
@@ -259,7 +262,7 @@ class TradingResearch(BaseResearch):
                 FROM market_stock_hist_bars_day_ts
                 WHERE symbol IN ({','.join(f"'{symbol}'" for symbol in symbols)})
                     AND time BETWEEN %s AND %s
-            """, [start_date, end_date])
+            """, [start_date, end_date_with_time])
             rows = cursor.fetchall()
 
             if not rows:

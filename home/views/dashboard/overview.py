@@ -23,11 +23,17 @@ def default(request):
 
     # Convert the DataFrame to JSON
     final_json = final_df.to_json(orient='records', date_format='iso')
+
+    # Step 2. Get performance_tracking_date from UserStaticSetting
+    user_static_setting = UserStaticSetting.objects.filter(user=user_id).first()
+    perf_tracking_date = user_static_setting.performance_tracking_date if user_static_setting else None
+
     return render(
         request=request,
         template_name='pages/dashboard/overview.html',
         context= {
             'parent': 'dashboard',
             'segment': 'overview',
-            'holdings': final_json
+            'holdings': final_json,
+            'perf_tracking_date': perf_tracking_date,
         })

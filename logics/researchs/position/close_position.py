@@ -10,3 +10,4 @@ class ClosePosition(PositionBase):
 
     def __init__(self, service: Service):
         super().__init__(service)
+

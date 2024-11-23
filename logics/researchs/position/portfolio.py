@@ -1,7 +1,9 @@
 import json
 import pandas as pd
 from typing import List
+import datetime
 
+from pandas import DataFrame
 from pandas.core.interchange.dataframe_protocol import DataFrame
 
 from logics.service import Service
@@ -18,7 +20,7 @@ class Portfolio(PositionBase):
     def __init__(self, service: Service):
         super().__init__(service)
 
-    def balance_history(self, portfolio: Portfolio) -> pd.DataFrame:
+    def balance_history(self, portfolio: Portfolio, cutoff_date: datetime.date = None) -> pd.DataFrame| None:
 
         holdings = Holding.objects.filter(portfolio=portfolio)
         if len(holdings) <= 0:
@@ -60,9 +62,13 @@ class Portfolio(PositionBase):
         balance_df = self.cumulative_sum_pivoted_columns(symbols_df, balance_df)
         balance_df = self.calculate_balance(balance_df)
 
+        # Filter data to include only dates greater than 2024-10-31
+        if cutoff_date:
+            balance_df = balance_df[balance_df['date'] > cutoff_date]
+
         return balance_df
 
-    def balance_calendar(self, portfolio: Portfolio) -> pd.DataFrame:
+    def balance_calendar(self, portfolio: Portfolio) -> pd.DataFrame| None:
 
         balance_df = self.balance_history(portfolio)
         # Step 1.
@@ -101,10 +107,32 @@ class Portfolio(PositionBase):
 
         if balance_df is None:
             return None
-
-
-
         return balance_df
+
+    def benchmark(self, portfolio: Portfolio, cutoff_date: datetime.date) -> DataFrame | None:
+        calendar_df = self.balance_calendar(portfolio)
+
+        # Filter data to include only dates greater than 2024-10-31
+        calendar_df = calendar_df[calendar_df['date'] > cutoff_date]
+
+        # List of columns to process
+        columns = ['margin', '^IXIC', '^DJI', '^GSPC']
+        for col in columns:
+            # Convert diff_pct to growth factor
+            calendar_df[f'{col}_growth_factor'] = calendar_df[f'{col}_diff_pct'] / 100 + 1
+            calendar_df[f'{col}_growth_factor'] = calendar_df[f'{col}_growth_factor'].astype(float)
+            calendar_df[f'{col}_perf'] = calendar_df[f'{col}_growth_factor'].cumprod()
+            calendar_df.loc[0, f'{col}_perf'] = 1
+            calendar_df[f'{col}_perf'] = calendar_df[f'{col}_perf'].round(4)
+            # Forward fill NaN values
+            calendar_df[f'{col}_perf'] = calendar_df[f'{col}_perf'].ffill()
+
+        if calendar_df is None:
+            return None
+        # Remove rows where the 'date' column is NaN
+        calendar_df = calendar_df.dropna(subset=['date'])
+        return calendar_df
+
 
 
     def get_transactions(self, holding_df: DataFrame ) -> pd.DataFrame:

@@ -128,6 +128,15 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    <label for="id_performance_tracking_date" class="form-label">Performance Tracking Date</label>
+                                    <input type="date" class="form-control {% if static_risk_form.performance_tracking_date.errors %}is-invalid{% endif %}" id="id_default_performance_tracking_date" name="performance_tracking_date" value="{{ static_risk_form.performance_tracking_date.value|date:'Y-m-d' }}">
+                                    <div class="invalid-feedback">
+                                        {{ static_risk_form.performance_tracking_date.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-2 mb-3 d-flex align-items-end">
                                     <button type="submit" class="btn btn-primary w-100">Save</button>
                                 </div>

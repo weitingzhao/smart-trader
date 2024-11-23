@@ -6,11 +6,10 @@ from django.db.models.query import QuerySet
 from pandas.core.interchange.dataframe_protocol import DataFrame
 from apps.common.models import *
 from logics.service import Service
-from django.shortcuts import render, get_object_or_404
 from .position_base import PositionBase
 from django.db.models import (
-    F,Case, When, Value, IntegerField, Sum, Max,Min,
-    FloatField, Q, BooleanField,Subquery, OuterRef)
+    F,Case, When, Value, IntegerField,
+    Sum, Max,Min, Q, BooleanField,Subquery, OuterRef)
 
 
 class OpenPosition(PositionBase):
@@ -198,7 +197,9 @@ class OpenPosition(PositionBase):
             final_df = pd.merge(final_df, today_transactions_df, on='holding_id', how='left').fillna(0)
             final_df['delta'] = final_df['today_quantity'] * (final_df['bk_close'].astype(float) - final_df['today_price'].astype(float))
         else:
-            final_df['delta'] = (0).astype(float)
+            final_df['delta'] = 0
+            final_df['delta'] = final_df['delta'].astype(float)
+
         return final_df, max_date
 
     def calc_market_value_trand(self, final_df: pd.DataFrame):

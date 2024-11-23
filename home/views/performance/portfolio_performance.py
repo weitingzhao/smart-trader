@@ -27,53 +27,81 @@ def default(request):
 @csrf_exempt
 def get_balance_history(request):
 
+    # Step 0. Check input parameters
     user_id = request.user.id  # Assuming you have the user_id from the request
     portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    balance_df = instance.research.position().Portfolio().balance_history(portfolio)
+    as_of_date_str = request.GET.get('as_of_date')
+    if not as_of_date_str:
+        return JsonResponse({'success': False, 'error': 'as of date is not found'}, status=404)
+    try:
+        as_of_date = datetime.strptime(as_of_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
 
-    # Last Step: Prepare the data for the chart
-    labels = balance_df['date'].astype(str).tolist()
+    # Step 1. Main: Get the balance history
+    data_df = instance.research.position().Portfolio().balance_history(portfolio, as_of_date)
 
-    market_data = balance_df['total_market'].tolist()
-    asset_data = balance_df['total_asset'].tolist()
-    invest_data = balance_df['total_invest'].tolist()
+    # Step 2. Extract: Prepare the data for the chart
+    # Step 2.a chart
+    labels = data_df['date'].astype(str).tolist()
+    market_data = data_df['total_market'].tolist()
+    asset_data = data_df['total_asset'].tolist()
+    invest_data = data_df['total_invest'].tolist()
 
-    chart_data = {
-        "labels": labels,
-        "datasets": [{
-            "label": "market",
-            "tension": 0,
-            "pointRadius": 0,
-            "borderColor": "#cb0c9f",
-            "borderWidth": 3,
-            "fill": True,
-            "data": market_data,
-            "maxBarThickness": 6
-        }, {
-            "label": "assets",
-            "tension": 0,
-            "pointRadius": 0,
-            "borderColor": "#3A416F",
-            "borderWidth": 3,
-            "fill": True,
-            "data": asset_data,
-            "maxBarThickness": 6
-        }, {
-            "label": "invest",
-            "tension": 0,
-            "pointRadius": 0,
-            "borderColor": "#16ce38",
-            "borderWidth": 3,
-            "fill": True,
-            "data": invest_data,
-            "maxBarThickness": 6
-        }],
+    # Step 2.b summary
+    # Get the last row of data_df
+    last_row = data_df.iloc[-1]
+    # Calculate margin and margin_pct
+    total_market = last_row['total_market']
+    total_asset = last_row['total_asset']
+    margin = round(total_market - total_asset, 0)
+    margin_pct = round((margin / total_asset) * 100, 2)
+
+
+    data = {
+        "summary": {
+            "margin": margin,
+            "margin_pct": margin_pct
+        },
+        "data": {
+            "labels": labels,
+            "datasets": [
+                {
+                    "label": "market",
+                    "tension": 0,
+                    "pointRadius": 0,
+                    "borderColor": "#3A416F",
+                    "borderWidth": 3,
+                    "fill": True,
+                    "data": market_data,
+                    "maxBarThickness": 6
+                }, {
+                    "label": "assets",
+                    "tension": 0,
+                    "pointRadius": 0,
+                    "borderColor": "#cb0c9f",
+                    "borderWidth": 3,
+                    "fill": True,
+                    "data": asset_data,
+                    "maxBarThickness": 6
+                }, {
+                    "label": "invest",
+                    "tension": 0,
+                    "pointRadius": 0,
+                    "borderColor": "#17c1e8",
+                    "borderWidth": 3,
+                    "fill": True,
+                    "data": invest_data,
+                    "maxBarThickness": 6
+                }
+            ]
+        }
     }
-    return JsonResponse(chart_data)
+    return JsonResponse(data)
 
 @csrf_exempt
 def get_balance_calendar(request):
@@ -84,14 +112,14 @@ def get_balance_calendar(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    balance_df = instance.research.position().Portfolio().balance_calendar(portfolio)
+    data_df = instance.research.position().Portfolio().balance_calendar(portfolio)
 
     # Get the minimum date from balance_df
     initial_date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
 
     # Create events based on balance_df
     events = []
-    for _, row in balance_df.iterrows():
+    for _, row in data_df.iterrows():
         events.append({
             "title": f"$ {round(row['margin_diff'], 0)}",
             "start": row['date'].strftime('%Y-%m-%d'),
@@ -118,11 +146,93 @@ def get_balance_calendar(request):
             "priority": 3,
         })
 
-    json_data = {
+    data = {
         "initialDate": initial_date,
         "events": events
     }
+    return JsonResponse(data)
 
-    return JsonResponse(json_data)
 
+@csrf_exempt
+def get_benchmark(request):
+
+    # Step 0. Check input parameters
+    user_id = request.user.id  # Assuming you have the user_id from the request
+    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+
+    if not portfolio:
+        return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+
+    as_of_date_str = request.GET.get('as_of_date')
+    if not as_of_date_str:
+        return JsonResponse({'success': False, 'error': 'as of date is not found'}, status=404)
+    try:
+        as_of_date = datetime.strptime(as_of_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
+
+    # Step 1. Main: Get the balance history
+    data_df = instance.research.position().Portfolio().benchmark(portfolio, as_of_date)
+
+    # Step 2. Extract: Prepare the data for the chart
+    # Step 2.a chart
+    labels = data_df['date'].astype(str).tolist()
+    nasdaq_data = data_df['^IXIC_perf'].tolist()
+    dow30_data = data_df['^DJI_perf'].tolist()
+    sp500_data = data_df['^GSPC_perf'].tolist()
+    margin_data = data_df['margin_perf'].tolist()
+
+    # Step 2.b summary
+    # Get the last row of data_df
+    last_row = data_df.iloc[-1]
+    # Calculate perf_pct
+    perf_pct = round((last_row['margin_perf'] - 1) * 100, 2)
+
+    data = {
+        "summary": {
+            "perf_pct": perf_pct
+        },
+        "data": {
+            "labels": labels,
+            "datasets": [{
+                "label": "IXIC",
+                "tension": 0,
+                "pointRadius": 2,
+                "pointBackgroundColor": "#cb0c9f",
+                "borderColor": "#cb0c9f",
+                "borderWidth": 3,
+                "data": nasdaq_data,
+                "maxBarThickness": 6
+            }, {
+                "label": "DJI",
+                "tension": 0,
+                "pointRadius": 2,
+                "pointBackgroundColor": "#25b840",
+                "borderColor": "#25b840",
+                "borderWidth": 3,
+                "data": dow30_data,
+                "maxBarThickness": 6
+            }, {
+                "label": "GSPC",
+                "tension": 0,
+                "pointRadius": 2,
+                "pointBackgroundColor": "#17c1e8",
+                "borderColor": "#17c1e8",
+                "borderWidth": 3,
+                "data": sp500_data,
+                "maxBarThickness": 6
+            }, {
+                "label": "portfolio",
+                "tension": 0,
+                "pointRadius": 2,
+                "pointBackgroundColor": "#000000",
+                "borderColor": "#000000",
+                "borderWidth": 3,
+                "data": margin_data,
+                "maxBarThickness": 6
+            }],
+        }
+    }
+
+    return JsonResponse(data)
 

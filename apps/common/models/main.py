@@ -16,6 +16,7 @@ class UserStaticSetting(models.Model):
     position_max = models.IntegerField(null=True, default=2)
     total_risk_cap = models.DecimalField(max_digits=5, decimal_places=2, default=10)
     net_risk_cap = models.DecimalField(max_digits=5, decimal_places=2, default=5)
+    performance_tracking_date = models.DateField(null=True, blank=True)
 
     class Meta:
         db_table = 'user_static_setting'

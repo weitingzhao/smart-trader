@@ -162,6 +162,8 @@ def default(request):
     final_df['init_risk_ratio'] = (final_df['init_risk'].astype(float) / final_df['buy_total_value'].astype(float)) * 100
 
 
+
+
     # Convert the DataFrame to JSON
     final_json = final_df.to_json(orient='records', date_format='iso')
     return render(
