@@ -173,14 +173,32 @@
         <div class="row">
             <div id="summary_panel" class="col-12">
                 <div class="card">
-                    <div class="card-body px-0 pb-0">
+                  <div class="card-header pb-0">
+                      <div class="d-flex align-items-center">
+                          <p class="text-sm">
+                              <span class="badge badge-md badge-dot me-4">
+                                  <span class="text-dark text-xs">Phase Legend:</span>
+                              </span>
+                              <i class="fas fa-hourglass-end fa-lg" style="color:#8fda2d"></i>
+                              <span class="badge-dot me-4 text-dark text-xs">After Breakout</span>
+                              <i class="fas fa-hourglass-half fa-lg" style="color:#8c0404"></i>
+                              <span class="badge-dot me-4 text-dark text-xs">Breaking Out</span>
+                              <i class="fas fa-hourglass-start fa-lg" style="color:black"></i>
+                              <span class="badge-dot me-4 text-dark text-xs">After Breakout</span>
+                              <i class="fas fa-stop fa-lg" style="color:grey"></i>
+                              <span class="badge-dot me-4 text-dark text-xs">None</span>
+                          </p>
+                      </div>
+                  </div>
+                    <div class="card-body px-0 pb-0 p-0">
                         <div class="table-responsive">
                             <table class="table table-flush table-hover text-end" id="summary-list">
                                 <thead class="thead-light">
                                 <tr class="main-header">
                                     <!-- Market-->
+                                    <th title="stock current phase">PH.</th>
                                     <th>SYMBOL</th>
-                                    <th>$ SHARE<br>CHG</th>
+                                    <th title="Current price per share and price change compared to the previous trading day.">$ SHARE<br>CHG</th>
                                     <th>%<br>CHG</th>
                                     <th>% DAY<br>CHG</th>
                                     <!-- Entry Action -->
@@ -192,8 +210,8 @@
                                     <th class="bg-primary text-white">COST<br/>BASE</th>
                                     <th class="bg-primary text-white">STOP<br>LIMIT</th>
                                     <!-- Risk vs Margin -->
-                                    <th class="bg-info text-white">$ <br>DIST</th>
-                                    <th class="bg-info text-white">% <br>DIST</th>
+                                    <th class="bg-info text-white" title="the distance between margin and risk as dollar">$ <br>DIST</th>
+                                    <th class="bg-info text-white" title="the distance between margin and risk as percent">% <br>DIST</th>
                                     <th class="bg-info text-white">%<br>RISK</th>
                                     <th class="bg-info text-white">% <br>GAIN</th>
                                     <th class="bg-info text-white">$ <br>RISK</th>
@@ -206,7 +224,7 @@
 
                                 </tr>
                                 <tr class="subheader">
-                                    <th colspan="4">MARKET</th>
+                                    <th colspan="5">MARKET</th>
                                     <th colspan="3" class="bg-gray-200  text-dark">Initial Entry</th>
                                     <th colspan="3" class="bg-primary text-white">Current Status</th>
                                     <th colspan="6" class="bg-info text-white">Risk vs Margin</th>
@@ -218,6 +236,14 @@
                                 {% for item in portfolio_items|to_json %}
                                     <tr>
                                         <!-- Market-->
+                                        <td class="text-start">
+                                            <span style="display: none;">{{ item.trade_phase }}</span>
+                                            <i class="{% trade_phase_fa_icon item.trade_phase True%}"
+                                                style="{% trade_phase_fa_icon item.trade_phase %}; cursor: pointer;"
+                                                data-phase="{{ item.trade_phase }}"
+                                                onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}')">
+                                            </i>
+                                        </td>
                                         <td class="text-start">
                                             <a href="{% url 'stock_quote' item.symbol %}"
                                                class="text-info text-decoration-none fw-bold">
@@ -512,18 +538,40 @@
         </div>
         {% include 'includes/footer.html' %}
     </div>
+
+    <!-- Trade Phase  Modal -->
+    <div class="modal fade" id="tradePhaseModal" tabindex="-1" role="dialog" aria-labelledby="tradePhaseModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tradePhaseModalLabel">Select Trade Phase</h5>
+                </div>
+                <div class="modal-body">
+                    <select id="tradePhaseSelect" class="form-control">
+                        {% for value, label in trade_phase_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeTradePhaseModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateTradePhase()">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
   <script>
-
-    
     function pagination(element_id, per_page=12) {
         if (document.getElementById(element_id)) {
             const dataTableSearch = new simpleDatatables.DataTable(`#${element_id}`, {
                 searchable: true,
                 fixedHeight: false,
-                perPage: per_page,
+                perPage: per_page
             });
             document.querySelectorAll(".export").forEach(function (el) {
                 el.addEventListener("click", function (e) {
@@ -638,7 +686,48 @@
         refreshSymbol(symbolInput,period,interval, '{{ csrf_token }}')
     }
 
-    
+    /////////////////////// Trade Phase ////////////////////////////
+    function showTradePhasePopup(tradeId, currentPhase) {
+        const select = document.getElementById('tradePhaseSelect');
+        select.value = currentPhase;
+        select.setAttribute('data-trade-id', tradeId);
+        $('#tradePhaseModal').modal('show');
+    }
+
+    function closeTradePhaseModal() {
+        $('#tradePhaseModal').modal('hide');
+    }
+
+    function updateTradePhase() {
+        const select = document.getElementById('tradePhaseSelect');
+        const tradeId = select.getAttribute('data-trade-id');
+        const selectedPhase = select.value;
+
+        fetch(`/position/holding/trade/${tradeId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ trade_phase: selectedPhase })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Trade phase updated successfully');
+                location.reload();
+            } else {
+                alert('Failed to update trade phase');
+            }
+            $('#tradePhaseModal').modal('hide');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating trade phase');
+            $('#tradePhaseModal').modal('hide');
+        });
+    }
+
 
   </script>
 

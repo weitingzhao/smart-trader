@@ -41,7 +41,8 @@ def default(request):
             'segment': 'open_positions',
             'portfolio': portfolio,
             'portfolio_items': final_json,
-            'summary': summary
+            'summary': summary,
+            'trade_phase_choices': TradePhaseChoices.choices
         })
 
 def get_holding_buy_order(request, holding_buy_order_id):

@@ -49,6 +49,9 @@ class OpenPosition(PositionBase):
         # Step 2.c Calculate goal
         self.calc_goal(final_df)
 
+        # Last Step: Sort by trade_phase in descending order
+        final_df.sort_values(by='trade_phase', ascending=False, inplace=True)
+
         return final_df, max_date
 
     def summary(self, portfolio:Portfolio, final_df: pd.DataFrame) -> dict:

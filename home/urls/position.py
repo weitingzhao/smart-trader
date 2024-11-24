@@ -10,6 +10,9 @@ urlpatterns = [
     # Close Position  -> Default
     path('close_positions/', position.close_positions.default,  name='close_positions'),
 
+    ####### holding. trade #######
+    path('holding/trade/<int:trade_id>/', position.trade.update_phase,  name='update_trade_phase'),
+
     ####### holding. buy order #######
 
     path('holding/buy/order/<int:holding_buy_order_id>/',

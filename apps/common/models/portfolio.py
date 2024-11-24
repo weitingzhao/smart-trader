@@ -40,11 +40,11 @@ class FundingTypeChoices(models.TextChoices):
     WITHDRAW = '1', 'Withdraw'
     DEPOSIT = '2', 'Deposit'
 
-class TradePhaseChoices(models.TextChoices):
-    NONE =  '0', 'None'
-    BEFORE_BO = '1', 'Before Break Out'
-    BREAKING = '2', 'Breaking'
-    AFTER_BO = '3', 'After Break Out'
+class  TradePhaseChoices(models.TextChoices):
+    NONE            =  '0', 'None' # None
+    BEFORE_BO  = '1', 'Before Breakout' # Before Breakout
+    BREAKING    = '2', 'Breaking Out' # Breaking Out
+    AFTER_BO    = '3', 'After Breakout' # After Breakout
 
 class Portfolio(models.Model):
     """
