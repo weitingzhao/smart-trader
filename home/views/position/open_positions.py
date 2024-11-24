@@ -24,51 +24,14 @@ def default(request):
     ##### Calculate Open Position ##############
     final_df, max_date = instance.research.position().Open().Position(portfolio)
 
-    if final_df is not None:
+    if final_df is None:
+        summary = {}
+        final_json = []
+    else:
+        ##### Calculate the summary tab ##############
+        summary = instance.research.position().Open().summary(portfolio, final_df)
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
-
-        ##### Calculate the summary tab##############
-        # Extract symbols from portfolio items
-        symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
-
-        # Step 1. calculate Market Value change
-        mv = final_df['market'].sum() + final_df['delta'].sum()
-        mv_bk = final_df['bk_market'].sum()
-        mv_chg = mv - mv_bk
-        mv_chg_pct = mv_chg / mv_bk * 100
-
-        # Step 2. calculate Assets change
-        # Merge cash_balance_df with final_df on date and date_bk
-        max_date = pd.to_datetime(final_df['date'].max())
-        max_date_bk = pd.to_datetime(final_df['bk_date'].max())
-
-        cash_balance_df = instance.research.position().Open().get_cash_balance_by_date(max_date)
-
-        today_cash_mm = cash_balance_df[cash_balance_df['cash_date'] == max_date]['cash_mm'].values[0]
-        today_cash_bk = cash_balance_df[cash_balance_df['cash_date'] == max_date_bk]['cash_mm'].values[0]
-
-        assets = mv + float(today_cash_mm)
-        assets_bk = mv_bk + float(today_cash_bk)
-        assets_chg = assets - assets_bk
-        assets_chg_pct = assets_chg / assets_bk * 100
-
-        # Join symbols with a comma separator
-        summary = {
-            # Holding Symbols
-            'holding_symbols': '|'.join(symbols),
-            # Market Value
-            'mv': mv,
-            'mv_chg': mv_chg,
-            'mv_chg_pct': mv_chg_pct,
-            # Assets
-            'assets': assets,
-            'assets_chg': assets_chg,
-            'assets_chg_pct': assets_chg_pct,
-            # Add other context variables here
-        }
-    else:
-        final_json = []
 
     return render(
         request = request,

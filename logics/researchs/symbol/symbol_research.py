@@ -4,6 +4,7 @@ from typing import List
 from logics.service import Service
 from logics.researchs.base_research import BaseResearch
 
+
 class SymbolResearch(BaseResearch):
 
     def __init__(self, service: Service):

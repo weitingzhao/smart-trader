@@ -31,12 +31,14 @@
           <div class="row">
             <div class="col-8">
               <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Market Value</p>
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Gain / Loss</p>
                 <h5 class="font-weight-bolder mb-0">
-                    {%round_by_digits summary.mv 2 '$ {0}' False%}
-                    <span class="{% if summary.mv_chg_pct > 0 %}text-success{% elif summary.mv_chg_pct < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                        {%round_by_digits summary.mv_chg_pct 2 '{0}%'%}
-                        {%round_by_digits summary.mv_chg 0 ' / {0}' False%}
+                    {%round_by_digits summary.realized.net 2 '$ {0}' False%}
+                    <span class="text-success text-sm font-weight-bolder">
+                        {%round_by_digits summary.realized.gain 0 '$ {0}' False%}&nbsp;
+                    </span>
+                    <span class="text-danger text-sm font-weight-bolder">
+                        {%round_by_digits summary.realized.lost 0 '$ {0}' False%}
                     </span>
                 </h5>
               </div>
@@ -56,12 +58,18 @@
           <div class="row">
             <div class="col-8">
               <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Assets</p>
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Win Rate</p>
                 <h5 class="font-weight-bolder mb-0">
-                    {%round_by_digits summary.assets 2 '$ {0}' False%}
-                    <span class="{% if summary.assets_chg > 0 %}text-success{% elif summary.assets_chg < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                        {%round_by_digits summary.assets_chg_pct 2 '{0}%'%}
-                        {%round_by_digits summary.assets_chg  0 ' / {0}' False%}
+                    {%round_by_digits summary.performance.rate 2 '{0}%' False%}
+                    <span class="text-success text-sm font-weight-bolder">
+                        {%round_by_digits summary.performance.win_trade 0 '{0}' False%}
+                        {%round_by_digits summary.performance.win_invest 0 '${0}' False%}
+                        {%round_by_digits summary.performance.win_percent 0 '{0}%' False%}
+                    </span>
+                    <span class="text-danger text-sm font-weight-bolder">
+                        {%round_by_digits summary.performance.lose_trade 0 '{0}' False%}
+                        {%round_by_digits summary.performance.lose_invest 0 '${0}' False%}
+                        {%round_by_digits summary.performance.lose_percent 0 '{0}%' False%}
                     </span>
                 </h5>
               </div>
@@ -186,8 +194,8 @@
                                 {% for item in portfolio_items|to_json%}
                                 <tr>
                                     <td class="text-start">
-                                        <a href="{% url 'stock_quote' item.symbol_id %}" class="text-info text-decoration-none fw-bold">
-                                            <b>{{ item.symbol_id }}</b>
+                                        <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
+                                            <b>{{ item.symbol }}</b>
                                         </a>
                                     </td>
                                     <td class="text-start">{{ item.trade_id }}</td>

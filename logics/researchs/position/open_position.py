@@ -51,6 +51,67 @@ class OpenPosition(PositionBase):
 
         return final_df, max_date
 
+    def summary(self, portfolio:Portfolio, final_df: pd.DataFrame) -> dict:
+        ##### Calculate the summary tab ##############
+        summary = {
+            'holding_symbols': '',
+            'mv': {
+                'value': 0,
+                'change': 0,
+                'percent': 0,
+            },
+            'assets': {
+                'value': 0,
+                'change': 0,
+                'percent': 0,
+            },
+            'unrealized': {
+                'gain': 0,
+                'risk': 0,
+                'dist': 0,
+            },
+            'water': {
+                'above': 0,
+                'below': 0,
+                'dist': 0,
+            }
+        }
+
+        # Part 1. holding_symbols
+        symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
+        summary['holding_symbols'] = '|'.join(symbols)
+
+        # Part 2. market value
+        summary['mv']['value'] = final_df['market'].sum() + final_df['delta'].sum()
+        mv_bk = final_df['bk_market'].sum()
+        summary['mv']['change'] = summary['mv']['value'] - mv_bk
+        summary['mv']['percent'] = summary['mv']['change'] / mv_bk * 100
+
+        # Part 3. assets
+        # Merge cash_balance_df with final_df on date and date_bk
+        max_date = pd.to_datetime(final_df['date'].max())
+        max_date_bk = pd.to_datetime(final_df['bk_date'].max())
+        cash_balance_df = self.get_cash_balance_by_date(max_date)
+        today_cash_mm = cash_balance_df[cash_balance_df['cash_date'] == max_date]['cash_mm'].values[0]
+        today_cash_bk = cash_balance_df[cash_balance_df['cash_date'] == max_date_bk]['cash_mm'].values[0]
+
+        summary['assets']['value'] = summary['mv']['value'] + float(today_cash_mm)
+        assets_bk = mv_bk + float(today_cash_bk)
+        summary['assets']['change'] = summary['assets']['value'] - assets_bk
+        summary['assets']['percent'] = summary['assets']['change'] / assets_bk * 100
+
+        # Part 4. gain, risk, and dist
+        summary['unrealized']['gain'] = final_df['gain'].sum()
+        summary['unrealized']['risk'] = final_df['risk'].sum()
+        summary['unrealized']['dist'] = final_df['dist'].sum()
+
+        # Part 5. water above and below
+        summary['water']['above'] = final_df[final_df['risk'] > 0]['risk'].sum()
+        summary['water']['below'] = final_df[final_df['risk'] < 0]['risk'].sum()
+        summary['water']['dist'] = summary['water']['above']  + summary['water']['below']
+
+        return summary
+
     def get_holding_initial_stop(self) -> pd.DataFrame:
 
         # Subquery to get the maximum holding_sell_order_id for each holding_id

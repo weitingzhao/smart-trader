@@ -1,7 +1,10 @@
 import pandas as pd
+from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
+
+instance = Logic()
 
 def default(request):
 
@@ -28,6 +31,14 @@ def default(request):
     user_static_setting = UserStaticSetting.objects.filter(user=user_id).first()
     perf_tracking_date = user_static_setting.performance_tracking_date if user_static_setting else None
 
+    # Step 3. Get widget data
+    ##### Calculate Open Position ##############
+    open_final_df, max_date = instance.research.position().Open().Position(portfolio)
+    close_final_df = instance.research.position().Close().Position(portfolio)
+
+    open_summary = instance.research.position().Open().summary(portfolio, open_final_df)
+    close_summary = instance.research.position().Close().summary(close_final_df)
+
     return render(
         request=request,
         template_name='pages/dashboard/overview.html',
@@ -36,4 +47,6 @@ def default(request):
             'segment': 'overview',
             'holdings': final_json,
             'perf_tracking_date': perf_tracking_date,
+            'open_summary': open_summary,
+            'close_summary': close_summary,
         })
