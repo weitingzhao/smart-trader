@@ -218,6 +218,12 @@ class Portfolio(PositionBase):
             if col.startswith('q/') or col.startswith('h/'):
                 balance_df[col] = balance_df[col].cumsum()
 
+        # Loop through q/ columns again and set h/ values to 0 if q/ value is 0
+        for col in [col for col in balance_df.columns if col.startswith('h/')]:
+            balance_df[col] = balance_df.apply(
+                lambda row: 0 if row[f'q/{col[2:]}'] == 0 else row[col], axis=1
+            )
+
         # Step 4.2 Calculate market value for each symbol
         for symbol in symbols_df['symbol']:
             quantity_col = f'q/{symbol}'

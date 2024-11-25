@@ -88,7 +88,7 @@ class Holding(models.Model):
     """
     holding_id = models.AutoField(primary_key=True)
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
-    symbol = models.ForeignKey(MarketSymbol, on_delete=models.DO_NOTHING)
+    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.DO_NOTHING)
 
     class Meta:
         db_table = 'holding'

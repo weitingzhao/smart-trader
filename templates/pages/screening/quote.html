@@ -1212,7 +1212,7 @@
         // Set the order ID in the hidden input field
         document.getElementById('buy_order_Id').value = holding_buy_order_Id;
         // Set the values in the modal input fields
-        document.getElementById('buy_date').value = order_place_date;
+        document.getElementById('buy_date').value = new Date().toISOString().split('T')[0]; //order_place_date;
         document.getElementById('buy_quantity_final').value = quantity_target;
         document.getElementById('buy_price_final').value = price_market;
         // Show the modal
@@ -1223,7 +1223,7 @@
         document.getElementById('sell_order_id').value = holding_sell_order_id;
         // Set the values in the modal input fields
         document.getElementById('sell_price_final').value = price_limit;
-        document.getElementById('sell_date').value = order_place_date;
+        document.getElementById('sell_date').value = new Date().toISOString().split('T')[0]; //order_place_date;
         document.getElementById('sell_quantity_final').value = quantity_target;
         // Show the modal
         new bootstrap.Modal(document.getElementById('sellTransactionModal')).show();

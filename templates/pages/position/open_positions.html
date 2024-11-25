@@ -287,14 +287,18 @@
                                             <b>{% round_by_digits item.dist 0 '{0}' False %}</b></td>
                                         <td class="text-md mb-0" style="color: black">
                                             <b>{% round_by_digits item.dist_pct 2 '{0}%' False %}</b></td>
-                                        <td class="text-md mb-0"
-                                            style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.risk_pct 2 '{0}%' False %}</td>
-                                        <td class="text-md mb-0"
-                                            style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.gain_pct 2 '{0}%' False %}</td>
-                                        <td class="text-md mb-0"
-                                            style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.risk 0 '{0}' False %}</td>
-                                        <td class="text-md mb-0"
-                                            style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.gain 0 '{0}' False %}</td>
+                                        <td class="text-md mb-0"  style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                            {% round_by_digits item.risk_pct 2 '{0}%' False %}
+                                        </td>
+                                        <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                            {% round_by_digits item.gain_pct 2 '{0}%' False %}
+                                        </td>
+                                        <td class="text-md mb-0" style="color:{% if item.risk_trend == 'UP' %}#007560{% elif item.risk_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                            <strong>{% round_by_digits item.risk 0 '{0}' False %}</strong>
+                                        </td>
+                                        <td class="text-md mb-0" style="color:{% if item.gain_trend == 'UP' %}#007560{% elif item.gain_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                            <strong>{% round_by_digits item.gain 0 '{0}' False %}</strong>
+                                        </td>
                                         <!-- Goal -->
                                         <td class="text-md mb-0"></td>
                                         <td class="text-md mb-0">

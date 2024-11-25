@@ -85,8 +85,8 @@ class OpenPosition(PositionBase):
         summary['holding_symbols'] = '|'.join(symbols)
 
         # Part 2. market value
-        summary['mv']['value'] = final_df['market'].sum() + final_df['delta'].sum()
-        mv_bk = final_df['bk_market'].sum()
+        summary['mv']['value'] = final_df['market'].sum()
+        mv_bk = final_df['bk_market'].sum() - final_df['delta'].sum()
         summary['mv']['change'] = summary['mv']['value'] - mv_bk
         summary['mv']['percent'] = summary['mv']['change'] / mv_bk * 100
 
