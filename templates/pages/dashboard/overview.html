@@ -303,7 +303,7 @@
                             <i class="bg-info"></i>
                             <span class="text-dark text-xs">invest</span>
                         </span>
-                        &nbsp;<p class="text-sm portfolio-balance-summary"></p>
+                        <p class="text-xs portfolio-balance-summary font-weight-bold"></p>
                     </p>
                     <div class="ms-auto">
                         <label class="me-2">As of Date:</label>
@@ -1021,13 +1021,17 @@
         const json_data = await fetchJson(`/performance/portfolio/balance/history/?as_of_date=${as_of_date}`, '{{ csrf_token }}');
 
         // Extract summary data
-        const { margin, margin_pct } = json_data.summary;
+        const { margin, margin_pct, capital, capital_pct } = json_data.summary;
 
         // Update the HTML content
         const marginElement = document.querySelector('.portfolio-balance-summary');
         marginElement.innerHTML = `
+            <span class="text-secondary"> Market:</span>
             <i class="fa ${margin >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            <span class="font-weight-bold">$${margin}</span> in <b>${margin_pct}%</b>
+            $${margin}&nbsp;${margin_pct}%
+            <span class="text-secondary"> Capital:</span>
+            <i class="fa ${capital >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
+            $${capital}&nbsp;${capital_pct}%
         `;
 
         // Update the chart data

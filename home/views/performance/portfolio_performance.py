@@ -53,19 +53,24 @@ def get_balance_history(request):
     invest_data = data_df['total_invest'].tolist()
 
     # Step 2.b summary
-    # Get the last row of data_df
+    # Get the first and last rows of data_df
+    first_row = data_df.iloc[0]
     last_row = data_df.iloc[-1]
-    # Calculate margin and margin_pct
-    total_market = last_row['total_market']
-    total_asset = last_row['total_asset']
-    margin = round(total_market - total_asset, 0)
-    margin_pct = round((margin / total_asset) * 100, 2)
 
+    # Calculate differences
+    margin = round(last_row['total_market'] - first_row['total_market'], 0)
+    capital = round(last_row['total_asset'] - first_row['total_asset'], 0)
+
+    # Calculate growth rates
+    margin_pct = round((margin / first_row['total_market']) * 100, 2)
+    capital_pct = round((capital / first_row['total_asset']) * 100, 2)
 
     data = {
         "summary": {
             "margin": margin,
-            "margin_pct": margin_pct
+            "margin_pct": margin_pct,
+            "capital": capital,
+            "capital_pct": capital_pct
         },
         "data": {
             "labels": labels,
