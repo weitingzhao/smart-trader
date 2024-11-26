@@ -105,14 +105,14 @@ def get_balance_history(request):
                     "maxBarThickness": 6
                 }, {
                 "label": "baseline",
-                "tension": 0,
+                "tension": 0.1,
                 "pointRadius": 0,
-                "borderColor": "brown",
+                "borderColor": "rgb(75, 192, 192)",
                 "borderWidth": 2,
                 "fill": False,
                 "data": baseline_data,
-                "maxBarThickness": 1
-            }
+                 "borderDash": [5, 5],  #This creates a dotted line(5px dash, 5px gap)
+                }
             ]
         }
     }

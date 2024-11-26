@@ -323,12 +323,12 @@ class Portfolio(PositionBase):
         # Fill NaN values for s/ columns based on the specified logic
 
         # /b is baseline /s is status
-        for col in balance_df.columns:
+        for col in balance_df.columns: # column
             if not col.startswith('s/'):
                 continue
             last_valid = None
             last_baseline = 0
-            for i in range(len(balance_df)):
+            for i in range(len(balance_df)): # row
                 # /s status
                 current_status = balance_df.iloc[i][col]
                 if pd.notna(current_status):  # Found a non-NaN value
@@ -345,8 +345,10 @@ class Portfolio(PositionBase):
                 if pd.notna(current_baseline):  # Found a non-NaN value
                     if current_status in ['Obsolete', 'Open']:
                         last_baseline = current_baseline
+                        balance_df.iloc[i, balance_df.columns.get_loc(b_col)] = last_baseline
                     elif current_status == 'Filled':
                         last_baseline = 0
+                        balance_df.iloc[i, balance_df.columns.get_loc(b_col)] = 0
                     else:
                         last_baseline = 0  # Stop forward filling after Filled
                 else:
