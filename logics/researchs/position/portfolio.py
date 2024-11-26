@@ -41,13 +41,15 @@ class Portfolio(PositionBase):
         funding_df = self.get_funding(portfolio)
         # Step 1.d fetch cash balance data
         cash_balance_df = self.get_cash_balance(portfolio)
-
+        # Step 1.e fetch holding_sell_order data
+        sell_order_df = self.get_holding_sell_order(holding_df)
 
         # Step 2 Calculate
         # step 2.a pivot transaction & full_market by symbol
         transactions_df = self.pivot_transaction(transactions_df)
         full_market_df = self.pivot_market_data(full_market_df)
-
+        # Step 2.b pivot sell_order by holding_id and date
+        sell_order_df = self.pivot_sell_order(sell_order_df)
 
         # Step 3. Merge all data
         # Merge the full date range with daily_balance_df
@@ -56,11 +58,13 @@ class Portfolio(PositionBase):
         balance_df = pd.merge(balance_df, funding_df[['date', 'funding']], on='date', how='left').fillna(0)
         # Forward fill the cash_mm values to fill any missing dates
         balance_df = pd.merge(balance_df, cash_balance_df[['date', 'cash_mm', 'money_market', 'cash']], on='date', how='left').fillna(0)
-
+        # Merge sell_order data
+        balance_df = pd.merge(balance_df, sell_order_df, on='date', how='left')
 
         # Step 4. Calculate balance
         balance_df = self.cumulative_sum_pivoted_columns(symbols_df, balance_df)
         balance_df = self.calculate_balance(balance_df)
+        balance_df = self.calculate_stop_limit(balance_df)
 
         # Filter data to include only dates greater than 2024-10-31
         if cutoff_date:
@@ -196,6 +200,60 @@ class Portfolio(PositionBase):
         cash_balance_df = cash_balance_df.rename(columns={'as_of_date': 'date'})
         return cash_balance_df
 
+    def get_holding_sell_order(self, holding_df: DataFrame) -> pd.DataFrame:
+        holding_ids = holding_df['holding_id'].tolist()
+        sell_orders = HoldingSellOrder.objects.filter(holding_id__in=holding_ids).values(
+            'holding_sell_order_id', 'holding_id', 'is_obsolete', 'order_place_date', 'quantity_target', 'price_stop', 'price_limit'
+        )
+        sell_order_df = pd.DataFrame(list(sell_orders))
+        sell_order_df['order_place_date'] = pd.to_datetime(sell_order_df['order_place_date']).dt.date
+        sell_order_df = pd.merge(sell_order_df, holding_df[['holding_id', 'symbol']], on='holding_id', how='left')
+
+        # Fetch transactions by sell_order_id
+        transactions = Transaction.objects.filter(sell_order_id__in=sell_order_df['holding_sell_order_id'].tolist())
+        transactions_df = pd.DataFrame(list(transactions.values()))
+        transactions_df['date'] = pd.to_datetime(transactions_df['date']).dt.date
+
+        # Calculate is_filled
+        sell_order_df['is_filled'] = sell_order_df.apply(
+            lambda row: True if transactions_df[transactions_df['sell_order_id'] == row['holding_sell_order_id']]['quantity_final'].sum()
+                             == row['quantity_target'] else False,axis=1)
+
+        # Add status column
+        sell_order_df['status'] = sell_order_df.apply(
+            lambda row: 'Obsolete' if row['is_obsolete'] else 'Open', axis=1
+        )
+
+        # Add fill_date column
+        sell_order_df['fill_date'] = sell_order_df.apply(
+            lambda row: transactions_df[transactions_df['sell_order_id'] == row['holding_sell_order_id']]['date'].max()
+            if row['is_filled'] else pd.NaT, axis=1
+        )
+
+        # Calculate baseline
+        sell_order_df['baseline'] = sell_order_df['quantity_target'] * ((sell_order_df['price_stop'] + sell_order_df['price_limit']) / 2)
+        # Rename columns
+        sell_order_df.rename(columns={'order_place_date':'date'}, inplace=True)
+        # Drop price_stop and price_limit columns
+        sell_order_df.drop(columns=['is_filled', 'quantity_target', 'price_stop', 'price_limit'], inplace=True)
+
+        # Compare fill_date with date and update status and fill_date
+        sell_order_df.loc[sell_order_df['fill_date'] == sell_order_df['date'], 'status'] = 'Filled'
+        sell_order_df.loc[sell_order_df['fill_date'] == sell_order_df['date'], 'fill_date'] = pd.NaT
+
+
+        # Extract records with non-NaN fill_date
+        filled_records = sell_order_df[sell_order_df['fill_date'].notna()].copy()
+        filled_records['date'] = filled_records['fill_date']
+        filled_records['status'] = 'Filled'
+        filled_records['holding_sell_order_id'] = -filled_records['holding_sell_order_id']
+        filled_records = filled_records[['holding_sell_order_id', 'holding_id', 'is_obsolete', 'date', 'symbol', 'status', 'fill_date','baseline']]
+        # Append filled records back to sell_order_df
+        sell_order_df = pd.concat([sell_order_df, filled_records])
+
+        return sell_order_df
+
+
     def pivot_transaction(self, transactions_df: DataFrame) -> pd.DataFrame:
         # pivot transactions by symbol
         transactions_df = transactions_df.pivot(index='date', columns='symbol', values=['quantity', 'holding'])
@@ -211,6 +269,18 @@ class Portfolio(PositionBase):
     def pivot_market_data(self, full_market_data_df: DataFrame) -> pd.DataFrame:
         # Pivot the resulting DataFrame by symbol
          return full_market_data_df.pivot(index='date', columns='symbol', values='close').reset_index()
+
+    def pivot_sell_order(self, sell_order_df: DataFrame) -> pd.DataFrame:
+        # Pivot the sell_order_df by date and symbol for baseline and status
+        sell_order_df = sell_order_df.pivot(index='date', columns='symbol', values=['baseline', 'status'])
+        # Rename columns to add prefixes
+        sell_order_df.columns = [
+            f"b/{col[1]}" if col[0] == 'baseline' else f"s/{col[1]}" for col in sell_order_df.columns.values
+        ]
+        # Reset index to make 'date' a column again
+        sell_order_df = sell_order_df.reset_index()
+        return sell_order_df
+
 
     def cumulative_sum_pivoted_columns(self, symbols_df: DataFrame, balance_df: DataFrame) -> pd.DataFrame:
         # Step 4.1 Apply cumulative sum to the pivoted columns
@@ -247,4 +317,42 @@ class Portfolio(PositionBase):
         balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily']
         balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily'] + balance_df['funding']
         balance_df['total_invest'] = balance_df['balance_holding']
+        return balance_df
+
+    def calculate_stop_limit(self, balance_df: pd.DataFrame) -> pd.DataFrame:
+        # Fill NaN values for s/ columns based on the specified logic
+
+        # /b is baseline /s is status
+        for col in balance_df.columns:
+            if not col.startswith('s/'):
+                continue
+            last_valid = None
+            last_baseline = 0
+            for i in range(len(balance_df)):
+                # /s status
+                current_status = balance_df.iloc[i][col]
+                if pd.notna(current_status):  # Found a non-NaN value
+                    if current_status in ['Obsolete', 'Open']:
+                        last_valid = current_status
+                    elif current_status == 'Filled':
+                        last_valid = None  # Stop forward filling after Filled
+                else:
+                    if last_valid:  # Fill only if a valid last value exists
+                        balance_df.iloc[i, balance_df.columns.get_loc(col)] = last_valid
+                # /b baseline
+                b_col = f"b/{col[2:]}"
+                current_baseline = balance_df.iloc[i][b_col]
+                if pd.notna(current_baseline):  # Found a non-NaN value
+                    if current_status in ['Obsolete', 'Open']:
+                        last_baseline = current_baseline
+                    elif current_status == 'Filled':
+                        last_baseline = 0
+                    else:
+                        last_baseline = 0  # Stop forward filling after Filled
+                else:
+                    balance_df.iloc[i, balance_df.columns.get_loc(b_col)] = last_baseline
+
+        # Sum all b/ columns
+        balance_df['total_baseline'] = balance_df[[col for col in balance_df.columns if col.startswith('b/')]].sum(axis=1)
+
         return balance_df

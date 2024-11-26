@@ -51,6 +51,7 @@ def get_balance_history(request):
     market_data = data_df['total_market'].tolist()
     asset_data = data_df['total_asset'].tolist()
     invest_data = data_df['total_invest'].tolist()
+    baseline_data = data_df['total_baseline'].tolist()
 
     # Step 2.b summary
     # Get the first and last rows of data_df
@@ -102,7 +103,16 @@ def get_balance_history(request):
                     "fill": True,
                     "data": invest_data,
                     "maxBarThickness": 6
-                }
+                }, {
+                "label": "baseline",
+                "tension": 0,
+                "pointRadius": 0,
+                "borderColor": "brown",
+                "borderWidth": 2,
+                "fill": False,
+                "data": baseline_data,
+                "maxBarThickness": 1
+            }
             ]
         }
     }
