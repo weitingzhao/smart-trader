@@ -144,6 +144,9 @@ class Transaction(models.Model):
     buy_order = models.ForeignKey('HoldingBuyOrder', on_delete=models.SET_NULL, null=True, blank=True)
     sell_order = models.ForeignKey('HoldingSellOrder', on_delete=models.SET_NULL, null=True, blank=True)
 
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
+    trade = models.ForeignKey(Trade, on_delete=models.DO_NOTHING, null=True, blank=True)  # Add trade_id field
+
     class Meta:
         db_table = 'transaction'
 
@@ -169,6 +172,24 @@ class HoldingOrder(models.Model):
 
     class Meta:
         abstract = True
+
+class Order(HoldingOrder):
+    """
+    This model is used to store the buy orders for a holding
+    """
+    order_id = models.AutoField(primary_key=True)
+    ref_order = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
+
+    wishlist = models.ForeignKey(Wishlist, on_delete=models.DO_NOTHING, null=True, blank=True)
+    is_obsolete = models.BooleanField(default=False, null=True, blank=True)
+    order_place_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'order'
+
+    def __str__(self):
+        return f"Order: {self.order_id} for {self.holding}"
+
 
 class HoldingBuyOrder(HoldingOrder):
     """
