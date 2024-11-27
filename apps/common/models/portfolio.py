@@ -146,9 +146,6 @@ class Transaction(models.Model):
     price_final = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
     commission = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
-    buy_order = models.ForeignKey('HoldingBuyOrder', on_delete=models.SET_NULL, null=True, blank=True)
-    sell_order = models.ForeignKey('HoldingSellOrder', on_delete=models.SET_NULL, null=True, blank=True)
-
     order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
     trade = models.ForeignKey(Trade, on_delete=models.DO_NOTHING, null=True, blank=True)  # Add trade_id field
 
@@ -196,37 +193,5 @@ class Order(HoldingOrder):
 
     def __str__(self):
         return f"Order: {self.order_id} for {self.holding}"
-
-
-class HoldingBuyOrder(HoldingOrder):
-    """
-    This model is used to store the buy orders for a holding
-    """
-    holding_buy_order_id = models.AutoField(primary_key=True)
-    ref_buy_order = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
-
-    wishlist = models.ForeignKey(Wishlist, on_delete=models.DO_NOTHING, null=True, blank=True)
-
-    class Meta:
-        db_table = 'holding_buy_order'
-
-    def __str__(self):
-        return f"Holding Buy Order: {self.holding_buy_order_id} for {self.holding}"
-
-class HoldingSellOrder(HoldingOrder):
-    """
-    This model is used to store the sell orders for a holding
-    """
-    holding_sell_order_id = models.AutoField(primary_key=True)
-    ref_sell_order = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
-
-    is_obsolete = models.BooleanField(default=False, null=True, blank=True)
-    order_place_date = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        db_table = 'holding_sell_order'
-
-    def __str__(self):
-        return f"Holding Sell Order: {self.holding_sell_order_id} for {self.holding}"
 
 

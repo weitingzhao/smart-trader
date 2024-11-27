@@ -9,7 +9,7 @@ def default(request):
     holdings = Holding.objects.filter(portfolio_id=portfolio.portfolio_id)
 
     if request.method == 'POST':
-        form = HoldingBuyOrderForm(request.POST)
+        form = OrderForm(request.POST)
         if form.is_valid():
             # get Market Symbol
             holding_symbol = form.cleaned_data['holding_symbol']
@@ -26,7 +26,7 @@ def default(request):
             form.save()
             return redirect('initial_positions')  # Replace with your success URL
     else:
-        form = HoldingBuyOrderForm()
+        form = OrderForm()
 
     return render(request,
         template_name='pages/wishlist/initial_positions.html',

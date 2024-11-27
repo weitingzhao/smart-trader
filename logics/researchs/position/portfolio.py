@@ -77,7 +77,7 @@ class Portfolio(PositionBase):
         balance_df = self.balance_history(portfolio)
         # Step 1.
         # calculate margin
-        balance_df['margin'] = balance_df['total_market'] - balance_df['total_asset'] + balance_df['funding']
+        balance_df['margin'] = balance_df['total_market']  - balance_df['total_asset'] + balance_df['funding']
         balance_df['margin_diff'] = balance_df['margin'].diff()
         balance_df['margin_diff_pct'] = (balance_df['margin_diff'] / balance_df['total_market'].shift(1)) * 100
 

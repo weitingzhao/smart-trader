@@ -10,7 +10,7 @@ def default(request):
     holdings = Holding.objects.filter(portfolio_id=portfolio.portfolio_id)
 
     if request.method == 'POST':
-        form = HoldingSellOrderForm(request.POST)
+        form = OrderForm(request.POST)
         if form.is_valid():
             try:
                 # get Market Symbol
@@ -36,7 +36,7 @@ def default(request):
                 for error in errors:
                     messages.error(request, f"Error in {field}: {error}")
     else:
-        form = HoldingSellOrderForm()
+        form = OrderForm()
 
     return render(
         request=request,
