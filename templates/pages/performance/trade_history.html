@@ -137,7 +137,7 @@
                                     <tbody>
                                     {% for buy_order in holding_buy_orders %}
                                         <tr>
-                                            <td>{{ buy_order.holding_buy_order_id }}</td>
+                                            <td>{{ buy_order.order_id }}</td>
                                             <td><b>{{ buy_order.trade_id }}</b></td>
                                             <td><b>{{ buy_order.symbol_id }}</b></td>
 
@@ -189,7 +189,7 @@
                                     <tbody>
                                     {% for sell_order in holding_sell_orders %}
                                         <tr>
-                                            <td>{{ sell_order.holding_sell_order_id }}</td>
+                                            <td>{{ sell_order.order_id }}</td>
                                             <td><b>{{ sell_order.trade_id }}</b></td>
                                             <td><b>{{ sell_order.symbol_id }}</b></td>
 

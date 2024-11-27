@@ -25,71 +25,55 @@ def default(request, symbol):
     portfolio = Portfolio.objects.filter(user=request.user.id, is_default=True).order_by('-portfolio_id').first()
     # Retrieve the holding related to the portfolio
     holding = Holding.objects.filter(portfolio=portfolio, symbol=symbol).first()
-    # Retrieve all holding_buy_order and holding_sell_order records related to the holding
-    holding_buy_orders = (HoldingBuyOrder.objects.filter(holding=holding).annotate(
+
+    # Step 1.
+    # 1.a Retrieve Orders
+    buy_orders = (Order.objects.filter(holding=holding, order_style=1).annotate(
         filled_quantity=Sum(
             'transaction__quantity_final',
-            filter=Q(transaction__buy_order_id=F('holding_buy_order_id')),
+            filter=Q(transaction__order_id=F('order_id')),
             output_field=FloatField()
         ),
         filled_rate=F('filled_quantity') / Cast(F('quantity_target'), FloatField()) * 100,
         is_filled=Case(
             When(
-                Q(filled_rate__isnull=True) | Q(filled_rate__lt=100),
+                Q(filled_rate__gte=100),
                 then=Value(True)
             ),
             default=Value(False),
             output_field=BooleanField()
         ),
         is_finished=F('trade__is_finished')
-    ).order_by('-holding_buy_order_id'))
+    ).order_by('-order_id'))
 
-    holding_sell_orders = (HoldingSellOrder.objects.filter(holding=holding).annotate(
+    sell_orders = (Order.objects.filter(holding=holding, order_style=2).annotate(
         filled_quantity=Sum(
             'transaction__quantity_final',
-            filter=Q(transaction__sell_order_id=F('holding_sell_order_id')),
+            filter=Q(transaction__order_id=F('order_id')),
             output_field=FloatField()
         ),
         filled_rate=F('filled_quantity') / Cast(F('quantity_target'), FloatField()) * 100,
         is_filled=Case(
             When(
-                Q(is_obsolete=False) & (Q(filled_rate__isnull=True) | Q(filled_rate__lt=100)),
+                Q(filled_rate__gte=100),
                 then=Value(True)
             ),
             default=Value(False),
             output_field=BooleanField()
         ),
         is_finished=F('trade__is_finished')
-    ).order_by('-holding_sell_order_id'))
+    ).order_by('-order_id'))
 
-    # Retrieve holding_buy_action data
+    # 1.b Retrieve transaction
     transaction = Transaction.objects.filter(holding=holding).annotate(
-        trade_id=Case(
-            When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
-            When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
-            default=Value(None),
-            output_field=IntegerField()
-        ),
-        order_id = Case(
-            When(buy_order_id__isnull=False, then=F('buy_order_id')),
-            When(sell_order_id__isnull=False, then=F('sell_order_id')),
-            default=Value(None),
-            output_field=IntegerField()
-        ),
-        is_finished=Case(
-            When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
-            When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
-            default=Value(False),
-            output_field=BooleanField()
-        )
+        is_finished=F('trade__is_finished')
     ).order_by('-transaction_id')
 
-    # Retrieve distinct trader_id from holding_buy_order based on holding_id
-    trade_ids = (HoldingBuyOrder.objects.filter(holding=holding)
+    # 1.c Retrieve trade
+    trade_ids = (Order.objects.filter(holding=holding)
                  .values('trade_id').distinct().order_by('-trade_id'))
 
-    form_buy_order = HoldingBuyOrderForm()
-    form_sell_order = HoldingSellOrderForm()
+    form_order = OrderForm()
 
     context = {
         'parent': 'pages',
@@ -109,11 +93,10 @@ def default(request, symbol):
                 "long_business_summary":stock.long_business_summary,
             }
         },
-        'form_buy_order': form_buy_order,
-        'form_sell_order': form_sell_order,
+        'form_order': form_order,
         'holding': holding,
-        'holding_buy_orders': holding_buy_orders,
-        'holding_sell_orders': holding_sell_orders,
+        'buy_orders': buy_orders,
+        'sell_orders': sell_orders,
         'transactions': transaction,
         'trade_ids': trade_ids
     }

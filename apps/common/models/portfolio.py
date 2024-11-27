@@ -28,6 +28,11 @@ class TransactionTypeChoices(models.TextChoices):
     DEPOSIT                         = '11', 'Deposit'
     WITHDRAW                     = '12', 'Withdraw'
 
+class OrderStyleChoices(models.TextChoices):
+    NONE =  '0', 'None'
+    BUY = '1', 'Buy'
+    SELL = '2', 'Sell'
+
 class OrderTypeChoices(models.TextChoices):
     NONE =  '0', 'None'
     MARKET = '1', 'Market'
@@ -179,6 +184,8 @@ class Order(HoldingOrder):
     """
     order_id = models.AutoField(primary_key=True)
     ref_order = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
+
+    order_style = models.CharField(max_length=20, choices=OrderStyleChoices.choices, default=ActionChoices.NONE)
 
     wishlist = models.ForeignKey(Wishlist, on_delete=models.DO_NOTHING, null=True, blank=True)
     is_obsolete = models.BooleanField(default=False, null=True, blank=True)

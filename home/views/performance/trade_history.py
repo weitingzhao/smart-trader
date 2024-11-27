@@ -25,24 +25,20 @@ def default(request):
         amount=ExpressionWrapper(
             F('quantity_final') * F('price_final') +  Coalesce(F('commission'), Value(0)),
             output_field=FloatField()
-        ),
-        trade_id=Case(
-            When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
-            When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
-            default=Value(None),
-            output_field=FloatField()
         )
     ).order_by('-date')
 
-    # Query holding_sell_order ordered by order_place_date desc and include symbol_id
-    holding_sell_orders = HoldingSellOrder.objects.filter(holding__in=holdings).select_related('holding').annotate(
+    # Query holding_buy_order ordered by holding_buy_order_id desc and include symbol_id
+    holding_buy_orders = Order.objects.filter(holding__in=holdings, order_style=1).select_related('holding').annotate(
         symbol_id=F('holding__symbol_id')
     ).order_by('-order_place_date')
 
-    # Query holding_buy_order ordered by holding_buy_order_id desc and include symbol_id
-    holding_buy_orders = HoldingBuyOrder.objects.filter(holding__in=holdings).select_related('holding').annotate(
+    # Query holding_sell_order ordered by order_place_date desc and include symbol_id
+    holding_sell_orders = Order.objects.filter(holding__in=holdings, order_style=2).select_related('holding').annotate(
         symbol_id=F('holding__symbol_id')
-    ).order_by('-holding_buy_order_id')
+    ).order_by('-order_place_date')
+
+
 
     return render(
         request=request,

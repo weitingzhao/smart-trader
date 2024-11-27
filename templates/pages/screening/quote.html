@@ -16,10 +16,10 @@
             <div class="col-auto my-auto">
               <div class="h-100">
                 <h5 class="mb-1">
-                   {{ stock|get_stock_field:"symbol:name" }}
+                    {{ symbol }}
                 </h5>
                 <p class="mb-0 font-weight-bold text-sm">
-                  {{ stock|get_stock_field:"symbol:market" }} : {{ symbol }}
+                    {{ stock|get_stock_field:"symbol:market" }} :  {{ stock|get_stock_field:"symbol:name" }}
                 </p>
               </div>
             </div>
@@ -87,72 +87,80 @@
         <div class="row mt-3">
             <div class="col-12 col-lg-7">
                 <div class="card mb-4">
-                     <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                    <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="mb-1">Buy Order</h6>
                             <p class="text-sm">Market/Limit</p>
                         </div>
                         <button type="button" class="btn btn-outline-primary btn-sm"
-                                onclick="showCreateBuyOrderModal()">Create Buy Order</button>
+                                onclick="CreateOrderModal('buy',1)">Create Buy Order
+                        </button>
                     </div>
                     <div class="card-body p-3">
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-flush table-hover" id="buy_order_table">
                                     <thead class="thead-light">
-                                      <tr>
-                                          <th>T.O.ID</th>
+                                    <tr>
+                                        <th>T.O.ID</th>
 
-                                          <th>Quantity</th>
-                                          <th>Detail</th>
+                                        <th>Quantity</th>
+                                        <th>Detail</th>
+                                        <th>Place Date</th>
 
-                                          <th>Status</th>
-                                          <th>Purpose</th>
-                                          <th>Action</th>
-                                      </tr>
+                                        <th>Status</th>
+                                        <th>Purpose</th>
+                                        <th>Action</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                    {% for holding_buy_order in holding_buy_orders %}
+                                    {% for buy_order in buy_orders %}
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" onclick="calculateTrade({{ holding_buy_order.trade_id }})">
-                                                    <span class="form-label fw-bold fs-6 {% if holding_buy_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ holding_buy_order.trade_id }}</span>
-                                                </a>-{{ holding_buy_order.holding_buy_order_id }}
+                                                <a href="javascript:void(0);"
+                                                   onclick="calculateTrade({{ buy_order.trade_id }})">
+                                                    <span class="form-label fw-bold fs-6 {% if buy_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ buy_order.trade_id }}</span>
+                                                </a>-{{ buy_order.order_id }}
                                             </td>
 
-                                            <td><strong>{{ holding_buy_order.quantity_target }} / {{ holding_buy_order.filled_quantity }}</strong></td>
-                                            <td><strong>{{ segment|order_price:holding_buy_order}}</strong></td>
+                                            <td><strong>{{ buy_order.quantity_target }}
+                                                / {{ buy_order.filled_quantity }}</strong></td>
+                                            <td><strong>{{ segment|order_price:buy_order }}</strong></td>
 
+                                            <td class="text-dark">{{ buy_order.order_place_date|date:"m-d-Y" }}</td>
                                             <td>
-                                                {% if holding_buy_order.filled_rate == 0 %}
+                                                {% if buy_order.filled_rate == 0 %}
                                                     <span class="text-primary fw-bold">Open</span>
-                                                {% elif holding_buy_order.filled_rate == 100 %}
+                                                {% elif buy_order.filled_rate == 100 %}
                                                     <span class="text-success fw-bold">Filled</span>
-                                                {%else %}
+                                                {% else %}
                                                     <span class="text-secondary fw-bold">
-                                                    Fill <strong>{{ holding_buy_order.filled_rate|floatformat:2 }}%</strong>
+                                                    Fill <strong>{{ buy_order.filled_rate|floatformat:2 }}%</strong>
                                                     </span>
-                                                {%endif %}
+                                                {% endif %}
                                             </td>
-                                            <td>{{ segment|action_lookup:holding_buy_order.action }}</td>
+                                            <td>{{ segment|action_lookup:buy_order.action }}</td>
                                             <td>
-                                                {% if holding_buy_order.is_filled %}
-                                                    <a href="javascript:showBuyOrderFill('{{ holding_buy_order.holding_buy_order_id }}', '{{ holding_buy_order.price_market }}', '{{ holding_buy_order.order_place_date|date:"Y-m-d" }}', '{{ holding_buy_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                {% if not buy_order.is_filled %}
+                                                    <a href="javascript:showBuyOrderFill('{{ buy_order.order_id }}','{{ buy_order.trade_id }}', '{{ buy_order.price_market }}', '{{ buy_order.order_place_date|date:"Y-m-d" }}', '{{ buy_order.quantity_target }}')"
+                                                       data-bs-toggle="tooltip" data-bs-original-title="Fill">
                                                         <i class="fas fa-pen text-primary"></i>
                                                     </a>
-                                                {%endif%}
-                                                <a href="javascript:editHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                                {% endif %}
+                                                <a href="javascript:loadEditOrder('{{ buy_order.order_id }}')"
+                                                   class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>
                                                 </a>
-                                                <a href="javascript:deleteHoldingBuyOrder('{{ holding_buy_order.holding_buy_order_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                                <a href="javascript:deleteOrder('{{ buy_order.order_id }}')"
+                                                   data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
                                                 </a>
                                             </td>
-                                      </tr>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
-                                  </table>
-                              </div>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,13 +171,14 @@
                             <p class="text-sm">Stop/Limit</p>
                         </div>
                         <button type="button" class="btn btn-outline-primary btn-sm"
-                                onclick="showCreateSellOrderModal()">Create Sell Order</button>
+                                onclick="CreateOrderModal('sell', 4)">Create Sell Order
+                        </button>
                     </div>
                     <div class="card-body p-3">
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table class="table table-flush table-hover" id="sell_order_table">
-                                <thead class="thead-light">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="sell_order_table">
+                                    <thead class="thead-light">
                                     <tr>
                                         <th>T.O.ID</th>
 
@@ -181,57 +190,64 @@
                                         <th>Purpose</th>
                                         <th>Action</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% for holding_sell_order in holding_sell_orders %}
+                                    </thead>
+                                    <tbody>
+                                    {% for sell_order in sell_orders %}
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" onclick="calculateTrade({{ holding_sell_order.trade_id }})">
-                                                    <span class="form-label fw-bold fs-6 {% if holding_sell_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ holding_sell_order.trade_id }}</span>
-                                                </a>-{{ holding_sell_order.holding_sell_order_id }}
+                                                <a href="javascript:void(0);"
+                                                   onclick="calculateTrade({{ sell_order.trade_id }})">
+                                                    <span class="form-label fw-bold fs-6 {% if sell_order.is_finished %}text-success{% else %}text-black{% endif %}">{{ sell_order.trade_id }}</span>
+                                                </a>-{{ sell_order.order_id }}
                                             </td>
 
-                                            <td><strong>{{ holding_sell_order.quantity_target }} / {{ holding_sell_order.filled_quantity }}</strong></td>
-                                            <td><strong>{{ segment|order_price:holding_sell_order}}</strong></td>
+                                            <td><strong>{{ sell_order.quantity_target }}
+                                                / {{ sell_order.filled_quantity }}</strong></td>
+                                            <td><strong>{{ segment|order_price:sell_order }}</strong></td>
 
-                                            <td class="text-dark">{{ holding_sell_order.order_place_date|date:"m-d-Y" }}</td>
+                                            <td class="text-dark">{{ sell_order.order_place_date|date:"m-d-Y" }}</td>
                                             <td>
-                                                {% if holding_sell_order.is_obsolete %}
+                                                {% if sell_order.is_obsolete %}
                                                     <span class="text-secondary">Obsolete</span>
                                                 {% else %}
-                                                     {% if holding_sell_order.filled_rate is None or holding_sell_order.filled_rate == 0 %}
+                                                    {% if sell_order.filled_rate is None or sell_order.filled_rate == 0 %}
                                                         <span class="text-primary fw-bold">Open</span>
-                                                    {% elif holding_sell_order.filled_rate == 100 %}
+                                                    {% elif sell_order.filled_rate == 100 %}
                                                         <span class="text-success fw-bold">Filled</span>
-                                                    {%else %}
-                                                        Fill <strong>{{ holding_sell_order.filled_rate|floatformat:2 }}%</strong>
-                                                    {%endif %}
+                                                    {% else %}
+                                                        Fill
+                                                        <strong>{{ sell_order.filled_rate|floatformat:2 }}%</strong>
+                                                    {% endif %}
                                                 {% endif %}
                                             </td>
-                                            <td>{{ segment|action_lookup:holding_sell_order.action }}</td>
+                                            <td>{{ segment|action_lookup:sell_order.action }}</td>
                                             <td>
-                                                {% if holding_sell_order.is_filled %}
-                                                    <a href="javascript:showSellOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.price_limit }}', '{{ holding_sell_order.order_place_date|date:"Y-m-d" }}', '{{ holding_sell_order.quantity_target }}')" data-bs-toggle="tooltip" data-bs-original-title="Fill">
+                                                {% if not sell_order.is_filled and not sell_order.is_obsolete %}
+                                                    <a href="javascript:showSellOrderFill('{{ sell_order.order_id }}','{{ sell_order.trade_id }}', '{{ sell_order.price_limit }}', '{{ sell_order.order_place_date|date:"Y-m-d" }}', '{{ sell_order.quantity_target }}')"
+                                                       data-bs-toggle="tooltip" data-bs-original-title="Fill">
                                                         <i class="fas fa-pen text-primary"></i>
                                                     </a>
-                                                    <a href="javascript:showSellAdjustOrderFill('{{ holding_sell_order.holding_sell_order_id }}', '{{ holding_sell_order.quantity_target }}','{{ holding_sell_order.price_stop }}', '{{ holding_sell_order.price_limit }}')" data-bs-toggle="tooltip" data-bs-original-title="Adjust">
+                                                    <a href="javascript:popAdjustSellOrder('{{ sell_order.order_id }}', '{{ sell_order.quantity_target }}','{{ sell_order.price_stop }}', '{{ sell_order.price_limit }}')"
+                                                       data-bs-toggle="tooltip" data-bs-original-title="Adjust">
                                                         <i class="fas fa-sliders text-primary"></i>
                                                     </a>
-                                                {%endif %}
-                                                <a href="javascript:editHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                                {% endif %}
+                                                <a href="javascript:loadEditOrder('{{ sell_order.order_id }}')"
+                                                   class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>
                                                 </a>
-                                                <a href="javascript:deleteHoldingSellOrder('{{ holding_sell_order.holding_sell_order_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                                <a href="javascript:deleteOrder('{{ sell_order.order_id }}')"
+                                                   data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
                                                 </a>
                                             </td>
                                         </tr>
                                     {% endfor %}
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
             <div class="col-12 col-lg-5">
@@ -244,42 +260,47 @@
                             <div class="table-responsive">
                                 <table class="table table-flush table-hover" id="buy_action_table">
                                     <thead class="thead-light">
-                                      <tr>
-                                          <th>T.O.T.ID</th>
-                                          <th>Action</th>
-                                          <th>Quantity</th>
-                                          <th>Price</th>
-                                          <th>Fees</th>
-                                          <th>Date</th>
-                                          <th>Action</th>
-                                      </tr>
+                                    <tr>
+                                        <th>T.O.T.ID</th>
+                                        <th>Action</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Fees</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
                                     {% for transaction in transactions %}
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" onclick="calculateTrade({{ transaction.trade_id }})">
+                                                <a href="javascript:void(0);"
+                                                   onclick="calculateTrade({{ transaction.trade_id }})">
                                                     <span class="form-label fw-bold fs-6 {% if transaction.is_finished %}text-success{% else %}text-black{% endif %}">{{ transaction.trade_id }}</span>
                                                 </a>-{{ transaction.order_id }}-{{ transaction.transaction_id }}</td>
-                                            <td><strong>{{ segment|transaction_type_lookup:transaction.transaction_type }}</strong></td>
+                                            <td>
+                                                <strong>{{ segment|transaction_type_lookup:transaction.transaction_type }}</strong>
+                                            </td>
                                             <td><strong>{{ transaction.quantity_final }}</strong></td>
                                             <td><strong>{{ transaction.price_final }}</strong></td>
                                             <td>{{ transaction.commission|default_if_none:"" }}</td>
                                             <td>{{ transaction.date|date:"m-d-Y" }}</td>
                                             <td>
-                                                <a href="javascript:editTransaction('{{ transaction.transaction_id }}')" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                                <a href="javascript:editTransaction('{{ transaction.transaction_id }}')"
+                                                   class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                     <i class="fas fa-user-edit text-info"></i>
                                                 </a>
-                                                <a href="javascript:deleteTransaction('{{ transaction.transaction_id }}')" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                                <a href="javascript:deleteTransaction('{{ transaction.transaction_id }}')"
+                                                   data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                     <i class="fas fa-trash text-secondary"></i>
                                                 </a>
                                             </td>
 
-                                      </tr>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
-                                  </table>
-                              </div>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -691,72 +712,76 @@
 
     <!------- Transaction -------->
     <!-- Buy Transaction -->
-    <div class="modal fade" id="buyTransactionModal" tabindex="-1" aria-labelledby="buyTransactionModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="buyTransactionModalLabel">Buy Transaction</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="holdingBuyActionForm">
-              <div class="mb-3">
-                <label for="buy_quantity_final" class="form-label">Final Quantity</label>
-                <input type="number" class="form-control" id="buy_quantity_final" required>
-              </div>
-              <div class="mb-3">
-                <label for="buy_price_final" class="form-label">Final Price</label>
-                <input type="number" class="form-control" id="buy_price_final" required>
-              </div>
-              <div class="mb-3">
-                <label for="buy_date" class="form-label">Date</label>
-                <input type="date" class="form-control" id="buy_date" required>
-              </div>
-              <input type="hidden" id="buy_order_Id">
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" onclick="addBuyTransaction()">Submit</button>
-          </div>
+    <div class="modal fade" id="buyTransactionModal" tabindex="-1" aria-labelledby="buyTransactionModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buyTransactionModalLabel">Buy Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="holdingBuyActionForm">
+                        <div class="mb-3">
+                            <label for="buy_quantity_final" class="form-label">Final Quantity</label>
+                            <input type="number" class="form-control" id="buy_quantity_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="buy_price_final" class="form-label">Final Price</label>
+                            <input type="number" class="form-control" id="buy_price_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="buy_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="buy_date" required>
+                        </div>
+                        <input type="hidden" id="buy_order_Id">
+                        <input type="hidden" id="buy_trade_Id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addBuyTransaction()">Submit</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <!-- Sell Transaction-->
-    <div class="modal fade" id="sellTransactionModal" tabindex="-1" aria-labelledby="sellTransactionModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="sellTransactionModalLabel">Sell Transaction</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="holdingSellActionForm">
-              <div class="mb-3">
-                <label for="sell_quantity_final" class="form-label">Final Quantity</label>
-                <input type="number" class="form-control" id="sell_quantity_final" required>
-              </div>
-              <div class="mb-3">
-                <label for="sell_price_final" class="form-label">Final Price</label>
-                <input type="number" class="form-control" id="sell_price_final" required>
-              </div>
-              <div class="mb-3">
-                <label for="sell_date" class="form-label">Date</label>
-                <input type="date" class="form-control" id="sell_date" required>
-              </div>
-              <div class="mb-3">
-                <label for="sell_commission" class="form-label">Commission</label>
-                <input type="number" class="form-control" id="sell_commission" required>
-              </div>
-              <input type="hidden" id="sell_order_id">
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" onclick="addSellTransaction()">Submit</button>
-          </div>
+    <div class="modal fade" id="sellTransactionModal" tabindex="-1" aria-labelledby="sellTransactionModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sellTransactionModalLabel">Sell Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="holdingSellActionForm">
+                        <div class="mb-3">
+                            <label for="sell_quantity_final" class="form-label">Final Quantity</label>
+                            <input type="number" class="form-control" id="sell_quantity_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sell_price_final" class="form-label">Final Price</label>
+                            <input type="number" class="form-control" id="sell_price_final" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sell_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="sell_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sell_commission" class="form-label">Commission</label>
+                            <input type="number" class="form-control" id="sell_commission" required>
+                        </div>
+                        <input type="hidden" id="sell_order_id">
+                        <input type="hidden" id="sell_trade_Id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addSellTransaction()">Submit</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <!-- Edit Transaction Modal -->
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionLabel" aria-hidden="true">
@@ -795,48 +820,62 @@
         </div>
     </div>
 
-    <!------- Buy Sell Order -------->
-    <!-- Create Buy Order Modal -->
-    <div class="modal fade" id="createBuyOrderModal" tabindex="-1" aria-labelledby="createBuyOrderModalLabel" aria-hidden="true">
+    <!------- Order -------->
+    <!-- Create Order Modal -->
+    <div class="modal fade" id="createOrderModal" tabindex="-1" aria-labelledby="createOrderModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createBuyOrderModalLabel">Create Buy Order</h5>
+                    <h5 class="modal-title" id="createOrderModalLabel">----</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <input type="hidden" id="id_order_style">
+                    <input type="hidden" id="name_order_style">
                 </div>
                 <div class="modal-body">
                     <form id="createBuyOrderForm">
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4">
                                 <label>Action</label>
-                                <select class="form-select" id="id_buy_action" name="{{ form_buy_order.action.name }}" onchange="toggleRefBuyOrderField()">
-                                    {% for choice in form_buy_order.action.field.choices %}
+                                <select class="form-select" id="id_action" name="{{ form_order.action.name }}"
+                                        onchange="toggleCreateOrderAction(document.getElementById('name_order_style').value)">
+                                    {% for choice in form_order.action.field.choices %}
                                         {% if choice.0 == '0' or choice.0 == '1'  or choice.0 == '2' %}
-                                            <option value="{{ choice.0 }}"  {% if choice.0 == '1' %}selected{% endif %}>
+                                            <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
                                                 {{ choice.1 }}
                                             </option>
                                         {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3 col-sm-4" id="lab_ref_buy_order">
-                                <label for="ref_buy_order_id">Reference Buy Order</label>
-                                <select class="form-select" id="ref_buy_order_id">
-                                    {% for order in holding_buy_orders %}
-                                        <option value="{{ order.holding_buy_order_id }}">[{{ order.holding_buy_order_id }}]: Buy {{ segment|order_name:order }}</option>
+                            <div class="col-12 col-sm-4" id="lab_trade">
+                                <label for="title_sell_trade">Trade ID</label>
+                                <select class="form-select" id="id_trade">
+                                    {% for trade in trade_ids %}
+                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
                                     {% endfor %}
+                                    <option value="">--------------</option>
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4" id="lab_ref_order">
+                                <label for="id_ref_order">Reference Order</label>
+                                <select class="form-select" id="id_ref_order">
                                 </select>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4 mt-3 mt-sm-0">
                                 <label>Quantity target</label>
-                                {{ form_buy_order.quantity_target }}
+                                {{ form_order.quantity_target }}
+                            </div>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0">
+                                <label for="{{ form_order.order_place_date.id_for_label }}">Order Place Date</label>
+                                {{ form_order.order_place_date }}
                             </div>
                             <div class="col-12 col-sm-4 mt-3 mt-sm-0">
                                 <label>Timing</label>
-                                <select class="form-select" id="id_buy_timing" name="{{ form_buy_order.timing.name }}">
-                                    {% for choice in form_buy_order.timing.field.choices %}
+                                <select class="form-select" id="id_timing" name="{{ form_order.timing.name }}">
+                                    {% for choice in form_order.timing.field.choices %}
                                         <option value="{{ choice.0 }}" {% if choice.0 == '2' %}selected{% endif %}>
                                             {{ choice.1 }}
                                         </option>
@@ -846,189 +885,116 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4 mt-3 mt-sm-0">
-                                <label for="{{ form_buy_order.order_type.id_for_label }}">Order Type</label>
-                                  <select class="form-select" id="id_buy_order_type" name="{{ form_buy_order.order_type.name }}" onchange="toggleBuyPriceFields()">
-                                    {% for choice in form_buy_order.order_type.field.choices %}
+                                <label for="{{ form_order.order_type.id_for_label }}">Order Type</label>
+                                <select class="form-select" id="id_order_type"
+                                        name="{{ form_order.order_type.name }}" onchange="toggleCreateOrderPrice()">
+                                    {% for choice in form_order.order_type.field.choices %}
                                         <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
                                             {{ choice.1 }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_market">
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_price_market">
                                 <label>Market Price</label>
-                                {{ form_buy_order.price_market }}
+                                {{ form_order.price_market }}
                             </div>
-                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_stop">
-                                  <label>Stop Price</label>
-                                  {{ form_buy_order.price_stop }}
-                              </div>
-                              <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_buy_price_limit">
-                                  <label>Limit Price</label>
-                                  {{ form_buy_order.price_limit }}
-                              </div>
-                          </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitCreateBuyOrder()">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Create Sell Order Modal -->
-    <div class="modal fade" id="createSellOrderModal" tabindex="-1" aria-labelledby="createSellOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createSellOrderModalLabel">Create Sell Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="createSellOrderForm">
-                        <div class="row mt-3">
-                            <div class="col-12 col-sm-4">
-                                <label for="{{ form_sell_order.action.id_for_label }}">Action</label>
-                                <select class="form-select" id="id_sell_action" name="{{ form_sell_order.action.name }}" onchange="toggleRefSellOrderField()">
-                                    {% for choice in form_sell_order.action.field.choices %}
-                                        {% if choice.0 == '0' or choice.0 == '1' or choice.0 == '11' or choice.0 == '15' %}
-                                            <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
-                                                {{ choice.1 }}
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_price_stop">
+                                <label>Stop Price</label>
+                                {{ form_order.price_stop }}
                             </div>
-                            <div class="col-12 col-sm-4" id="lab_sell_trade">
-                                <label for="trade_id">Trade ID</label>
-                                <select class="form-select" id="id_sell_trade">
-                                    {% for trade in trade_ids %}
-                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-3 col-sm-4" id="lab_ref_sell_order">
-                                <label for="ref_sell_order_id">Reference Sell Order</label>
-                                <select class="form-select" id="id_ref_sell_order">
-                                    {% for order in holding_sell_orders %}
-                                        <option value="{{ order.holding_sell_order_id }}">Buy {{ segment|order_name:order }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_price_limit">
+                                <label>Limit Price</label>
+                                {{ form_order.price_limit }}
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                <label for="{{ form_sell_order.quality_target.id_for_label }}">Quantity</label>
-                                {{ form_sell_order.quantity_target }}
-                            </div>
-                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                              <label for="{{ form_sell_order.timing.id_for_label }}">Timing</label>
-                              <select class="form-select" id="id_sell_timing" name="{{ form_sell_order.timing.name }}">
-                                {% for choice in form_sell_order.timing.field.choices %}
-                                    <option value="{{ choice.0 }}" {% if choice.0 == '2' %}selected{% endif %}>
-                                        {{ choice.1 }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                          </div>
-                      </div>
-                      <div class="row mt-3">
-                          <div class="col-3 col-sm-4 mt-3 mt-sm-0">
-                              <label for="{{ form_sell_order.order_type.id_for_label }}">Order Type</label>
-                              <select class="form-select" id="id_sell_order_type" name="{{ form_sell_order.order_type.name }}" onchange="toggleSellPriceFields()">
-                                {% for choice in form_sell_order.order_type.field.choices %}
-                                    <option value="{{ choice.0 }}" {% if choice.0 == '4' %}selected{% endif %}>
-                                        {{ choice.1 }}
-                                    </option>
-                                {% endfor %}
-                              </select>
-                          </div>
-                          <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_sell_price_market">
-                              <label>Market Price</label>
-                              {{ form_sell_order.price_market }}
-                          </div>
-                          <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_sell_price_stop">
-                              <label>Stop Price</label>
-                              {{ form_sell_order.price_stop }}
-                          </div>
-                          <div class="col-3 col-sm-4 mt-3 mt-sm-0" id="lab_holding_sell_price_limit">
-                              <label>Limit Price</label>
-                              {{ form_sell_order.price_limit }}
-                          </div>
-                      </div>
-                      <div class="row mt-3">
-                          <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                              <label for="{{ form_sell_order.order_place_date.id_for_label }}">Order Place Date</label>
-                              {{ form_sell_order.order_place_date }}
-                          </div>
-                      </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitCreateSellOrder()">Submit</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCreateOrder()">Submit</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Edit Buy Order Modal -->
-    <div class="modal fade" id="editBuyOrderModal" tabindex="-1" aria-labelledby="editBuyOrderModalLabel" aria-hidden="true">
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editBuyOrderModalLabel">Edit Buy Order</h5>
+                    <h5 class="modal-title" id="editOrderModalLabel">Edit xxx Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <input type="hidden" id="edit_id_order_style">
+                    <input type="hidden" id="edit_name_order_style">
                 </div>
                 <div class="modal-body">
                     <form id="editHoldingBuyOrderForm">
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4">
                                 <label>Action</label>
-                                <select class="form-select" id="edit_buy_action" name="{{ form_buy_order.action.name }}">
-                                    {% for choice in form_buy_order.action.field.choices %}
-                                        {% if choice.0 == '0' or choice.0 == '1'  or choice.0 == '2' %}
+                                <select class="form-select" id="edit_action" name="{{ form_order.action.name }}"
+                                        onchange="toggleEditOrderAction(document.getElementById('edit_name_order_style').value)">
+                                    {% for choice in form_order.action.field.choices %}
                                             <option value="{{ choice.0 }}">
                                                 {{ choice.1 }}
                                             </option>
-                                        {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
+                            <div class="col-12 col-sm-4" id="lab_edit_trade">
+                                <label for="edit_trade">Trade ID</label>
+                                <select class="form-select" id="edit_trade">
+                                    {% for trade in trade_ids %}
+                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
+                                    {% endfor %}
+                                    <option value="">--------------</option>
+                                </select>
+                            </div>
+                            <div class="col-3 col-sm-4" id="lab_ref_edit_order">
+                                <label for="ref_edit_order">Reference Order</label>
+                                <select class="form-select" id="ref_edit_order">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
                             <div class="col-3 mb-3">
-                                <label for="edit_buy_quantity_target" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="edit_buy_quantity_target" required>
+                                <label for="edit_quantity_target" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="edit_quantity_target" required>
+                            </div>
+                            <div class="col-3 mb-3">
+                                <label for="edit_order_place_date">Order Place Date</label>
+                                <input type="date" class="form-control" id="edit_order_place_date">
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-3 col-sm-4 mt-3 mt-sm-0">
-                                <label for="{{ form_buy_order.order_type.id_for_label }}">Order Type</label>
-                                <select class="form-select" id="edit_buy_order_type"  onchange="toggleBuyEditFields()">
-                                    {% for choice in form_buy_order.order_type.field.choices %}
+                                <label for="{{ form_order.order_type.id_for_label }}">Order Type</label>
+                                <select class="form-select" id="edit_order_type"  onchange="toggleEditOrderPrice()">
+                                    {% for choice in form_order.order_type.field.choices %}
                                         <option value="{{ choice.0 }}">
                                             {{ choice.1 }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3 mb-3" id="lab_edit_buy_price_market">
-                                <label for="edit_buy_price_market" class="form-label">Market</label>
-                                <input type="number" class="form-control" id="edit_buy_price_market" step="0.01">
+                            <div class="col-3 mb-3" id="lab_edit_price_market">
+                                <label for="edit_price_market" class="form-label">Market</label>
+                                <input type="number" class="form-control" id="edit_price_market" step="0.01">
                             </div>
-                            <div class="col-3 mb-3" id="lab_edit_buy_price_stop">
-                                <label for="edit_buy_price_stop" class="form-label">Stop</label>
-                                <input type="number" class="form-control" id="edit_buy_price_stop" step="0.01">
+                            <div class="col-3 mb-3" id="lab_edit_price_stop">
+                                <label for="edit_price_stop" class="form-label">Stop</label>
+                                <input type="number" class="form-control" id="edit_price_stop" step="0.01">
                             </div>
-                            <div class="col-3 mb-3" id="lab_edit_buy_price_limit">
-                                <label for="edit_buy_price_limit" class="form-label">Limit</label>
-                                <input type="number" class="form-control" id="edit_buy_price_limit" step="0.01">
+                            <div class="col-3 mb-3" id="lab_edit_price_limit">
+                                <label for="edit_price_limit" class="form-label">Limit</label>
+                                <input type="number" class="form-control" id="edit_price_limit" step="0.01">
                             </div>
                         </div>
-                        <input type="hidden" id="edit_buy_order_id">
+                        <input type="hidden" id="edit_order_id">
                         <hr style="border: 1px solid black;">
                         <div class="row mt-3">
                             <div class="col-12">
-                                <label><h6>Reference additional buy Orders</h6></label>
+                                <label><h6>Reference additional Orders</h6></label>
                                 <ul id="ref_order_list" class="list-group">
                                     <!-- Reference orders will be populated here -->
                                 </ul>
@@ -1038,101 +1004,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitEditBuyOrder()">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditOrder()">Save changes</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Edit Sell Order Modal -->
-    <div class="modal fade" id="editSellOrderModal" tabindex="-1" aria-labelledby="editSellOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editSellOrderModalLabel">Edit Sell Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editHoldingSellOrderForm">
-                        <div class="row mt-3">
-                            <div class="col-3 col-sm-4">
-                                <label>Action</label>
-                                <select class="form-select" id="edit_sell_action" name="{{ form_sell_order.action.name }}"
-                                onchange="toggleEditRefSellOrderField()">
-                                    {% for choice in form_sell_order.action.field.choices %}
-                                        {% if choice.0 == '0' or choice.0 == '1' or choice.0 == '11' or choice.0 == '15' %}
-                                            <option value="{{ choice.0 }}">
-                                                {{ choice.1 }}
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-12 col-sm-4" id="lab_edit_sell_trade">
-                                <label for="edit_sell_trade">Trade ID</label>
-                                <select class="form-select" id="edit_sell_trade">
-                                    <option value="">--------------</option>
-                                    {% for trade in trade_ids %}
-                                        <option value="{{ trade.trade_id }}">{{ trade.trade_id }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-3 col-sm-4" id="lab_ref_edit_sell_order">
-                                <label for="ref_edit_sell_order">Reference Sell Order</label>
-                                <select class="form-select" id="ref_edit_sell_order">
-                                    <option value="">--------------</option>
-                                    {% for order in holding_sell_orders %}
-                                        <option value="{{ order.holding_sell_order_id }}">Buy {{ segment|order_name:order }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-3 mb-3">
-                                <label for="edit_sell_quantity_target" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="edit_sell_quantity_target" required>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-3 col-sm-4 mt-3 mt-sm-0">
-                                <label for="{{ form_sell_order.order_type.id_for_label }}">Order Type</label>
-                                <select class="form-select" id="edit_sell_order_type"  onchange="toggleSellEditFields()">
-                                    {% for choice in form_sell_order.order_type.field.choices %}
-                                        <option value="{{ choice.0 }}">
-                                            {{ choice.1 }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-3 mb-3" id="lab_edit_sell_price_market">
-                                <label for="edit_sell_price_market" class="form-label">Market</label>
-                                <input type="number" class="form-control" id="edit_sell_price_market" step="0.01">
-                            </div>
-                            <div class="col-3 mb-3" id="lab_edit_sell_price_stop">
-                                <label for="edit_sell_price_stop" class="form-label">Stop</label>
-                                <input type="number" class="form-control" id="edit_sell_price_stop" step="0.01">
-                            </div>
-                            <div class="col-3 mb-3" id="lab_edit_sell_price_limit">
-                                <label for="edit_sell_price_limit" class="form-label">Limit</label>
-                                <input type="number" class="form-control" id="edit_sell_price_limit" step="0.01">
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                <label for="edit_sell_order_place_date">Order Place Date</label>
-                                <input type="date" class="form-control" id="edit_sell_order_place_date">
-                            </div>
-                        </div>
-                        <input type="hidden" id="edit_sell_order_id">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitEditSellOrder()">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Edit Sell Order Modal -->
+    <!-- Adjust Order Modal -->
     <div class="modal fade" id="adjustSellOrderModal" tabindex="-1" aria-labelledby="adjustSellOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
@@ -1208,9 +1085,10 @@
     }
 
     ////////////////////////////////////////////// Transaction js //////////////////////////////////////////////
-    function showBuyOrderFill(holding_buy_order_Id, price_market, order_place_date, quantity_target) {
+    function showBuyOrderFill(order_Id, trade_id, price_market, order_place_date, quantity_target) {
         // Set the order ID in the hidden input field
-        document.getElementById('buy_order_Id').value = holding_buy_order_Id;
+        document.getElementById('buy_order_Id').value = order_Id;
+        document.getElementById('buy_trade_Id').value = trade_id;
         // Set the values in the modal input fields
         document.getElementById('buy_date').value = new Date().toISOString().split('T')[0]; //order_place_date;
         document.getElementById('buy_quantity_final').value = quantity_target;
@@ -1218,9 +1096,10 @@
         // Show the modal
         new bootstrap.Modal(document.getElementById('buyTransactionModal')).show();
     }
-    function showSellOrderFill(holding_sell_order_id, price_limit, order_place_date, quantity_target) {
+    function showSellOrderFill(order_id, trade_Id, price_limit, order_place_date, quantity_target) {
         // Set the order ID in the hidden input field
-        document.getElementById('sell_order_id').value = holding_sell_order_id;
+        document.getElementById('sell_order_id').value = order_id;
+        document.getElementById('sell_trade_Id').value = trade_Id;
         // Set the values in the modal input fields
         document.getElementById('sell_price_final').value = price_limit;
         document.getElementById('sell_date').value = new Date().toISOString().split('T')[0]; //order_place_date;
@@ -1231,21 +1110,23 @@
 
     async function addBuyTransaction() {
         const buy_order_Id = document.getElementById('buy_order_Id').value;
+        const buy_trade_Id = document.getElementById('buy_trade_Id').value;
         const quantityFinal = document.getElementById('buy_quantity_final').value;
         const priceFinal = document.getElementById('buy_price_final').value;
         const date = document.getElementById('buy_date').value;
-        addTransaction('Buy', buy_order_Id, quantityFinal, priceFinal, date, null);
+        addTransaction('Buy', buy_order_Id, buy_trade_Id, quantityFinal, priceFinal, date, null);
     }
     async function addSellTransaction() {
         const sell_order_Id = document.getElementById('sell_order_id').value;
+        const sell_trade_Id = document.getElementById('sell_trade_Id').value;
         const quantityFinal = document.getElementById('sell_quantity_final').value;
         const priceFinal = document.getElementById('sell_price_final').value;
         const date = document.getElementById('sell_date').value;
         const commission = document.getElementById('sell_commission').value;
-        addTransaction('Sell', sell_order_Id, quantityFinal, priceFinal, date, commission);
+        addTransaction('Sell', sell_order_Id, sell_trade_Id, quantityFinal, priceFinal, date, commission);
     }
 
-    async function addTransaction(type, order_Id, quantityFinal, priceFinal, date, commission) {
+    async function addTransaction(type, order_Id, trade_id, quantityFinal, priceFinal, date, commission) {
         const response = await fetch('/transaction/add/', {
             method: 'POST',
             headers: {
@@ -1254,6 +1135,7 @@
             },
             body: JSON.stringify({
                 holding_id: {{ holding.holding_id }},
+                trade_id : trade_id,
                 quantity_final: quantityFinal,
                 price_final: priceFinal,
                 date: date,
@@ -1333,90 +1215,216 @@
 
    ////////////////////////////////////////////// Order js //////////////////////////////////////////////
 
+    // toggle
+    function toggleCreateOrderAction(order_style){ toggleOrderAction(order_style, 'id_action', 'lab_trade', 'lab_ref_order');}
+    function toggleEditOrderAction(order_style){ toggleOrderAction(order_style, 'edit_action', 'lab_edit_trade', 'lab_ref_edit_order'); }
 
-    function toggleRefBuyOrderField(){
-        const action = document.getElementById('id_buy_action').value;
-        const ref_order = document.getElementById('lab_ref_buy_order');
+    function toggleCreateOrderPrice(){ toggleOrderPrice('id_order_type', 'lab_price_market', 'lab_price_stop', 'lab_price_limit'); }
+    function toggleEditOrderPrice(){ toggleOrderPrice('edit_order_type', 'lab_edit_price_market', 'lab_edit_price_stop', 'lab_edit_price_limit');}
 
-        if (action == '1' || action == '0' ){
-            ref_order.style.display = 'none';
-        } else {
-            ref_order.style.display = 'block';
+    function toggleOrderModal(id_modal, id_order_style, name_order_style, order_style){
+        const modal = document.getElementById(id_modal);
+        const style_id = document.getElementById(id_order_style);
+        const style_name = document.getElementById(name_order_style);
+
+        style_name.value = order_style
+        if (order_style === 'buy') {
+            modal.textContent = 'Create Buy Order';
+            style_id.value = 1;
+        } else if (order_style === 'sell') {
+            modal.textContent = 'Create Sell Order';
+            style_id.value = 2;
+        }else {
+            modal.textContent = 'UnKnown Order';
+            style_id.value = 0;
         }
     }
+    function toggleOrderAction(order_style, id_action, lab_trade, lab_ref_order){
+        const action = document.getElementById(id_action).value;
+        const ref_trade = document.getElementById(lab_trade);
+        const ref_order = document.getElementById(lab_ref_order);
 
-    function toggleRefSellOrderField(){
-        toggleRefSellOrder('id_sell_action', 'lab_sell_trade', 'lab_ref_sell_order');
-    }
-    function toggleEditRefSellOrderField(){
-        toggleRefSellOrder('edit_sell_action', 'lab_edit_sell_trade', 'lab_ref_edit_sell_order');
-    }
-    function toggleRefSellOrder(id_sell_action, lab_sell_trade,lab_ref_sell_order){
-        const action = document.getElementById(id_sell_action).value;
-        const ref_trade = document.getElementById(lab_sell_trade);
-        const ref_order = document.getElementById(lab_ref_sell_order);
-
-        if (action == '1' || action == '0' ){
-            ref_trade.style.display = 'block';
+        if (action === '1' || action === '0' ){
+            ref_trade.style.display= order_style === 'buy' ? 'none' : 'block';
             ref_order.style.display = 'none';
         } else {
             ref_trade.style.display = 'none';
             ref_order.style.display = 'block';
         }
     }
+    function toggleOrderPrice(id_order_type, id_price_market, id_price_stop, id_price_limit) {
+        const order_type = document.getElementById(id_order_type).value;
+        const market_price = document.getElementById(id_price_market);
+        const stop_price = document.getElementById(id_price_stop);
+        const limit_price = document.getElementById(id_price_limit);
 
-    function toggleBuyPriceFields(){
-        togglePriceFields('id_buy_order_type', 'lab_holding_buy_price_market', 'lab_holding_buy_price_stop', 'lab_holding_buy_price_limit');
-    }
-    function toggleSellPriceFields(){
-        togglePriceFields('id_sell_order_type', 'lab_holding_sell_price_market', 'lab_holding_sell_price_stop', 'lab_holding_sell_price_limit');
-    }
-    function toggleBuyEditFields(){
-        togglePriceFields('edit_buy_order_type', 'lab_edit_buy_price_market', 'lab_edit_buy_price_stop', 'lab_edit_buy_price_limit');
-    }
-    function toggleSellEditFields(){
-        togglePriceFields('edit_sell_order_type', 'lab_edit_sell_price_market', 'lab_edit_sell_price_stop', 'lab_edit_sell_price_limit');
-    }
-    function togglePriceFields(
-        id_buy_order_type, id_holding_buy_price_market, id_holding_buy_price_stop, id_holding_buy_price_limit) {
-        const orderType = document.getElementById(id_buy_order_type).value;
-        const marketPriceField = document.getElementById(id_holding_buy_price_market);
-        const stopPriceField = document.getElementById(id_holding_buy_price_stop);
-        const limitPriceField = document.getElementById(id_holding_buy_price_limit);
+        market_price.style.display = 'none';
+        stop_price.style.display = 'none';
+        limit_price.style.display = 'none';
 
-        marketPriceField.style.display = 'none';
-        stopPriceField.style.display = 'none';
-        limitPriceField.style.display = 'none';
-
-        if (orderType === '1') { // Market
-            marketPriceField.style.display = 'block';
-        } else if (orderType === '3') { // Stop
-            stopPriceField.style.display = 'block';
-        } else if (orderType === '2') { // Limit
-            limitPriceField.style.display = 'block';
-        } else if (orderType === '4') { // Stop Limit
-            stopPriceField.style.display = 'block';
-            limitPriceField.style.display = 'block';
+        if (order_type === '1') { // Market
+            market_price.style.display = 'block';
+        } else if (order_type === '3') { // Stop
+            stop_price.style.display = 'block';
+        } else if (order_type === '2') { // Limit
+            limit_price.style.display = 'block';
+        } else if (order_type === '4') { // Stop Limit
+            stop_price.style.display = 'block';
+            limit_price.style.display = 'block';
         }
     }
 
-    // Call the function on page load to set the initial state
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleBuyPriceFields();
-        toggleSellPriceFields();
-    });
+    // load
+    function loadEditOrder(id) {
+        // Fetch the existing data and populate the modal fields
+        fetch(`/position/order/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_order_id').value = data.id;
 
-    function showCreateBuyOrderModal() {
-        toggleRefBuyOrderField();
-        new bootstrap.Modal(document.getElementById('createBuyOrderModal')).show();
+                document.getElementById('edit_action').value = data.action;
+
+                document.getElementById('edit_order_type').value = data.order_type;
+                document.getElementById('edit_quantity_target').value = data.quantity_target;
+                document.getElementById('edit_price_market').value = data.price_market;
+                document.getElementById('edit_price_stop').value = data.price_stop;
+                document.getElementById('edit_price_limit').value = data.price_limit;
+
+                document.getElementById('edit_order_place_date').value = data.order_place_date;
+
+                //Reference Orders
+                fetchRefOrders(data.id); // Fetch and display reference orders
+
+                //modal
+                EditOrderModal(data.order_style === '1' ? 'buy' : 'sell');
+            });
     }
-    function showCreateSellOrderModal() {
-        toggleRefSellOrderField();
-        new bootstrap.Modal(document.getElementById('createSellOrderModal')).show();
+    function CreateOrderModal(order_style, order_type) {
+        //modal
+        toggleOrderModal('createOrderModalLabel', 'id_order_style', 'name_order_style', order_style);
+        //Action
+        toggleCreateOrderAction(order_style);
+        //Price
+        document.getElementById('id_order_type').value = order_type;
+        toggleCreateOrderPrice();
+        //load reference order
+        reloadRefOrderOptions('id_ref_order', order_style);
+        //Show modal
+        new bootstrap.Modal(document.getElementById('createOrderModal')).show();
+    }
+    function EditOrderModal(order_style) {
+        //modal
+        toggleOrderModal('editOrderModalLabel', 'edit_id_order_style', 'edit_name_order_style', order_style);
+        //Action
+        toggleEditOrderAction(order_style);
+        //Price
+        toggleEditOrderPrice();
+        //load reference order
+        reloadRefOrderOptions('ref_edit_order', order_style);
+        //Show modal
+        new bootstrap.Modal(document.getElementById('editOrderModal')).show();
     }
 
-    async function fetchRefOrders(ref_buy_order_id) {
-        const response = await fetch(`/position/holding/buy/order/${ref_buy_order_id}/ref_orders/`);
+    // save
+    async function submitCreateOrder() {
+        const ref_order_id = document.getElementById('id_ref_order').value;
+        const trade_id = document.getElementById('id_trade').value;
+
+        const order_style = document.getElementById('id_order_style').value;
+        const order_type = document.getElementById('id_order_type').value;
+        const quantity_target = document.getElementById('id_quantity_target').value;
+        const price_market = document.getElementById('id_price_market').value;
+        const price_stop = document.getElementById('id_price_stop').value;
+        const price_limit = document.getElementById('id_price_limit').value;
+
+        const order_place_date = document.getElementById('id_order_place_date').value;
+
+        const action = document.getElementById('id_action').value;
+        const timing = document.getElementById('id_timing').value;
+
+        const response = await fetch('/position/order/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                holding_id: {{ holding.holding_id }},
+                ref_order_id: ref_order_id,
+                trade_id: trade_id,
+
+                order_style: order_style,
+                order_type: order_type,
+                quantity_target: quantity_target,
+                price_market: price_market,
+                price_stop: price_stop,
+                price_limit: price_limit,
+
+                order_place_date: order_place_date,
+
+                action: action,
+                timing: timing,
+            })
+        });
+
+        if (response.ok) {
+            if (order_style === '1') {
+                alert("Buy Order created successfully!");
+            } else if (order_style === '2') {
+                alert("Sell Order created successfully!");
+            }
+            location.reload();
+        } else {
+            alert("Failed to create Order.");
+        }
+    }
+    async function submitEditOrder() {
+        const id = document.getElementById('edit_order_id').value;
+
+        const action = document.getElementById('edit_action').value;
+        const trade_id = document.getElementById('edit_trade').value;
+        const ref_order_id = document.getElementById('ref_edit_order').value;
+
+        const order_type = document.getElementById('edit_order_type').value;
+        const quantity_target = document.getElementById('edit_quantity_target').value;
+        const price_market = document.getElementById('edit_price_market').value;
+        const price_stop = document.getElementById('edit_price_stop').value;
+        const price_limit = document.getElementById('edit_price_limit').value;
+
+        const order_place_date = document.getElementById('edit_order_place_date').value;
+
+        const response = await fetch(`/position/order/${id}/edit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                action: action,
+                trade_id: trade_id,
+                ref_order_id: ref_order_id,
+
+                order_type: order_type,
+                quantity_target: quantity_target,
+                price_market: price_market,
+                price_stop: price_stop,
+                price_limit: price_limit,
+
+                order_place_date:  order_place_date
+            })
+        });
+
+        if (response.ok) {
+            alert("Order updated successfully!");
+            location.reload();
+        } else {
+            alert("Failed to update order.");
+        }
+    }
+
+    // fetch reference orders
+    async function fetchRefOrders(ref_order_id) {
+        const response = await fetch(`/position/order/${ref_order_id}/ref/`);
         const refOrders = await response.json();
         const refOrderList = document.getElementById('ref_order_list');
         refOrderList.innerHTML = '';
@@ -1429,221 +1437,10 @@
         });
     }
 
-    function editHoldingBuyOrder(id) {
-        // Fetch the existing data and populate the modal fields
-        fetch(`/position/holding/buy/order/${id}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('edit_buy_order_id').value = data.id;
-
-                document.getElementById('edit_buy_action').value = data.action;
-
-                document.getElementById('edit_buy_order_type').value = data.order_type;
-                document.getElementById('edit_buy_quantity_target').value = data.quantity_target;
-                document.getElementById('edit_buy_price_market').value = data.price_market;
-                document.getElementById('edit_buy_price_stop').value = data.price_stop;
-                document.getElementById('edit_buy_price_limit').value = data.price_limit;
-
-                fetchRefOrders(data.id); // Fetch and display reference orders
-
-                var editModal = new bootstrap.Modal(document.getElementById('editBuyOrderModal'));
-                editModal.show();
-                toggleBuyEditFields();
-            });
-    }
-    function editHoldingSellOrder(id) {
-        fetch(`/position/holding/sell/order/${id}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('edit_sell_order_id').value = data.id;
-
-                document.getElementById('edit_sell_action').value = data.action;
-
-                document.getElementById('edit_sell_trade').value = data.trade_id|| "";
-                document.getElementById('ref_edit_sell_order').value = data.ref_order_id|| "";
-                document.getElementById('edit_sell_order_type').value = data.order_type;
-                document.getElementById('edit_sell_quantity_target').value = data.quantity_target;
-                document.getElementById('edit_sell_price_market').value = data.price_market;
-                document.getElementById('edit_sell_price_stop').value = data.price_stop;
-                document.getElementById('edit_sell_price_limit').value = data.price_limit;
-
-                document.getElementById('edit_sell_order_place_date').value = data.order_place_date;
-                {#console.log("edit->"+data.order_place_date);#}
-
-                var editModal = new bootstrap.Modal(document.getElementById('editSellOrderModal'));
-                toggleEditRefSellOrderField();
-                toggleSellEditFields();
-                editModal.show();
-            })
-            .catch(error => console.error('Error fetching sell order data:', error));
-    }
-
-    async function submitCreateBuyOrder() {
-        const action = document.getElementById('id_buy_action').value;
-        const timing = document.getElementById('id_buy_timing').value;
-        const ref_order_id = document.getElementById('ref_buy_order_id').value;
-
-        const order_type = document.getElementById('id_buy_order_type').value;
-        const quantity_target = document.getElementById('id_buy_quantity_target').value;
-        const price_market = document.getElementById('id_buy_price_market').value;
-        const price_stop = document.getElementById('id_buy_price_stop').value;
-        const price_limit = document.getElementById('id_buy_price_limit').value;
-
-        const response = await fetch('/position/holding/buy/order/create/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                holding_id: {{ holding.holding_id }},
-                action: action,
-                timing: timing,
-                ref_order_id: ref_order_id,
-
-                order_type: order_type,
-                quantity_target: quantity_target,
-                price_market: price_market,
-                price_stop: price_stop,
-                price_limit: price_limit,
-            })
-        });
-
-        if (response.ok) {
-            alert("Buy Order created successfully!");
-            location.reload();
-        } else {
-            alert("Failed to create Buy Order.");
-        }
-    }
-    async function submitCreateSellOrder() {
-        const action = document.getElementById('id_sell_action').value;
-        const timing = document.getElementById('id_sell_timing').value;
-        const trade_id = document.getElementById('id_sell_trade').value;
-        const ref_order_id = document.getElementById('id_ref_sell_order').value;
-
-
-        const order_type = document.getElementById('id_sell_order_type').value;
-        const quantity_target = document.getElementById('id_sell_quantity_target').value;
-        const price_market = document.getElementById('id_sell_price_market').value;
-        const price_stop = document.getElementById('id_sell_price_stop').value;
-        const price_limit = document.getElementById('id_sell_price_limit').value;
-
-        const order_place_date = document.getElementById('id_sell_order_place_date').value;
-
-        const response = await fetch('/position/holding/sell/order/create/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                holding_id: {{ holding.holding_id }},
-                action: action,
-                timing: timing,
-
-                trade_id: trade_id,
-                ref_order_id: ref_order_id,
-
-                order_type: order_type,
-                quantity_target: quantity_target,
-                price_market: price_market,
-                price_stop: price_stop,
-                price_limit: price_limit,
-
-                order_place_date: order_place_date,
-            })
-        });
-
-        if (response.ok) {
-            alert("Sell Order created successfully!");
-            location.reload();
-        } else {
-            alert("Failed to create Sell Order.");
-        }
-    }
-
-    async function submitEditBuyOrder() {
-        const id = document.getElementById('edit_buy_order_id').value;
-
-        const action = document.getElementById('edit_buy_action').value;
-
-        const order_type = document.getElementById('edit_buy_order_type').value;
-        const quantity_target = document.getElementById('edit_buy_quantity_target').value;
-        const price_market = document.getElementById('edit_buy_price_market').value;
-        const price_stop = document.getElementById('edit_buy_price_stop').value;
-        const price_limit = document.getElementById('edit_buy_price_limit').value;
-
-        const response = await fetch(`/position/holding/buy/order/${id}/edit/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                action: action,
-
-                order_type: order_type,
-                quantity_target: quantity_target,
-                price_market: price_market,
-                price_stop: price_stop,
-                price_limit: price_limit
-            })
-        });
-
-        if (response.ok) {
-            alert("Order updated successfully!");
-            location.reload();
-        } else {
-            alert("Failed to update order.");
-        }
-    }
-    async function submitEditSellOrder() {
-        const id = document.getElementById('edit_sell_order_id').value;
-
-        const action = document.getElementById('edit_sell_action').value;
-        const trade_id = document.getElementById('edit_sell_trade').value;
-        const ref_order_id = document.getElementById('ref_edit_sell_order').value;
-
-        const order_type = document.getElementById('edit_sell_order_type').value;
-        const quantity_target = document.getElementById('edit_sell_quantity_target').value;
-        const price_market = document.getElementById('edit_sell_price_market').value;
-        const price_stop = document.getElementById('edit_sell_price_stop').value;
-        const price_limit = document.getElementById('edit_sell_price_limit').value;
-        const order_place_date = document.getElementById('edit_sell_order_place_date').value;
-
-        const response = await fetch(`/position/holding/sell/order/${id}/edit/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                action: action,
-                trade_id: trade_id,
-                ref_order_id: ref_order_id,
-
-                order_type: order_type,
-                quantity_target: quantity_target,
-                price_market: price_market,
-                price_stop: price_stop,
-                price_limit: price_limit,
-
-                order_place_date: order_place_date
-            })
-        });
-
-        if (response.ok) {
-            alert("Order updated successfully!");
-            location.reload();
-        } else {
-            alert("Failed to update order.");
-        }
-    }
-
-    function showSellAdjustOrderFill(holding_sell_order_id, quantity_target, price_stop, price_limit) {
+    // adjust stop limit order
+    function popAdjustSellOrder(order_id, quantity_target, price_stop, price_limit) {
         // Set the order ID in the hidden input field
-        document.getElementById('adjust_sell_order_id').value = holding_sell_order_id;
+        document.getElementById('adjust_sell_order_id').value = order_id;
         // Set the values in the modal input fields
         document.getElementById('adjust_sell_quantity').value = quantity_target;
         document.getElementById('adjust_sell_price_stop').value = price_stop;
@@ -1655,23 +1452,20 @@
         new bootstrap.Modal(document.getElementById('adjustSellOrderModal')).show();
     }
     async function submitAdjustSellOrder() {
-        const sell_order_id = document.getElementById('adjust_sell_order_id').value;
+        const order_id = document.getElementById('adjust_sell_order_id').value;
 
         const quantity_target = document.getElementById('adjust_sell_quantity').value;
         const price_stop = document.getElementById('adjust_sell_price_stop').value;
         const price_limit = document.getElementById('adjust_sell_price_limit').value;
         const order_place_date = document.getElementById('adjust_order_place_date').value;
 
-
-        const response = await fetch(`/position/holding/sell/order/${sell_order_id}/adjust/`, {
+        const response = await fetch(`/position/order/${order_id}/adjust/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
             body: JSON.stringify({
-                sell_order_id: sell_order_id,
-
                 quantity_target: quantity_target,
                 price_stop: price_stop,
                 price_limit: price_limit,
@@ -1687,26 +1481,9 @@
         }
     }
 
-    async function deleteHoldingBuyOrder(id) {
+    async function deleteOrder(id) {
         if (confirm("Are you sure you want to delete this order?")) {
-            const response = await fetch(`/position/holding/buy/order/${id}/delete/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-
-            if (response.ok) {
-                alert("Order deleted successfully!");
-                location.reload();
-            } else {
-                alert("Failed to delete order.");
-            }
-        }
-    }
-    async function deleteHoldingSellOrder(id) {
-        if (confirm("Are you sure you want to delete this order?")) {
-            const response = await fetch(`/position/holding/sell/order/${id}/delete/`, {
+            const response = await fetch(`/position/order/${id}/delete/`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -1737,6 +1514,44 @@
         } else {
             alert("Failed to calculate trade.");
         }
+    }
+
+    async function reloadRefOrderOptions(id_ref_order, order_style) {
+        const refOrderSelect = document.getElementById(id_ref_order);
+        const buyOrders = [
+            {% for order in buy_orders %}
+            { id: '{{ order.order_id }}', text: '[{{ order.order_id }}]: Buy {{ segment|order_name:order }}' },
+            {% endfor %}
+        ];
+        const sellOrders = [
+            {% for order in sell_orders %}
+            { id: '{{ order.order_id }}', text: '[{{ order.order_id }}]: Sell {{ segment|order_name:order }}' },
+            {% endfor %}
+        ];
+
+        // Clear existing options
+        refOrderSelect.innerHTML = '';
+
+        // Add filtered options
+        let orders = [];
+        if (order_style === 'buy') {
+            orders = buyOrders;
+        } else if (order_style === 'sell') {
+            orders = sellOrders;
+        }
+
+        orders.forEach(order => {
+            const option = document.createElement('option');
+            option.value = order.id;
+            option.textContent = order.text;
+            refOrderSelect.appendChild(option);
+        });
+
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '--------------------';
+        refOrderSelect.appendChild(defaultOption);
     }
 
     ////////////////////////////////////////////// Quote html //////////////////////////////////////////////

@@ -202,21 +202,21 @@ class Portfolio(PositionBase):
 
     def get_holding_sell_order(self, holding_df: DataFrame) -> pd.DataFrame:
         holding_ids = holding_df['holding_id'].tolist()
-        sell_orders = HoldingSellOrder.objects.filter(holding_id__in=holding_ids).values(
-            'holding_sell_order_id', 'holding_id', 'is_obsolete', 'order_place_date', 'quantity_target', 'price_stop', 'price_limit'
+        sell_orders = Order.objects.filter(holding_id__in=holding_ids, order_style=2).values(
+            'order_id', 'holding_id', 'is_obsolete', 'order_place_date', 'quantity_target', 'price_stop', 'price_limit'
         )
         sell_order_df = pd.DataFrame(list(sell_orders))
         sell_order_df['order_place_date'] = pd.to_datetime(sell_order_df['order_place_date']).dt.date
         sell_order_df = pd.merge(sell_order_df, holding_df[['holding_id', 'symbol']], on='holding_id', how='left')
 
         # Fetch transactions by sell_order_id
-        transactions = Transaction.objects.filter(sell_order_id__in=sell_order_df['holding_sell_order_id'].tolist())
+        transactions = Transaction.objects.filter(order_id__in=sell_order_df['order_id'].tolist())
         transactions_df = pd.DataFrame(list(transactions.values()))
         transactions_df['date'] = pd.to_datetime(transactions_df['date']).dt.date
 
         # Calculate is_filled
         sell_order_df['is_filled'] = sell_order_df.apply(
-            lambda row: True if transactions_df[transactions_df['sell_order_id'] == row['holding_sell_order_id']]['quantity_final'].sum()
+            lambda row: True if transactions_df[transactions_df['order_id'] == row['order_id']]['quantity_final'].sum()
                              == row['quantity_target'] else False,axis=1)
 
         # Add status column
@@ -226,7 +226,7 @@ class Portfolio(PositionBase):
 
         # Add fill_date column
         sell_order_df['fill_date'] = sell_order_df.apply(
-            lambda row: transactions_df[transactions_df['sell_order_id'] == row['holding_sell_order_id']]['date'].max()
+            lambda row: transactions_df[transactions_df['order_id'] == row['order_id']]['date'].max()
             if row['is_filled'] else pd.NaT, axis=1
         )
 
@@ -246,8 +246,8 @@ class Portfolio(PositionBase):
         filled_records = sell_order_df[sell_order_df['fill_date'].notna()].copy()
         filled_records['date'] = filled_records['fill_date']
         filled_records['status'] = 'Filled'
-        filled_records['holding_sell_order_id'] = -filled_records['holding_sell_order_id']
-        filled_records = filled_records[['holding_sell_order_id', 'holding_id', 'is_obsolete', 'date', 'symbol', 'status', 'fill_date','baseline']]
+        filled_records['order_id'] = -filled_records['order_id']
+        filled_records = filled_records[['order_id', 'holding_id', 'is_obsolete', 'date', 'symbol', 'status', 'fill_date','baseline']]
         # Append filled records back to sell_order_df
         sell_order_df = pd.concat([sell_order_df, filled_records])
 

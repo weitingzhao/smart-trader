@@ -126,7 +126,7 @@
                                   <div class="row mt-3">
                                       <div class="col-3 col-sm-4 mt-3 mt-sm-0">
                                           <label for="{{ form.order_type.id_for_label }}">Order Type</label>
-                                          <select class="form-select" id="id_buy_order_type" name="{{ form.order_type.name }}" onchange="toggleBuyPriceFields()">
+                                          <select class="form-select" id="id_buy_order_type" name="{{ form.order_type.name }}" onchange="toggleCreateOrderPrice()">
                                             {% for choice in form.order_type.field.choices %}
                                                 <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
                                                     {{ choice.1 }}

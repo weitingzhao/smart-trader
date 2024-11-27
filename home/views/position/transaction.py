@@ -29,6 +29,7 @@ def add(request):
         data = json.loads(request.body)
 
         holding_id = data.get('holding_id')
+        trade_id = data.get('trade_id')
         quantity_final = data.get('quantity_final')
         price_final = data.get('price_final')
         date = data.get('date') if data.get('date') != '' else datetime.now().strftime('%Y-%m-%d')
@@ -48,21 +49,12 @@ def add(request):
                 date=date,
                 quantity_final=quantity_final,
                 price_final=price_final,
-                commission=commission
+                commission=commission,
+                trade_id=trade_id,
+                order_id=ref_id,
             )
 
-            if ref_type == 'Buy':  # Buy
-                transaction.buy_order_id = ref_id
-                holding_order = HoldingBuyOrder.objects.get(holding_buy_order_id=ref_id)
-            elif ref_type == 'Sell' :  # Sell
-                transaction.sell_order_id = ref_id
-                holding_order = HoldingSellOrder.objects.get(holding_sell_order_id=ref_id)
-            transaction.save()
-
-            # Get trade_id and call trade_calculate method
-            if holding_order is not None:
-                trade_id = holding_order.trade_id
-                position.open_positions.trade_calculate(None, trade_id)
+            position.open_positions.trade_calculate(None, trade_id)
 
             return JsonResponse({'status': 'success', 'transaction_id': transaction.transaction_id})
 

@@ -99,20 +99,11 @@ class ClosePosition(PositionBase):
         # Step 3. trades
         trades = (Transaction.objects.filter(holding__in=holdings)
         .annotate(
-            trade_id=Case(
-                When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
-                When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
-                default=Value(None),
-                output_field=IntegerField()
-            ),
-            is_finished=Case(
-                When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
-                When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
-                default=Value(None),
-                output_field=BooleanField()
+            trade_is_finished=Subquery(
+                Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
             )
         )
-        .filter(Q(is_finished=True))
+        .filter(Q(trade_is_finished=True))
         .annotate(amount=F('quantity_final') * F('price_final'))
         .values('trade_id', 'holding_id')
         .annotate(
@@ -144,11 +135,12 @@ class ClosePosition(PositionBase):
         return stock_prices_df
 
     def get_initial_sell_orders(self, trade_ids: List) -> pd.DataFrame:
-        initial_sell_orders = HoldingSellOrder.objects.filter(
-            trade_id__in=trade_ids
+        initial_sell_orders = Order.objects.filter(
+            trade_id__in=trade_ids,
+            order_style=2,
         ).values('trade_id').annotate(
-            init_sell_order_id=Min('holding_sell_order_id'),
-            last_sell_order_id=Max('holding_sell_order_id')
+            init_sell_order_id=Min('order_id'),
+            last_sell_order_id=Max('order_id')
         )
         # Convert to DataFrame
         initial_sell_orders_df = pd.DataFrame(list(initial_sell_orders))
@@ -156,12 +148,12 @@ class ClosePosition(PositionBase):
         # get init_stop, init_limit, last_stop, and last_limit
         init_sell_order_ids = initial_sell_orders_df['init_sell_order_id'].tolist()
         last_sell_order_ids = initial_sell_orders_df['last_sell_order_id'].tolist()
-        init_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=init_sell_order_ids
-        ).values('holding_sell_order_id', 'price_stop', 'price_limit')
-        last_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=last_sell_order_ids
-        ).values('holding_sell_order_id', 'price_stop', 'price_limit')
+        init_sell_orders = Order.objects.filter(
+            order_id__in=init_sell_order_ids
+        ).values('order_id', 'price_stop', 'price_limit')
+        last_sell_orders = Order.objects.filter(
+            order_id__in=last_sell_order_ids
+        ).values('order_id', 'price_stop', 'price_limit')
 
         # Convert to DataFrame
         init_sell_orders_df = pd.DataFrame(list(init_sell_orders))
@@ -172,18 +164,18 @@ class ClosePosition(PositionBase):
             initial_sell_orders_df,
             init_sell_orders_df,
             left_on='init_sell_order_id',
-            right_on='holding_sell_order_id',
+            right_on='order_id',
             how='left',
             suffixes=('', '_init')
-        ).drop(columns=['holding_sell_order_id'])
+        ).drop(columns=['order_id'])
         initial_sell_orders_df = pd.merge(
             initial_sell_orders_df,
             last_sell_orders_df,
             left_on='last_sell_order_id',
-            right_on='holding_sell_order_id',
+            right_on='order_id',
             how='left',
             suffixes=('', '_last')
-        ).drop(columns=['holding_sell_order_id'])
+        ).drop(columns=['order_id'])
 
         # Rename columns for clarity
         initial_sell_orders_df.rename(columns={

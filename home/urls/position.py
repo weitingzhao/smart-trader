@@ -13,47 +13,18 @@ urlpatterns = [
     ####### holding. trade #######
     path('holding/trade/<int:trade_id>/', position.trade.update_phase,  name='update_trade_phase'),
 
-    ####### holding. buy order #######
+    ####### order #######
+    path('order/create/', position.open_positions.add_order, name='add_order'),
 
-    path('holding/buy/order/<int:holding_buy_order_id>/',
-        position.open_positions.get_holding_buy_order,
-        name='get_holding_buy_order'),
+    path('order/<int:order_id>/', position.open_positions.get_order,  name='get_order'),
 
-    path('holding/buy/order/<int:ref_buy_order_id>/ref_orders/',
-         position.open_positions.get_holding_buy_ref_order,
-         name='get_holding_buy_ref_order'),
+    path('order/<int:order_id>/edit/', position.open_positions.edit_order, name='edit_order'),
 
-    path('holding/buy/order/create/',
-         position.open_positions.add_holding_buy_order,
-         name='add_holding_buy_order'),
+    path('order/<int:order_id>/ref/', position.open_positions.get_order_ref, name='get_order_ref'),
 
-    path('holding/buy/order/<int:holding_buy_order_id>/edit/',
-        position.open_positions.edit_holding_buy_order,
-        name='edit_holding_buy_order'),
+    path('order/<int:order_id>/delete/', position.open_positions.delete_order,  name='delete_order'),
 
-    path('holding/buy/order/<int:holding_buy_order_id>/delete/',
-        position.open_positions.delete_holding_buy_order,
-        name='delete_holding_sell_order'),
-
-    ####### holding. sell order #######
-
-    path('holding/sell/order/<int:holding_sell_order_id>/',
-         position.open_positions.get_holding_sell_order,
-         name='get_holding_sell_order'),
-
-    path('holding/sell/order/create/',
-         position.open_positions.add_holding_sell_order,
-         name='add_holding_sell_order'),
-
-    path('holding/sell/order/<int:holding_sell_order_id>/edit/',
-         position.open_positions.edit_holding_sell_order,
-         name='edit_holding_sell_order'),
-    path('holding/sell/order/<int:holding_sell_order_id>/adjust/',
-         position.open_positions.adjust_holding_sell_order,
-         name='adjust_holding_sell_order'),
-    path('holding/sell/order/<int:holding_sell_order_id>/delete/',
-         position.open_positions.delete_holding_sell_order,
-         name='delete_holding_sell_order'),
+    path('order/<int:order_id>/adjust/', position.open_positions.adjust_order, name='adjust_order'),
 
     ####### position.adjust_stop_limits #######
     # Adjust Stop Limit  -> Default

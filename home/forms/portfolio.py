@@ -40,7 +40,7 @@ class HoldingOrderForm(forms.ModelForm):
     price_market = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
         'step': '0.01',
-        'id': 'id_buy_price_market'
+        'id': 'id_price_market'
     }))
     price_stop = forms.DecimalField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
@@ -65,31 +65,15 @@ class HoldingOrderForm(forms.ModelForm):
         ]
 
 
-class HoldingBuyOrderForm(HoldingOrderForm):
+class OrderForm(HoldingOrderForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['id'] = f'id_buy_{field_name}'
 
     wishlist = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
         'min': '0',
-        'id': 'id_holding_buy_wishlist'
+        'id': 'id_wishlist'
     }), required=False)
-
-    class Meta:
-        model = HoldingBuyOrder
-        fields = [
-            'holding_symbol', 'action', 'timing','order_type',
-            'quantity_target', 'price_market', 'price_stop', 'price_limit',
-            "wishlist"
-        ]
-
-class HoldingSellOrderForm(HoldingOrderForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['id'] = f'id_sell_{field_name}'
 
     order_place_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
         'class': 'form-control',
@@ -98,12 +82,53 @@ class HoldingSellOrderForm(HoldingOrderForm):
     }), required=False, initial=datetime.date.today().strftime('%Y-%m-%d'))
 
     class Meta:
-        model = HoldingSellOrder
+        model = Order
         fields = [
-            'holding_symbol', 'action', 'timing', 'order_type',
-            'quantity_target','price_market', 'price_stop', 'price_limit',
-            'is_obsolete', 'order_place_date'
+            'holding_symbol', 'action', 'timing',
+            'order_type','order_style',
+            'quantity_target', 'price_market', 'price_stop', 'price_limit',
+            "wishlist",'is_obsolete', 'order_place_date'
         ]
+
+# class HoldingBuyOrderForm(HoldingOrderForm):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for field_name, field in self.fields.items():
+#             field.widget.attrs['id'] = f'id_buy_{field_name}'
+#
+#     wishlist = forms.IntegerField(widget=forms.NumberInput(attrs={
+#         'class': 'form-control',
+#         'min': '0',
+#         'id': 'id_holding_buy_wishlist'
+#     }), required=False)
+#
+#     class Meta:
+#         model = HoldingBuyOrder
+#         fields = [
+#             'holding_symbol', 'action', 'timing','order_type',
+#             'quantity_target', 'price_market', 'price_stop', 'price_limit',
+#             "wishlist"
+#         ]
+#
+# class HoldingSellOrderForm(HoldingOrderForm):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for field_name, field in self.fields.items():
+#             field.widget.attrs['id'] = f'id_sell_{field_name}'
+#
+#     order_place_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={
+#         'class': 'form-control',
+#         'type': 'date',
+#         'id': 'id_order_place_date',
+#     }), required=False, initial=datetime.date.today().strftime('%Y-%m-%d'))
+#
+#     class Meta:
+#         model = HoldingSellOrder
+#         fields = [
+#             'holding_symbol', 'action', 'timing', 'order_type',
+#             'quantity_target','price_market', 'price_stop', 'price_limit',
+#             'is_obsolete', 'order_place_date'
+#         ]
 
 class FundingForm(forms.ModelForm):
 

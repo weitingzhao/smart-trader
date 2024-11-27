@@ -118,14 +118,16 @@ class OpenPosition(PositionBase):
     def get_holding_initial_stop(self) -> pd.DataFrame:
 
         # Subquery to get the maximum holding_sell_order_id for each holding_id
-        max_id_subquery = HoldingSellOrder.objects.filter(
+        max_id_subquery = Order.objects.filter(
             holding_id=OuterRef('holding_id'),
+            order_style=2,
             action=1
-        ).order_by('-holding_sell_order_id').values('holding_sell_order_id')[:1]
+        ).order_by('-order_id').values('order_id')[:1]
 
         # Query to get initial sell orders (action=1) for each holding_id based on the subquery
-        initial_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=Subquery(max_id_subquery)
+        initial_sell_orders = Order.objects.filter(
+            order_id__in=Subquery(max_id_subquery),
+            order_style=2
         ).values('holding_id', 'order_place_date', 'price_stop', 'price_limit')
 
         # Convert the query result to a DataFrame
@@ -146,22 +148,25 @@ class OpenPosition(PositionBase):
     def get_holding_current_stop(self) -> pd.DataFrame:
 
         # Subquery to get the maximum trade_id for each holding_id
-        max_trade_id_subquery = (HoldingSellOrder.objects.filter(holding_id=OuterRef('holding_id'))
+        max_trade_id_subquery = (Order.objects.filter(holding_id=OuterRef('holding_id'))
             .order_by('-trade_id').values('trade_id'))[:1]
 
         # Query to get holding_sell_order where trade_id is in the previous trade_id list
-        sell_orders_with_max_trade_id = (HoldingSellOrder.objects.filter(trade_id__in=Subquery(max_trade_id_subquery)))
+        sell_orders_with_max_trade_id = (Order.objects.filter(
+            trade_id__in=Subquery(max_trade_id_subquery),
+            order_style=2
+        ))
 
         # Subquery to get the maximum holding_sell_order_id for each trade_id
         max_sell_order_id_subquery = (
             sell_orders_with_max_trade_id
             .values('trade_id')
-            .annotate(max_sell_order_id=Max('holding_sell_order_id'))
+            .annotate(max_sell_order_id=Max('order_id'))
             .values('max_sell_order_id'))
 
         # Query to get all holding_sell_order in the previous holding_sell_order_id list
-        last_sell_orders = HoldingSellOrder.objects.filter(
-            holding_sell_order_id__in=Subquery(max_sell_order_id_subquery)
+        last_sell_orders = Order.objects.filter(
+            order_id__in=Subquery(max_sell_order_id_subquery)
         ).values('holding_id', 'order_place_date', 'price_stop', 'price_limit', 'trade_id')
 
         # Convert the query result to a DataFrame
@@ -207,22 +212,14 @@ class OpenPosition(PositionBase):
     def get_current_position(self, holdings: QuerySet[Holding]) -> pd.DataFrame:
 
         # Fetch and sum the quantity_final from transaction
-        transaction = (Transaction.objects.filter(holding__in=holdings)
+        transaction = (
+            Transaction.objects.filter(holding__in=holdings)
             .annotate(
-               trade_id=Case(
-                   When(buy_order_id__isnull=False, then=F('buy_order__trade_id')),
-                   When(sell_order_id__isnull=False, then=F('sell_order__trade_id')),
-                   default=Value(None),
-                   output_field=IntegerField()
-               ),
-               is_finished=Case(
-                   When(buy_order_id__isnull=False, then=F('buy_order__trade__is_finished')),
-                   When(sell_order_id__isnull=False, then=F('sell_order__trade__is_finished')),
-                   default=Value(None),
-                   output_field=BooleanField()
-               )
-           )
-           .filter(Q(is_finished=False) | Q(is_finished__isnull=True))
+                trade_is_finished=Subquery(
+                    Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
+                )
+            )
+           .filter(Q(trade_is_finished=False) | Q(trade_is_finished__isnull=True))
            .annotate(amount=F('quantity_final') * F('price_final'))
            .values('holding_id')
            .annotate(
