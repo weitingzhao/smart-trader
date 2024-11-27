@@ -77,14 +77,17 @@ class Portfolio(PositionBase):
         balance_df = self.balance_history(portfolio)
         # Step 1.
         # calculate margin
-        balance_df['margin'] = balance_df['total_market']  - balance_df['total_asset'] + balance_df['funding']
-        balance_df['margin_diff'] = balance_df['margin'].diff()
+        # remove funding affect margin logic
+        balance_df['total_market_with_funding'] = balance_df['total_market'] + balance_df['funding']
+        balance_df['margin_diff'] = balance_df['total_market_with_funding'].diff()
+        balance_df['margin_diff'] = balance_df['margin_diff'] - balance_df['funding']
+
         balance_df['margin_diff_pct'] = (balance_df['margin_diff'] / balance_df['total_market'].shift(1)) * 100
 
         # Calculate asset growth percentage
-        balance_df['asset_growth_pct'] = (balance_df['margin'] / balance_df['total_asset']) * 100
+        balance_df['asset_growth_pct'] = (balance_df['margin_diff'] / balance_df['total_asset']) * 100
         # Calculate invest growth percentage
-        balance_df['invest_growth_pct'] = (balance_df['margin'] / balance_df['total_invest']) * 100
+        balance_df['invest_growth_pct'] = (balance_df['margin_diff'] / balance_df['total_invest']) * 100
 
         # Step 2.
         # compare with index
@@ -156,7 +159,6 @@ class Portfolio(PositionBase):
             if row['transaction_type'] == '1' else -row['quantity_final'] * row['price_final'] - row['commission'],
             axis=1
         )
-        transactions_df = transactions_df.drop(columns=['buy_order_id', 'sell_order_id'])
 
         # Group by holding and trade_id
         transactions_df['symbol'] = transactions_df['holding_id'].map(holding_df.set_index('holding_id')['symbol'])
@@ -314,7 +316,7 @@ class Portfolio(PositionBase):
         balance_df = balance_df.drop(columns=['cash_mm'])
         # balance_df['funding']
         # Calculate total capital and market value
-        balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily']
+        balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily'] # not  add funding here
         balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily'] + balance_df['funding']
         balance_df['total_invest'] = balance_df['balance_holding']
         return balance_df
