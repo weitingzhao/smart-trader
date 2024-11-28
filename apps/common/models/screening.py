@@ -2,6 +2,9 @@ from django.db import models
 
 from . import Wishlist
 from .market import MarketSymbol
+from timescale.db.models.models import TimescaleModel
+
+
 
 class Screening(models.Model):
     """
@@ -16,7 +19,6 @@ class Screening(models.Model):
 
     def __str__(self):
         return f"Screening: {self.name}"
-
 
 
 class ScreeningResult(models.Model):
@@ -35,6 +37,7 @@ class ScreeningResult(models.Model):
     def __str__(self):
         return f"Screening Result: {self.screening.name} for {self.symbol.symbol} at {self.run_at}"
 
+
 class ScreeningCriteria(models.Model):
     """
     This model is used to store the criteria of a screening strategy
@@ -51,3 +54,26 @@ class ScreeningCriteria(models.Model):
     def __str__(self):
         return f"Screening Criteria: {self.criteria} for {self.screening.name}"
 
+
+class RatingIndicatorResult(TimescaleModel):
+
+    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.DO_NOTHING)
+    time = models.DateField()
+
+    sma = models.FloatField(null=True, blank=True)
+    rsi = models.FloatField(null=True, blank=True)
+    bollinger_upper = models.FloatField(null=True, blank=True)
+    bollinger_lower = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'rating_indicator_result'
+        indexes = [
+            models.Index(fields=['symbol', 'time']),
+        ]
+        # Setting a composite primary key
+        constraints = [
+            models.UniqueConstraint(fields=['symbol', 'time'], name='unique_symbol_time_pk')
+        ]
+
+    def __str__(self):
+        return f"screening.rating_indicator_result: {self.symbol} on {self.time}"

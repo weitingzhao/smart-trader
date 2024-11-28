@@ -26,6 +26,9 @@ urlpatterns = [
     # Screening Result -> Default
     path('screening_result/', screening.screening_results.default, name='screening_results'),
 
+    path('rating/output/', screening.screening_results.output, name='screening_output'),
+
+
     ####### screening.quote #######
     # Screening Quote -> Default
     path('stock/quote/<str:symbol>', screening.quote.default, name="stock_quote"),

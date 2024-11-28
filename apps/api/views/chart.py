@@ -65,14 +65,33 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         # Return the image as a response
         return HttpResponse(buf, content_type='image/png')
 
-    # Calculate volatility contraction
-    def detect_vcp(self, stock_data):
-        stock_data['SMA_50'] = ta.SMA(stock_data['close'], timeperiod=50)
-        stock_data['ATR'] = ta.ATR(stock_data['high'], stock_data['low'], stock_data['close'], timeperiod=14)
-        # Calculate the relative contraction in volatility (percentage reduction in ATR over time)
-        stock_data['Volatility_Contraction'] = stock_data['ATR'].pct_change().rolling(window=5).mean()
+
+    def detect_vcp_pattern(self, stock_data,
+            contraction_window=10, higher_lows_window=5, volume_dry_up_window=10):
+
+        # Step 3.a.1 Define contraction condition: multiple successive lower ATR readings
+        contraction_data = self.detect_contraction(stock_data, window=contraction_window)
+        # Step 3.d.2 Detect higher lows and tightening price ranges
+        higher_lows_data = self.detect_higher_lows(contraction_data, window=higher_lows_window)
+        # Step 3.d.3 Detect volume dry-up
+        volume_dry_up_data = self.detect_volume_dry_up(higher_lows_data , window=volume_dry_up_window)
+
+        # Step 4. Locate VCP Candidate
+        # The final VCP candidates are the intersection of all conditions
+        vcp_candidates = contraction_data.index.intersection(higher_lows_data.index).intersection(volume_dry_up_data.index)
+
         # Define contraction condition: multiple successive lower ATR readings
-        contraction = (stock_data['Volatility_Contraction'] < 0).rolling(window=10).sum() > 5
+        contraction = (stock_data['RCV'] < 0).rolling(window=10).sum() > 5
+        # Detect when price is contracting and trending above its 50-day SMA
+        vcp_candidate = contraction & (stock_data['close'] > stock_data['SMA_50'])
+        vcp_data = stock_data[vcp_candidate]
+        stock_data['VCP_Candidate'] = np.where(stock_data.index.isin(vcp_data.index), 1, np.nan)
+
+
+    def detect_contraction(self, stock_data, window=10):
+        # Step 3.a.1 Define contraction condition: multiple successive lower ATR readings
+        contraction = (stock_data['RCV'] < 0).rolling(window=window).sum() > 5
+
         # Detect when price is contracting and trending above its 50-day SMA
         vcp_candidate = contraction & (stock_data['close'] > stock_data['SMA_50'])
         return stock_data[vcp_candidate]
@@ -87,72 +106,51 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
         stock_data.loc[:, 'High_Delta'] = stock_data['high'].diff(periods=window)
         tightening_ranges = (stock_data['High_Delta'] < 0).rolling(window=window).sum() >= (window - 1)
 
+        # Combine both conditions to identify VCP candidates
         vcp_candidate = higher_lows & tightening_ranges
         return stock_data[vcp_candidate]
 
-    def detect_volume_dryup(self, stock_data, window=10):
-        stock_data['Volume_SMA'] = ta.SMA(stock_data['volume'], timeperiod=window)
+    def detect_volume_dry_up(self, stock_data, window=10):
         # Check for volume dry-up (low volume) during price contraction
         volume_dryup = stock_data['volume'] < (stock_data['Volume_SMA'] * 0.5)
         return stock_data[volume_dryup]
 
-    def detect_vcp_pattern(self, stock_data):
-        # Detect price contraction (volatility contraction)
-        contraction_data = self.detect_vcp(stock_data)
-
-        # Detect higher lows and tightening price ranges
-        higher_lows_data = self.detect_higher_lows(contraction_data)
-
-        # Detect volume dry-up
-        volume_dryup_data = self.detect_volume_dryup(higher_lows_data)
-
-        # The final VCP candidates are the intersection of all conditions
-        vcp_candidates = contraction_data.index.intersection(higher_lows_data.index).intersection(
-            volume_dryup_data.index)
-
-        return stock_data.loc[vcp_candidates]
 
     def fetch_data(self, symbol, interval, elements=None):
-        # Base query
 
-        query = MarketStockHistoricalBarsByDay.objects.filter(symbol=symbol)
-
-        # add 200 since results include SMA_200
+        # Step 1. Prepare base data
+        # Step 1.a preset elements, ]add 200 since results include SMA_200
         elements = elements + 200
 
-        # Filter based on elements
-        if elements:
-            query = query.order_by('-time')[:elements]
-        else:
-            query = query.filter(time__gte=Dates.cutoff_date(interval))
+        # Step 1.b. Prepare query
+        query = MarketStockHistoricalBarsByDay.objects.filter(symbol=symbol)
+        query = query.order_by('-time')[:elements] if elements else  query.filter(time__gte=Dates.cutoff_date(interval))
 
-        # Convert query to DataFrame
+        # Step 1. c Convert to df
         stock_data = query.values('time', 'open', 'high', 'low', 'close', 'volume')
         df = pd.DataFrame(list(stock_data))
-
         if len(df) == 0:
             return df
 
+        # Step 1.d Sort DataFrame by time in ascending order
         df['time'] = pd.to_datetime(df['time'], utc=True)  # Ensure 'time' column is datetime with UTC
-        # Sort DataFrame by time in ascending order
         df = df.sort_values(by='time', ascending=True)
 
-        # Calculate 50-day and 200-day SMA
-
-        # Calculate volatility contraction
+        # Step 2. Calculate Indicators
+        # Step 2.a SMA 50-day
         df['SMA_50'] = ta.SMA(df['close'], timeperiod=50)
+        # Step 2.b SMA 200-day
         df['SMA_200'] = ta.SMA(df['close'], timeperiod=200)
+        # Step 2.c SMA Volume 10-day
+        df['Volume_SMA'] = ta.SMA(df['volume'], timeperiod=10)
+        # Step 2.d ATR Average True value
+        df['ATR'] = ta.ATR(df['high'], df['low'], df['close'], timeperiod=14)
+        # Step 2.e RCV Relative contraction in volatility (percentage reduction in ATR over time)
+        df['RCV'] = df['ATR'].pct_change().rolling(window=5).mean()
 
-        # print(vcp_data.tail())
-        # higher_lows_data = self.detect_higher_lows(vcp_data)
-        # print(higher_lows_data.tail())
-        # volume_dryup_data = self.detect_volume_dryup(df)
-        # print(volume_dryup_data.tail())
-
-        # Example usage
-        # vcp_candidates = self.detect_vcp_pattern(df)
-        # print(vcp_candidates.tail())
-
+        # Step 3. Detect Patterns
+        # Step 3.a Detect (VCP) Volatility Contraction Patterns
+        self.detect_vcp_pattern(df, contraction_window=10, higher_lows_window=5, volume_dry_up_window=10)
 
         if interval == 'weekly':
             df.set_index('time', inplace=True)
@@ -228,19 +226,14 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
 
         # Create additional plots for SMA_50 and SMA_200
         plots = []
-        if np.isnan(df['SMA_50']).all() is np.False_:
+        if not df['SMA_50'].isna().all():
             plots.append(mpf.make_addplot(df['SMA_50'], color='#0000FF', width=0.5))
-        if np.isnan(df['SMA_200']).all() is np.False_:
+        if not df['SMA_200'].isna().all():
             plots.append(mpf.make_addplot(df['SMA_200'], color='#FF0000', width=0.5))
 
-        # # if np.isnan(df['Volatility_Contraction']).all() is np.False_:
-        vcp_data = self.detect_vcp(df)
-        df['VCP_Candidate'] = np.where(df.index.isin(vcp_data.index), 1, np.nan)
-
-        plots.append(mpf.make_addplot(df['VCP_Candidate'], type='scatter', markersize=100, marker='^', color='white'))
-
-
-
+        # Check if 'VCP_Candidate' column exists and has at least one cell not 0
+        if 'VCP_Candidate' in df.columns and (df['VCP_Candidate'] != 0).any():
+            plots.append(mpf.make_addplot(df['VCP_Candidate'], type='scatter', markersize=20, marker='^', color='white'))
 
         # Step 5. Build Chart
         dpi = 100
@@ -357,7 +350,7 @@ class ChartSymbolViewSet(viewsets.ModelViewSet):
                     return date.strftime('%b')
             else:
                 return date.strftime('%d')
-        # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: custom_date_formatter(x,pos, date_min=df.index)))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: custom_date_formatter(x,pos, date_min=df.index)))
         
 
         # Step 6. Add symbol and symbol name to the figure
