@@ -58,7 +58,8 @@
                                 <div class="numbers">
                                     <div class="d-flex align-items-center">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Market</p>
-                                        <p class="text-sm mb-0">(percent / dollar)</p>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <p class="text-sm mb-0">percent / dollar</p>
                                     </div>
                                     <h5 class="font-weight-bolder mb-0">
                                         {% round_by_digits summary.mv.value 2 '$ {0}' False %}
@@ -85,14 +86,18 @@
                             <div class="col-8">
                                 <div class="numbers">
                                     <div class="d-flex align-items-center">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Assets</p>
-                                        <p class="text-sm mb-0">(percent / dollar)</p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Distance</p>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <p class="text-sm mb-0">gain / risk</p>
                                     </div>
                                     <h5 class="font-weight-bolder mb-0">
-                                        {% round_by_digits summary.assets.value 2 '$ {0}' False %}
-                                        <span class="{% if summary.assets.change > 0 %}text-success{% elif summary.assets.change < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits summary.assets.percent 2 '{0}%' %}
-                                            {% round_by_digits summary.assets.change 0 '  ${0}' False %}
+                                        {% round_by_digits summary.unrealized.dist 2 '$ {0}' False %}
+                                        <span class="{% if summary.unrealized.gain > 0 %}text-success{% elif summary.unrealized.gain < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                                            {% round_by_digits summary.unrealized.gain 0 '${0}' False %}
+                                        </span>
+                                        <span class="text-sm">/</span>
+                                        <span class="{% if summary.unrealized.risk > 0 %}text-success{% elif summary.unrealized.risk < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                                            {% round_by_digits summary.unrealized.risk 0 '${0}' False %}
                                         </span>
                                     </h5>
                                 </div>
@@ -113,17 +118,18 @@
                             <div class="col-8">
                                 <div class="numbers">
                                     <div class="d-flex align-items-center">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Distance</p>
-                                        <p class="text-sm mb-0">(gain / risk)</p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Capital Risk</p>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <p class="text-sm mb-0">above / dist</p>
                                     </div>
                                     <h5 class="font-weight-bolder mb-0">
-                                        {% round_by_digits summary.unrealized.dist 2 '$ {0}' False %}
-                                        <span class="{% if summary.unrealized.gain > 0 %}text-success{% elif summary.unrealized.gain < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits summary.unrealized.gain 0 '${0}' False %}
+                                        {% round_by_digits summary.water.below 0 '$ {0}' False %}
+                                        <span class="{% if summary.water.above > 0 %}text-success{% elif summary.water.above < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                                            {% round_by_digits summary.water.above 0 '${0}' False %}
                                         </span>
                                         <span class="text-sm">/</span>
-                                        <span class="{% if summary.unrealized.risk > 0 %}text-success{% elif summary.unrealized.risk < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits summary.unrealized.risk 0 '${0}' False %}
+                                        <span class="{% if summary.water.dist > 0 %}text-success{% elif summary.water.dist < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                                            {% round_by_digits summary.water.dist 0 '${0}' False %}
                                         </span>
                                     </h5>
                                 </div>
@@ -144,19 +150,12 @@
                             <div class="col-8">
                                 <div class="numbers">
                                     <div class="d-flex align-items-center">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Below Water</p>
-                                        &nbsp;&nbsp;
-                                        <p class="text-sm mb-0">(above / dist)</p>
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">XXXXX</p>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <p class="text-sm mb-0">yyyy / zzz</p>
                                     </div>
                                     <h5 class="font-weight-bolder mb-0">
-                                        {% round_by_digits summary.water.below 0 '$ {0}' False %}
-                                        <span class="{% if summary.water.above > 0 %}text-success{% elif summary.water.above < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits summary.water.above 0 '${0}' False %}
-                                        </span>
-                                        <span class="text-sm">/</span>
-                                        <span class="{% if summary.water.dist > 0 %}text-success{% elif summary.water.dist < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits summary.water.dist 0 '${0}' False %}
-                                        </span>
+                                        -----
                                     </h5>
                                 </div>
                             </div>

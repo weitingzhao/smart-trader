@@ -13,13 +13,15 @@
                             <div class="col-8">
                                 <div class="numbers">
                                     <div class="d-flex align-items-center">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Assets</p>&nbsp;&nbsp;
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Market</p>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <p class="text-sm mb-0">percent / dollar</p>
                                     </div>
                                     <h5 class="font-weight-bolder mb-0">
-                                        {% round_by_digits open_summary.assets.value 2 '$ {0}' False %}
-                                        <span class="{% if open_summary.assets.change > 0 %}text-success{% elif open_summary.assets.change < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
-                                            {% round_by_digits open_summary.assets.percent 2 '{0}%' %}
-                                            {% round_by_digits open_summary.assets.change 0 '  ${0}' False %}
+                                        {% round_by_digits open_summary.mv.value 2 '$ {0}' False %}
+                                        <span class="{% if open_summary.mv.percent > 0 %}text-success{% elif open_summary.mv.percent < 0 %}text-danger{% else %}text-dark{% endif %} text-sm font-weight-bolder">
+                                            {% round_by_digits open_summary.mv.percent 2 '{0}%' %}&nbsp;
+                                            {% round_by_digits open_summary.mv.change 0 '  ${0}' False %}
                                         </span>
                                     </h5>
                                 </div>
