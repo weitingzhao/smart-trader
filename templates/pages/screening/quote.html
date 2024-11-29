@@ -1148,10 +1148,10 @@
         });
 
         if (response.ok) {
-            alert("Order executed successfully!");
-            location.reload();
+            showNotification('success', 'Transaction', 'Order executed successfully!', new Date().toLocaleTimeString());
+            setTimeout(function() {location.reload();}, 1000);
         } else {
-            alert("Failed to execute order.");
+            showNotification('error', 'Transaction', 'Failed to execute order.', new Date().toLocaleTimeString());
         }
     }
     function editTransaction(id) {
@@ -1189,10 +1189,10 @@
         });
 
         if (response.ok) {
-            alert("Action updated successfully!");
-            location.reload();
+            showNotification('success', 'Transaction', 'Action updated successfully!', new Date().toLocaleTimeString());
+            setTimeout(function() {location.reload();}, 1000);
         } else {
-            alert("Failed to update action.");
+            showNotification('error', 'Transaction', 'Failed to update action.', new Date().toLocaleTimeString());
         }
     }
     async function deleteTransaction(id) {
@@ -1205,10 +1205,10 @@
             });
 
             if (response.ok) {
-                alert("Transaction deleted successfully!");
-                location.reload();
+                showNotification('success', 'Transaction', 'Transaction deleted successfully!', new Date().toLocaleTimeString());
+                setTimeout(function() {location.reload();}, 1000);
             } else {
-                alert("Failed to delete Transaction.");
+                showNotification('error', 'Transaction', 'Failed to delete Transaction.', new Date().toLocaleTimeString());
             }
         }
     }
@@ -1369,13 +1369,13 @@
 
         if (response.ok) {
             if (order_style === '1') {
-                alert("Buy Order created successfully!");
+                showNotification('success', 'Order', 'Buy Order created successfully!', new Date().toLocaleTimeString());
             } else if (order_style === '2') {
-                alert("Sell Order created successfully!");
+                showNotification('error', 'Order', 'Sell Order created successfully!', new Date().toLocaleTimeString());
             }
-            location.reload();
+            setTimeout(function() {location.reload();}, 1000);
         } else {
-            alert("Failed to create Order.");
+                showNotification('error', 'Order', 'Failed to create Order.', new Date().toLocaleTimeString());
         }
     }
     async function submitEditOrder() {
@@ -1415,10 +1415,10 @@
         });
 
         if (response.ok) {
-            alert("Order updated successfully!");
-            location.reload();
+            showNotification('success', 'Order', 'Order updated successfully!', new Date().toLocaleTimeString());
+            setTimeout(function() { location.reload(); }, 1000);
         } else {
-            alert("Failed to update order.");
+            showNotification('error', 'Order', 'Failed to update order.', new Date().toLocaleTimeString());
         }
     }
 
@@ -1474,10 +1474,10 @@
         });
 
         if (response.ok) {
-            alert("Order adjust successfully!");
-            location.reload();
+            showNotification('success', 'Order', 'Order adjust successfully!', new Date().toLocaleTimeString());
+            setTimeout(function() {location.reload();}, 1000);
         } else {
-            alert("Failed to adjust order.");
+            showNotification('error', 'Order', 'Failed to adjust order.', new Date().toLocaleTimeString());
         }
     }
 
@@ -1491,10 +1491,10 @@
             });
 
             if (response.ok) {
-                alert("Order deleted successfully!");
-                location.reload();
+                showNotification('success', 'Order', 'Order deleted successfully!', new Date().toLocaleTimeString());
+                setTimeout(function() {location.reload();}, 1000);
             } else {
-                alert("Failed to delete order.");
+                showNotification('error', 'Order', 'Failed to delete order.', new Date().toLocaleTimeString());
             }
         }
     }
@@ -1510,9 +1510,9 @@
 
         if (response.ok) {
             const data = await response.json();
-            alert(`Trade calculation completed. Is Finished: ${data.is_finished}`);
+            showNotification('success', 'Trade', `Trade calculation completed. Is Finished: ${data.is_finished}`, new Date().toLocaleTimeString());
         } else {
-            alert("Failed to calculate trade.");
+            showNotification('error', 'Trade', 'Failed to calculate trade.', new Date().toLocaleTimeString());
         }
     }
 

@@ -18,9 +18,9 @@ urlpatterns = [
     # Screening Criteria -> Stock -> Detail
     path('api/stock_data', screening.screening_criteria.get_stock_data, name='get_stock_data'),
 
-    ####### screening.saved_screeners #######
+    ####### screening.screening_upload #######
     # Saved Screeners -> Default
-    path('saved_screeners/', screening.saved_screeners.default, name='saved_screeners'),
+    path('screening_upload/', screening.screening_upload.default, name='screening_upload'),
 
     ####### screening.screening_results #######
     # Screening Result -> Default

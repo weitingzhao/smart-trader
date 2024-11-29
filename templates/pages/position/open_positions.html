@@ -216,20 +216,20 @@
                                     <!-- Goal -->
                                     <th class="bg-success text-white">$ % <br/>CURRENT</th>
                                     <th class="bg-success text-white">$ % <br/>INIT</th>
+                                    <!-- Statistics -->
+                                    <th class="bg-dark text-white">$ CURRENT<br></br>Market</th>
                                     <!-- Entry Action -->
                                     <th class="bg-gray-200  text-dark">ENTRY<br/>DATE</th>
                                     <th class="bg-gray-200  text-dark">$ INVEST<br/>AMOUNT</th>
                                     <th class="bg-gray-200  text-dark">$ INITIAL<br/>ACTION</th>
-                                    <!-- Statistics -->
-                                    <th class="bg-dark text-white">$ CURRENT<br></br>Market</th>
                                 </tr>
                                 <tr class="subheader">
                                     <th colspan="5">MARKET</th>
-                                    <th colspan="3" class="bg-gray-200  text-dark">Initial Entry</th>
                                     <th colspan="3" class="bg-primary text-white">Current Status</th>
                                     <th colspan="6" class="bg-info text-white">Risk vs Margin</th>
                                     <th colspan="2" class="bg-success text-white">Goal</th>
-                                    <th colspan="4" class="bg-dark text-white">Statistics</th>
+                                    <th colspan="1" class="bg-dark text-white">Statistics</th>
+                                    <th colspan="3" class="bg-gray-200  text-dark">Initial Entry</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -237,7 +237,7 @@
                                     <tr>
                                         <!-- Market-->
                                         <td class="text-start">
-                                            <span style="display: block;">{{ item.sort_order}}</span>
+                                            <span style="display: none;">{{ item.sort_order}}</span>
                                             <i class="{% trade_phase_fa_icon item.trade_phase True%}"
                                                 style="{% trade_phase_fa_icon item.trade_phase %}; cursor: pointer;"
                                                 data-phase="{{ item.trade_phase }}"
@@ -297,17 +297,17 @@
                                             <b>{% round_by_digits item.init_risk_pct 2 '{0}%' False %}
                                                 <br>{% round_by_digits item.init_risk 0 '{0}' False %}</b>
                                         </td>
+                                        <!-- Statistics -->
+                                        <td class="text-md mb-0 text-dark">{% round_by_digits item.market_value 0 '{0}' False %}</td>
                                         <!-- Entry Action -->
-                                        <td class="text-md mb-0 bg-light text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
-                                        <td class="text-md mb-0 bg-light text-dark">{% round_by_digits item.init_invest 0 '{0}' False %}</td>
-                                        <td class="text-md mb-0 bg-light text-dark">
+                                        <td class="text-md mb-0 text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
+                                        <td class="text-md mb-0 text-dark">{% round_by_digits item.init_invest 0 '{0}' False %}</td>
+                                        <td class="text-md mb-0 text-dark">
                                             {% round_by_digits item.price 2 '{0}' False %}
                                             @ {% round_by_digits item.init_quantity 0 '{0}' False %} <br>
                                             {% round_by_digits item.init_stop 2 '{0}' False %}
                                             / {% round_by_digits item.init_limit 2 '{0}' False %}
                                         </td>
-                                        <!-- Statistics -->
-                                        <td class="text-md mb-0 text-dark">{% round_by_digits item.market_value 0 '{0}' False %}</td>
                                         <!--<div id="sliderDouble"></div>-->
                                     </tr>
                                 {% endfor %}
