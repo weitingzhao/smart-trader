@@ -51,6 +51,19 @@ class  TradePhaseChoices(models.TextChoices):
     BREAKING    = '2', 'Breaking Out' # Breaking Out
     AFTER_BO    = '3', 'After Breakout' # After Breakout
 
+class  TradePhaseRatingChoices(models.TextChoices):
+    NONE      = '0', '0 None' # None
+    First        = '1', '1 First' # Before Breakout
+    Second   = '2', '2 Second' # Breaking Out
+    Third      = '3', '3 Third' # After Breakout
+    Forth      = '4', '4 Forth' # After Breakout
+    Fifth       = '5', '5 Fifth' # After Breakout
+    Sixth      = '6', '6 Sixth' # After Breakout
+    Seventh = '7', '7 Seventh' # After Breakout
+    Eighth    = '8', '8 Eighth' # After Breakout
+    Ninth      = '9', '9 Ninth' # After Breakout
+    Tenth     = '10', '10 Tenth' # After Breakout
+
 class Portfolio(models.Model):
     """
     This model is used to store the portfolio of stocks
@@ -111,6 +124,7 @@ class Trade(models.Model):
     profit_actual_ratio = models.DecimalField(max_digits=5, decimal_places=2)
     is_finished = models.BooleanField(null=True, blank=True)
     trade_phase = models.CharField(max_length=20, choices=TradePhaseChoices.choices, default=TradePhaseChoices.NONE)
+    trade_phase_rating = models.CharField(max_length=20, choices=TradePhaseRatingChoices.choices, default=TradePhaseRatingChoices.NONE)
 
     class Meta:
         db_table = 'trade'

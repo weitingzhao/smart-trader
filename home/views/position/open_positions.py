@@ -42,7 +42,8 @@ def default(request):
             'portfolio': portfolio,
             'portfolio_items': final_json,
             'summary': summary,
-            'trade_phase_choices': TradePhaseChoices.choices
+            'trade_phase_choices': TradePhaseChoices.choices,
+            'trade_phase_rating_choices': TradePhaseRatingChoices.choices,
         })
 
 def get_order(request, order_id):

@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, date
 from django.db.models.query import QuerySet
 from pandas.core.interchange.dataframe_protocol import DataFrame
 from apps.common.models import *
+from decimal import Decimal
 from logics.service import Service
 from .position_base import PositionBase
 from django.db.models import (
@@ -50,7 +51,10 @@ class OpenPosition(PositionBase):
         self.calc_goal(final_df)
 
         # Last Step: Sort by trade_phase in descending order
-        final_df.sort_values(by='trade_phase', ascending=False, inplace=True)
+        final_df['trade_phase'].replace('', 0, inplace=True)
+        final_df['trade_phase_rating'].replace('', 0, inplace=True)
+        final_df['sort_order'] = final_df['trade_phase'].apply(Decimal) + (1 - final_df['trade_phase_rating'].apply(Decimal)/100)
+        final_df.sort_values(by='sort_order', ascending=False, inplace=True)
 
         return final_df, max_date
 
@@ -174,7 +178,7 @@ class OpenPosition(PositionBase):
     def get_trading_info(self, holdings_df: DataFrame) -> pd.DataFrame:
         # Step 2. attach Trade info
         trade_phases = Trade.objects.filter(trade_id__in=holdings_df['trade_id'].tolist()
-        ).values('trade_id', 'trade_phase')
+        ).values('trade_id', 'trade_phase', 'trade_phase_rating')
         # Convert the query result to a DataFrame
         trade_phases_df = pd.DataFrame(list(trade_phases))
         return trade_phases_df

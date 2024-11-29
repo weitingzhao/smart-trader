@@ -202,10 +202,6 @@
                                     <th title="Current price per share and price change compared to the previous trading day.">$ SHARE<br>CHG</th>
                                     <th>%<br>CHG</th>
                                     <th>% DAY<br>CHG</th>
-                                    <!-- Entry Action -->
-                                    <th class="bg-gray-200  text-dark">ENTRY<br/>DATE</th>
-                                    <th class="bg-gray-200  text-dark">$ INVEST<br/>AMOUNT</th>
-                                    <th class="bg-gray-200  text-dark">$ INITIAL<br/>ACTION</th>
                                     <!-- Current Status -->
                                     <th class="bg-primary text-white">$ INVEST<br/>AMOUNT</th>
                                     <th class="bg-primary text-white">COST<br/>BASE</th>
@@ -220,9 +216,12 @@
                                     <!-- Goal -->
                                     <th class="bg-success text-white">$ % <br/>CURRENT</th>
                                     <th class="bg-success text-white">$ % <br/>INIT</th>
+                                    <!-- Entry Action -->
+                                    <th class="bg-gray-200  text-dark">ENTRY<br/>DATE</th>
+                                    <th class="bg-gray-200  text-dark">$ INVEST<br/>AMOUNT</th>
+                                    <th class="bg-gray-200  text-dark">$ INITIAL<br/>ACTION</th>
                                     <!-- Statistics -->
                                     <th class="bg-dark text-white">$ CURRENT<br></br>Market</th>
-
                                 </tr>
                                 <tr class="subheader">
                                     <th colspan="5">MARKET</th>
@@ -238,11 +237,12 @@
                                     <tr>
                                         <!-- Market-->
                                         <td class="text-start">
-                                            <span style="display: none;">{{ item.trade_phase }}</span>
+                                            <span style="display: block;">{{ item.sort_order}}</span>
                                             <i class="{% trade_phase_fa_icon item.trade_phase True%}"
                                                 style="{% trade_phase_fa_icon item.trade_phase %}; cursor: pointer;"
                                                 data-phase="{{ item.trade_phase }}"
-                                                onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}')">
+                                                onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}', '{{ item.trade_phase_rating }}')">
+                                                {{ item.trade_phase_rating }}
                                             </i>
                                         </td>
                                         <td class="text-start">
@@ -264,15 +264,6 @@
                                         <td class="text-start"
                                             style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
                                             <b>{% round_by_digits item.chg_position 0 '{0}' %}</b>
-                                        </td>
-                                        <!-- Entry Action -->
-                                        <td class="text-md mb-0 bg-light text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
-                                        <td class="text-md mb-0 bg-light text-dark">{% round_by_digits item.init_invest 0 '{0}' False %}</td>
-                                        <td class="text-md mb-0 bg-light text-dark">
-                                            {% round_by_digits item.price 2 '{0}' False %}
-                                            @ {% round_by_digits item.init_quantity 0 '{0}' False %} <br>
-                                            {% round_by_digits item.init_stop 2 '{0}' False %}
-                                            / {% round_by_digits item.init_limit 2 '{0}' False %}
                                         </td>
                                         <!-- Current Status -->
                                         <td class="text-md mb-0 text-primary">
@@ -305,6 +296,15 @@
                                         <td class="text-md mb-0">
                                             <b>{% round_by_digits item.init_risk_pct 2 '{0}%' False %}
                                                 <br>{% round_by_digits item.init_risk 0 '{0}' False %}</b>
+                                        </td>
+                                        <!-- Entry Action -->
+                                        <td class="text-md mb-0 bg-light text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
+                                        <td class="text-md mb-0 bg-light text-dark">{% round_by_digits item.init_invest 0 '{0}' False %}</td>
+                                        <td class="text-md mb-0 bg-light text-dark">
+                                            {% round_by_digits item.price 2 '{0}' False %}
+                                            @ {% round_by_digits item.init_quantity 0 '{0}' False %} <br>
+                                            {% round_by_digits item.init_stop 2 '{0}' False %}
+                                            / {% round_by_digits item.init_limit 2 '{0}' False %}
                                         </td>
                                         <!-- Statistics -->
                                         <td class="text-md mb-0 text-dark">{% round_by_digits item.market_value 0 '{0}' False %}</td>
@@ -553,11 +553,24 @@
                     <h5 class="modal-title" id="tradePhaseModalLabel">Select Trade Phase</h5>
                 </div>
                 <div class="modal-body">
-                    <select id="tradePhaseSelect" class="form-control">
-                        {% for value, label in trade_phase_choices %}
-                            <option value="{{ value }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="row">
+                        <div class="col">
+                            <label for="tradePhaseSelect" class="form-label">Phase</label>
+                            <select id="tradePhaseSelect" class="form-control">
+                                {% for value, label in trade_phase_choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="tradePhaseRatingSelect" class="form-label">Phase Rating</label>
+                            <select id="tradePhaseRatingSelect" class="form-control">
+                                {% for value, label in trade_phase_rating_choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeTradePhaseModal()">Cancel</button>
@@ -692,10 +705,14 @@
     }
 
     /////////////////////// Trade Phase ////////////////////////////
-    function showTradePhasePopup(tradeId, currentPhase) {
-        const select = document.getElementById('tradePhaseSelect');
-        select.value = currentPhase;
-        select.setAttribute('data-trade-id', tradeId);
+    function showTradePhasePopup(tradeId, phase, phase_rating) {
+        const phaseSelect = document.getElementById('tradePhaseSelect');
+        phaseSelect.value = phase;
+        phaseSelect.setAttribute('data-trade-id', tradeId);
+
+        const phaseRatingSelect = document.getElementById('tradePhaseRatingSelect');
+        phaseRatingSelect.value = phase_rating;
+
         $('#tradePhaseModal').modal('show');
     }
 
@@ -704,9 +721,11 @@
     }
 
     function updateTradePhase() {
-        const select = document.getElementById('tradePhaseSelect');
-        const tradeId = select.getAttribute('data-trade-id');
-        const selectedPhase = select.value;
+        const phaseSelect = document.getElementById('tradePhaseSelect');
+        const tradeId = phaseSelect.getAttribute('data-trade-id');
+        const selectedPhase = phaseSelect.value;
+        const phaseRatingSelect = document.getElementById('tradePhaseRatingSelect');
+        const selectedPhaseRating = phaseRatingSelect.value;
 
         fetch(`/position/holding/trade/${tradeId}/`, {
             method: 'POST',
@@ -714,21 +733,21 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: JSON.stringify({ trade_phase: selectedPhase })
+            body: JSON.stringify({ trade_phase: selectedPhase, trade_phase_rating: selectedPhaseRating })
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert('Trade phase updated successfully');
+                showNotification('success', 'Phase updated', 'Phase updated successfully', new Date().toLocaleTimeString());
                 location.reload();
             } else {
-                alert('Failed to update trade phase');
+                showNotification('error', 'Phase updated', 'Failed to update trade phase', new Date().toLocaleTimeString());
             }
             $('#tradePhaseModal').modal('hide');
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error updating trade phase');
+            showNotification('error', 'Phase updated', error, new Date().toLocaleTimeString());
             $('#tradePhaseModal').modal('hide');
         });
     }
