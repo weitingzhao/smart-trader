@@ -3,7 +3,6 @@ from .celery import app
 from .controller import *
 from celery.contrib.abortable import AbortableTask
 
-
 def get_tasks() -> List:
     return [
         no_01_fetching,
@@ -33,9 +32,5 @@ def no_02_calculating(self, data):
 def no_03_indexing(self, data):
     task = IndexingTask(self, data)
     task.run()
-
-
-
-
 
 

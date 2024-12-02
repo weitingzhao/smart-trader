@@ -26,7 +26,6 @@ class UtilitiesFilterAdmin(admin.ModelAdmin):
 admin.site.register(UtilitiesLookup, UtilitiesLookupAdmin)
 admin.site.register(UtilitiesFilter, UtilitiesFilterAdmin)
 
-
 # @admin.register(ScreeningChartmillOverview)
 # class Celery_ScreeningChartmillOverviewAdmin(ImportMixin, admin.ModelAdmin):
 #     list_display = ("name",)
@@ -34,8 +33,8 @@ admin.site.register(UtilitiesFilter, UtilitiesFilterAdmin)
 #     resource_classes = [ScreeningChartmillOverviewResource]
 #     actions = (create_export_job_action,)
 
-
-@admin.register(ScreeningChartmillOverview)
-class ScreeningChartmillOverviewAdmin(ImportExportModelAdmin):
+@admin.register(ScreeningSnapshotOverview)
+class ScreeningSnapshotOverviewAdmin(ImportExportModelAdmin):
     list_display = ("name",)
-    resource_classes = [ScreeningChartmillOverviewResource]
+    resource_classes = [ScreeningSnapshotOverviewResource]
+

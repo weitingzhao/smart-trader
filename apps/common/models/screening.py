@@ -1,5 +1,6 @@
+import re
+from datetime import datetime as dt
 from django.db import models
-
 from . import Wishlist
 from .market import MarketSymbol
 from timescale.db.models.models import TimescaleModel
@@ -80,47 +81,72 @@ class RatingIndicatorResult(TimescaleModel):
     def __str__(self):
         return f"screening.rating_indicator_result: {self.symbol} on {self.time}"
 
+#///////////////// snapshot //////////////////////
 
-
-class ScreeningChartmillOverview(models.Model):
+class ScreeningSnapshotOverview(TimescaleModel):
 
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.DO_NOTHING)
+    time = models.DateField()
+
     name = models.CharField(max_length=255)
-    chartmill_setup_rating = models.FloatField(null=True, blank=True)
-    chartmill_technical_rating = models.FloatField(null=True, blank=True)
-    chartmill_fundamental_rating = models.FloatField(null=True, blank=True)
-    chartmill_relative_strength = models.FloatField(null=True, blank=True)
+
+    #rating
+    setup_rating = models.FloatField(null=True, blank=True)
+    technical_rating = models.FloatField(null=True, blank=True)
+    fundamental_rating = models.FloatField(null=True, blank=True)
+
+    relative_strength = models.FloatField(null=True, blank=True)
     percent_change = models.FloatField(null=True, blank=True)
+
     one_month_performance = models.FloatField(null=True, blank=True)
     three_month_performance = models.FloatField(null=True, blank=True)
     six_month_performance = models.FloatField(null=True, blank=True)
+
     price_earnings = models.FloatField(null=True, blank=True)
     market_cap = models.FloatField(null=True, blank=True)
     avg_volume_50 = models.FloatField(null=True, blank=True)
 
     class Meta:
-        db_table = 'screening_chartmill_overview'
+        db_table = 'screening_snapshot_overview'
         indexes = [
-            models.Index(fields=['symbol']),
+            models.Index(fields=['symbol','time']),
         ]
-        # Setting a composite primary key
         constraints = [
-            models.UniqueConstraint(fields=['symbol'], name='unique_symbol_pk')
+            models.UniqueConstraint(fields=['symbol', 'time'], name='snapshot_overview_unique_symbol_time_pk')
         ]
 
     def __str__(self):
-        return f"Screening Chartmill Overview: {self.symbol.symbol} - {self.name}"
+        return f"Screening Snapshot Overview: {self.symbol.symbol} - {self.name} at {self.time}"
 
 
-class ScreeningChartmillOverviewResource(resources.ModelResource):
+class ScreeningSnapshotOverviewResource(resources.ModelResource):
+
+    def before_import(self, dataset, **kwargs):
+        try:
+            filename = kwargs['file_name']
+            match = re.search(r'_(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2}\.\d{3}Z)\.csv$', filename)
+            if match:
+                date_str = match.group(1)
+                self.date_obj = dt.strptime(date_str, '%Y-%m-%dT%H_%M_%S.%fZ').date()
+        except KeyError:
+            try:
+                filename = self.import_job.file.name
+                match = re.search(r'_(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2})_', filename)
+                if match:
+                    date_str = match.group(1)
+                    self.date_obj = dt.strptime(date_str, '%Y-%m-%dT%H_%M_%S').date()
+            except AttributeError:
+                self.date_obj = None
+
 
     def before_import_row(self, row, **kwargs):
         for key, value in row.items():
             if value == "N/A":
                 row[key] = None
+        if self.date_obj:
+            row['time'] = self.date_obj
+            # print(f"row - Date===========>: {row['time']}")
 
-    # def before_import_row(self, row, **kwargs):
-    #     print(row)
 
     # def before_save_instance(self, instance, using_transactions, dry_run, **kwargs):
     #     if not instance.symbol:
@@ -135,28 +161,33 @@ class ScreeningChartmillOverviewResource(resources.ModelResource):
         widget=ForeignKeyWidget(MarketSymbol, 'symbol')
     )
     name = fields.Field(column_name='Name', attribute='name')
-    chartmill_setup_rating = fields.Field(column_name='ChartMill Setup Rating', attribute='chartmill_setup_rating')
-    chartmill_technical_rating = fields.Field(column_name='ChartMill Technical Rating', attribute='chartmill_technical_rating')
-    chartmill_fundamental_rating = fields.Field(column_name='ChartMill Fundamental Rating', attribute='chartmill_fundamental_rating')
-    chartmill_relative_strength = fields.Field(column_name='ChartMill Relative Strength', attribute='chartmill_relative_strength')
+
+    setup_rating = fields.Field(column_name='ChartMill Setup Rating', attribute='setup_rating')
+    technical_rating = fields.Field(column_name='ChartMill Technical Rating', attribute='technical_rating')
+    fundamental_rating = fields.Field(column_name='ChartMill Fundamental Rating', attribute='fundamental_rating')
+
+    relative_strength = fields.Field(column_name='ChartMill Relative Strength', attribute='relative_strength')
     percent_change = fields.Field(column_name='% Change', attribute='percent_change')
+
     one_month_performance = fields.Field(column_name='1 Month Performance', attribute='one_month_performance')
     three_month_performance = fields.Field(column_name='3 Month Performance', attribute='three_month_performance')
     six_month_performance = fields.Field(column_name='6 Month Performance', attribute='six_month_performance')
+
     price_earnings = fields.Field(column_name='Price/Earnings', attribute='price_earnings')
     market_cap = fields.Field(column_name='Market Cap', attribute='market_cap')
     avg_volume_50 = fields.Field(column_name='Avg Volume(50)', attribute='avg_volume_50')
 
     class Meta:
-        model = ScreeningChartmillOverview
+        model = ScreeningSnapshotOverview
         fields = (
-            'id', 'symbol', 'name',
+            'id', 'symbol', 'time', 'name',
 
-            'chartmill_setup_rating', 'chartmill_technical_rating',
-            'chartmill_fundamental_rating', 'chartmill_relative_strength', 'percent_change',
+            'setup_rating', 'technical_rating',
+            'fundamental_rating', 'relative_strength', 'percent_change',
 
             'one_month_performance', 'three_month_performance', 'six_month_performance',
 
-            'price_earnings', 'market_cap', 'avg_volume_50'
+            'price_earnings', 'market_cap', 'avg_volume_50',
         )
-        name = 'ScreeningChartmillOverview'
+        name = 'ScreeningSnapshotOverview'
+
