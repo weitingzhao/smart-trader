@@ -51,8 +51,8 @@ class OpenPosition(PositionBase):
         self.calc_goal(final_df)
 
         # Last Step: Sort by trade_phase in descending order
-        final_df['trade_phase'].replace('', 0, inplace=True)
-        final_df['trade_phase_rating'].replace('', 0, inplace=True)
+        final_df.replace({'trade_phase': {'': 0}}, inplace=True)
+        final_df.replace({'trade_phase_rating': {'': 0}}, inplace=True)
         final_df['sort_order'] = final_df['trade_phase'].apply(Decimal) + (1 - final_df['trade_phase_rating'].apply(Decimal)/100)
         final_df.sort_values(by='sort_order', ascending=False, inplace=True)
 

@@ -76,11 +76,14 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_quill',
 
-    'import_export',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular',
     'django_api_gen',
+
+    # Import & Export
+    "import_export_celery",
+    'import_export',
 ]
 
 SITE_ID = 1
@@ -95,6 +98,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "author.middlewares.AuthorDefaultBackendMiddleware",
 
     # Required for allauth
     'allauth.account.middleware.AccountMiddleware',
@@ -284,4 +288,23 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-# ### django-import-export###
+def screening_chartmill_overview_resource():  # Optional
+    from apps.common.models import ScreeningChartmillOverviewResource
+    return ScreeningChartmillOverviewResource
+
+############# django-import-export############
+IMPORT_EXPORT_CELERY_MODELS = {
+    "SEPA-Q Chartmill Overview": {
+        "app_label": "common",
+        "model_name": "ScreeningChartmillOverview",
+        'resource': screening_chartmill_overview_resource,  # Optional
+    }
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Default import time limits (in seconds)
+IMPORT_EXPORT_CELERY_IMPORT_SOFT_TIME_LIMIT = 300  # 5 minutes
+IMPORT_EXPORT_CELERY_IMPORT_HARD_TIME_LIMIT = 360  # 6 minutes
+# Default export time limits (in seconds)
+IMPORT_EXPORT_CELERY_EXPORT_SOFT_TIME_LIMIT = 300  # 5 minutes
+IMPORT_EXPORT_CELERY_EXPORT_HARD_TIME_LIMIT = 360  # 6 minutes

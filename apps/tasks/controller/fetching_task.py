@@ -32,6 +32,7 @@ class FetchingTask(BaseTask):
         ]
 
     def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
+
         if script_name == 'stock-hist-bars':
             logic.service.fetching().stock_hist_bars_yahoo().run(meta, task_result, args, is_test=False)
         elif script_name == 'company-info':
