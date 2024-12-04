@@ -1,4 +1,5 @@
 import re
+import os
 from datetime import datetime as dt
 from apps.common.models import *
 from import_export import resources, fields
@@ -9,6 +10,7 @@ class SnapshotResource(resources.ModelResource):
 
 
     def before_import(self, dataset, **kwargs):
+
         try:
             filename = kwargs['file_name']
             match = re.search(r'_(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2}\.\d{3}Z)\.csv$', filename)
@@ -18,10 +20,14 @@ class SnapshotResource(resources.ModelResource):
         except KeyError:
             try:
                 filename = self.import_job.file.name
-                match = re.search(r'_(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2})_', filename)
+                match = re.search(r'\d{4}-\d{2}-\d{2}', filename)
+                # print("filename: ", filename)
+                # print("match: ", match)
                 if match:
-                    date_str = match.group(1)
-                    self.date_obj = dt.strptime(date_str, '%Y-%m-%dT%H_%M_%S').date()
+                    date_str = match.group(0)
+                    # print("date_str: ", date_str)
+                    self.date_obj = dt.strptime(date_str, '%Y-%m-%d').date()
+                    # print("date_obj: ", self.date_obj)
             except AttributeError:
                 self.date_obj = None
 
@@ -32,6 +38,12 @@ class SnapshotResource(resources.ModelResource):
         if self.date_obj:
             row['time'] = self.date_obj
             # print(f"row - Date===========>: {row['time']}")
+
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        return self._meta.model.objects.filter(
+            symbol=instance.symbol,
+            time=instance.time
+        ).exists()
 
     # def before_save_instance(self, instance, using_transactions, dry_run, **kwargs):
     #     if not instance.symbol:
@@ -47,11 +59,51 @@ class SnapshotResource(resources.ModelResource):
         abstract = True
         fields = ('id', 'symbol', 'time')
 
+# Screening
 class SnapshotScreeningResource(SnapshotResource):
+
+    def before_import(self, dataset, **kwargs):
+
+        super().before_import(dataset, **kwargs)
+        self.ref_screening_id = None  # Initialize screening_id as None
+
+        try:
+            filename = kwargs['file_name']
+        except KeyError:
+            try:
+                filename = os.path.basename(self.import_job.file.name)
+            except AttributeError:
+                filename = None
+        # print(f"before filename: {filename}")
+
+        if filename is not None:
+            screenings = Screening.objects.all()
+            for screening in screenings:
+                if filename.startswith(screening.file_pattern):
+                    self.ref_screening_id = screening.screening_id
+                    break
+        # print(f"screening_id: {self.screening_id}")
+
+    def before_import_row(self, row, **kwargs):
+        super().before_import_row(row, **kwargs)
+        if self.ref_screening_id is None:
+            raise ValueError("screening_id is not set. Cannot import row without screening_id.")
+        row['screening'] = self.ref_screening_id
+        # print(f"row:: {row}")
+
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        return self._meta.model.objects.filter(
+            symbol=instance.symbol,
+            time=instance.time,
+            screening=instance.screening
+        ).exists()
+
 
     class Meta:
         name = 'SnapshotScreening'
         model = SnapshotScreening
+        fields = SnapshotResource.Meta.fields + ('screening',)
+
 
 # Overview
 class SnapshotOverviewResource(SnapshotResource):

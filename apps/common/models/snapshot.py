@@ -5,11 +5,14 @@ from timescale.db.models.models import TimescaleModel
 class SnapshotScreening(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateTimeField()
-    screening = models.ForeignKey(Screening, on_delete=models.CASCADE)
+    time = models.DateField()
+    screening = models.ForeignKey(Screening, on_delete=models.DO_NOTHING)
 
     class Meta:
         db_table = 'snapshot_screening'
+        indexes = [
+            models.Index(fields=['symbol','time','screening']),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=['symbol', 'time', 'screening'],
@@ -51,7 +54,9 @@ class SnapshotOverview(TimescaleModel):
             models.Index(fields=['symbol','time']),
         ]
         constraints = [
-            models.UniqueConstraint(fields=['symbol', 'time'], name='snapshot_overview_unique_symbol_time_pk')
+            models.UniqueConstraint(
+                fields=['symbol', 'time'],
+                name='snapshot_overview_unique_symbol_time_pk')
         ]
 
     def __str__(self):
@@ -61,7 +66,7 @@ class SnapshotOverview(TimescaleModel):
 class SnapshotSetup(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateTimeField()
+    time = models.DateField()
 
     market_cap = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     high_52_week = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -82,7 +87,7 @@ class SnapshotSetup(TimescaleModel):
 class SnapshotTechnical(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateTimeField()
+    time = models.DateField()
 
     lower_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     upper_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -105,7 +110,7 @@ class SnapshotTechnical(TimescaleModel):
 class SnapshotFundamental(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateTimeField()
+    time = models.DateField()
 
     valuation_rating = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     price_FCF = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -133,7 +138,7 @@ class SnapshotFundamental(TimescaleModel):
 class SnapshotBullFlag(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateTimeField()
+    time = models.DateField()
 
     # Bull Flag
     bull_indicator = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
