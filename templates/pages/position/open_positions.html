@@ -254,16 +254,21 @@
                                         <td class="text-start">
                                             <b style="color: black">{% round_by_digits item.close 2 '{0}' False %}</b>
                                             <br>
-                                            <b style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
-                                                {% round_by_digits item.chg 2 '{0}' %}</b>
+                                            <a href="https://client.schwab.com/app/research/#/stocks/{{ item.symbol }}/" target="_blank">
+                                                <b style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
+                                                    {% round_by_digits item.chg 2 '{0}' %}
+                                                </b>
+                                            </a>
                                         </td>
-                                        <td class="text-start"
-                                            style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
-                                            <b>{% round_by_digits item.chg_pct 2 '{0}%' %}</b>
+                                        <td class="text-start">
+                                            <a href="https://finance.yahoo.com/quote/{{ item.symbol }}/" target="_blank">
+                                                <b  style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.chg_pct 2 '{0}%' %}</b>
+                                            </a>
                                         </td>
-                                        <td class="text-start"
-                                            style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">
-                                            <b>{% round_by_digits item.chg_position 0 '{0}' %}</b>
+                                        <td class="text-start">
+                                            <a href="https://www.chartmill.com/stock/quote/{{ item.symbol }}/" target="_blank">
+                                                <b style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.chg_position 0 '{0}' %}</b>
+                                            </a>
                                         </td>
                                         <!-- Current Status -->
                                         <td class="text-md mb-0 text-primary">

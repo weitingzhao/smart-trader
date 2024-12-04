@@ -39,15 +39,27 @@ def no_03_indexing(self, data):
 
 @app.task(bind=True, base=AbortableTask)
 def fetching_screening_result(self, data):
-    ##### Calculate Open Position ##############
-    file_resources = instance.service.fetching().screening().fetching_screening()
 
-    for file_resource in file_resources:
-        for file_path, resource in file_resource.items():
-            with open(file_path, 'r') as file:
-                dataset = resource.import_data(file, format='csv')
-                result = resource.import_data(dataset, dry_run=False)
-    return result
+    # Step 1.  Get the screening operations
+    screening_operations = instance.service.fetching().screening().fetching_screening_operation()
+
+    # # Step 2. Loop through the screening operations
+    # for screening_operation in screening_operations:
+    #     # Create import data task
+    #     task = ImportDataTask()
+    #     task_id = task.job_id
+    #
+    #     # Update screening_operation with import_job_id and status
+    #     screening_operation.import_job_id = task_id
+    #     screening_operation.status = ScreeningOperationChoices.PROCESSING
+    #     screening_operation.save()
+
+    # for file_resource in file_resources:
+    #     for file_path, resource in file_resource.items():
+    #         with open(file_path, 'r') as file:
+    #             dataset = resource.import_data(file, format='csv')
+    #             result = resource.import_data(dataset, dry_run=False)
+    # return result
 
 # Create your views here.
 instance = Logic()

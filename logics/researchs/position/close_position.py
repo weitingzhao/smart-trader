@@ -1,15 +1,11 @@
-import json
 import pandas as pd
 from typing import List
 from logics.service import Service
 from apps.common.models import *
 from .position_base import PositionBase
 from django.db.models.query import QuerySet
-from datetime import datetime, timedelta, date
 from pandas.core.interchange.dataframe_protocol import DataFrame
-from django.db.models import (
-    F,Case, When, Value, IntegerField, Sum, Min, Max,
-    FloatField, Q, BooleanField,Subquery, OuterRef)
+from django.db.models import (F,Case, When, Sum, Min, Max, Q, Subquery, OuterRef)
 
 
 class ClosePosition(PositionBase):

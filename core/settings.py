@@ -288,17 +288,33 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-def snapshot_overview_resource():  # Optional
+def screening_resource():  # Optional
+    from apps.common.resources import SnapshotScreeningResource
+    return SnapshotScreeningResource
+def overview_resource():  # Optional
     from apps.common.resources import SnapshotOverviewResource
     return SnapshotOverviewResource
+def technical_resource():  # Optional
+    from apps.common.resources import SnapshotTechnicalResource
+    return SnapshotTechnicalResource
+def fundamental_resource():  # Optional
+    from apps.common.resources import SnapshotFundamentalResource
+    return SnapshotFundamentalResource
+def setup_resource():  # Optional
+    from apps.common.resources import SnapshotSetupResource
+    return SnapshotSetupResource
+def bull_flag_resource():  # Optional
+    from apps.common.resources import SnapshotBullFlagResource
+    return SnapshotBullFlagResource
 
 ############# django-import-export############
 IMPORT_EXPORT_CELERY_MODELS = {
-    "SEPA-Q Chartmill Overview": {
-        "app_label": "common",
-        "model_name": "SnapshotOverview",
-        'resource': snapshot_overview_resource,  # Optional
-    }
+    "Snapshot Screening": { "app_label": "common",  "model_name": "SnapshotScreening", 'resource': screening_resource},
+    "Snapshot Overview": { "app_label": "common",  "model_name": "SnapshotOverview", 'resource': overview_resource},
+    "Snapshot Technical": { "app_label": "common",  "model_name": "SnapshotTechnical", 'resource': technical_resource},
+    "Snapshot Fundamental": { "app_label": "common",  "model_name": "SnapshotFundamental", 'resource': fundamental_resource},
+    "Snapshot Setup": { "app_label": "common",  "model_name": "SnapshotSetup", 'resource': setup_resource},
+    "Snapshot Bull Flag": { "app_label": "common",  "model_name": "SnapshotBullFlag", 'resource': bull_flag_resource}
 }
 
 
