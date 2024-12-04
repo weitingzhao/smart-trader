@@ -3,8 +3,10 @@ from django import forms
 
 # Register your models here.
 from apps.common.models import *
-
+from apps.common.resources import *
 from import_export.admin import ImportExportMixin, ImportMixin, ImportExportModelAdmin
+
+
 # from import_export_celery.admin_actions import create_export_job_action
 
 class UtilitiesLookupAdmin(admin.ModelAdmin):
@@ -26,15 +28,18 @@ class UtilitiesFilterAdmin(admin.ModelAdmin):
 admin.site.register(UtilitiesLookup, UtilitiesLookupAdmin)
 admin.site.register(UtilitiesFilter, UtilitiesFilterAdmin)
 
+
+
+@admin.register(SnapshotOverview)
+class ScreeningSnapshotOverviewAdmin(ImportExportModelAdmin):
+    list_display = ("name",)
+    resource_classes = [SnapshotOverviewResource]
+
+
+
 # @admin.register(ScreeningChartmillOverview)
 # class Celery_ScreeningChartmillOverviewAdmin(ImportMixin, admin.ModelAdmin):
 #     list_display = ("name",)
 #     resource = ScreeningChartmillOverviewResource()
 #     resource_classes = [ScreeningChartmillOverviewResource]
 #     actions = (create_export_job_action,)
-
-@admin.register(ScreeningSnapshotOverview)
-class ScreeningSnapshotOverviewAdmin(ImportExportModelAdmin):
-    list_display = ("name",)
-    resource_classes = [ScreeningSnapshotOverviewResource]
-

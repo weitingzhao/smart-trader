@@ -159,6 +159,7 @@ class Config:
         self.ROOT_Logs = self.path_exist(self.ROOT / "log")
         self.ROOT_Data = self.path_exist(self.ROOT / "data")
         self.ROOT_Research = self.path_exist(self.ROOT / "research")
+        self.ROOT_import = self.path_exist(self.ROOT / "import")
 
         # data sub-folder
         self.FOLDER_Symbols = self.path_exist(self.ROOT_Data / "symbols")
@@ -166,6 +167,7 @@ class Config:
         self.FOLDER_Tradings = self.path_exist(self.ROOT_Data / "daily")
         self.FOLDER_Infos = self.path_exist(self.ROOT_Data / "infos")
         self.folder_schema_index = self.path_exist(self.ROOT_Data / "schema_index")
+        self.FOLDER_Screenings = self.path_exist(self.ROOT_import / "screenings")
 
         # research sub-folder
         self.FOLDER_Watch = self.path_exist(self.ROOT_Research / "watch")

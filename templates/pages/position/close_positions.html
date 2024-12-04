@@ -31,7 +31,11 @@
           <div class="row">
             <div class="col-8">
               <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Gain / Loss</p>
+                <div class="d-flex align-items-center">
+                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Realized Margin</p>
+                    &nbsp;&nbsp;&nbsp;
+                    <p class="text-sm mb-0">Gain / Loss</p>
+                </div>                  
                 <h5 class="font-weight-bolder mb-0">
                     {%round_by_digits summary.realized.net 2 '$ {0}' False%}
                     <span class="text-success text-sm font-weight-bolder">
@@ -58,18 +62,24 @@
           <div class="row">
             <div class="col-8">
               <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Win Rate</p>
+                  <div class="d-flex align-items-center">
+                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Win Rate</p>
+                      &nbsp;&nbsp;&nbsp;
+                      <p class="text-sm mb-0">trade / invest / rate / days</p>
+                  </div>
                 <h5 class="font-weight-bolder mb-0">
                     {%round_by_digits summary.performance.rate 2 '{0}%' False%}
                     <span class="text-success text-sm font-weight-bolder">
                         {%round_by_digits summary.performance.win_trade 0 '{0}' False%}
                         {%round_by_digits summary.performance.win_invest 0 '${0}' False%}
                         {%round_by_digits summary.performance.win_percent 0 '{0}%' False%}
+                        {%round_by_digits summary.performance.win_avg_days 0 '{0}' False%}
                     </span>
                     <span class="text-danger text-sm font-weight-bolder">
                         {%round_by_digits summary.performance.lose_trade 0 '{0}' False%}
                         {%round_by_digits summary.performance.lose_invest 0 '${0}' False%}
                         {%round_by_digits summary.performance.lose_percent 0 '{0}%' False%}
+                        {%round_by_digits summary.performance.lose_avg_days 0 '{0}' False%}
                     </span>
                 </h5>
               </div>

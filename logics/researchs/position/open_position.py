@@ -139,8 +139,10 @@ class OpenPosition(PositionBase):
     def get_holding_current_stop(self) -> pd.DataFrame:
 
         # Subquery to get the maximum trade_id for each holding_id
-        max_trade_id_subquery = (Order.objects.filter(holding_id=OuterRef('holding_id'))
-            .order_by('-trade_id').values('trade_id'))[:1]
+        max_trade_id_subquery = (Order.objects.filter(
+            holding_id=OuterRef('holding_id'),
+            trade_id__isnull=False
+        ).order_by('-trade_id').values('trade_id'))[:1]
 
         # Query to get holding_sell_order where trade_id is in the previous trade_id list
         sell_orders_with_max_trade_id = (Order.objects.filter(
@@ -279,9 +281,15 @@ class OpenPosition(PositionBase):
         final_df['dist_pct'] = final_df['dist'].apply(float) / final_df['invest'].apply(float) * 100
 
     def calc_goal(self, final_df: pd.DataFrame):
+        # Ensure bk_date and init_stop_date are datetime
+        final_df['date'] = pd.to_datetime(final_df['bk_date'])
+        final_df['init_stop_date'] = pd.to_datetime(final_df['init_stop_date'])
+
         # Calculate the goal
         final_df['init_risk'] = final_df['init_quantity'] * (final_df['init_price'] - (final_df['init_stop'] + final_df['init_limit']) / 2)
         final_df['init_risk_pct'] = final_df['init_risk'] / final_df['init_invest'] * 100
+        # Calculate holding days
+        final_df['holding_days'] = (final_df['date'] - final_df['init_stop_date']).dt.days + 1
 
         # # Retrieve the UserStaticSetting record for the given user_id
         # user_static_setting = get_object_or_404(UserStaticSetting, user_id=user_id)

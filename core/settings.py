@@ -288,16 +288,16 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-def screening_snapshot_overview_resource():  # Optional
-    from apps.common.models import ScreeningSnapshotOverviewResource
-    return ScreeningSnapshotOverviewResource
+def snapshot_overview_resource():  # Optional
+    from apps.common.resources import SnapshotOverviewResource
+    return SnapshotOverviewResource
 
 ############# django-import-export############
 IMPORT_EXPORT_CELERY_MODELS = {
     "SEPA-Q Chartmill Overview": {
         "app_label": "common",
-        "model_name": "ScreeningSnapshotOverview",
-        'resource': screening_snapshot_overview_resource,  # Optional
+        "model_name": "SnapshotOverview",
+        'resource': snapshot_overview_resource,  # Optional
     }
 }
 

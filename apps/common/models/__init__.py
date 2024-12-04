@@ -6,6 +6,7 @@ from .signals import *
 # PLAN
 from .wishlist import *
 from .screening import *
+from .snapshot import *
 from .portfolio import *
 
 # Research

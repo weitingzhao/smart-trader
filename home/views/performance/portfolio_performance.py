@@ -48,10 +48,10 @@ def get_balance_history(request):
     # Step 2. Extract: Prepare the data for the chart
     # Step 2.a chart
     labels = data_df['date'].astype(str).tolist()
-    market_data = data_df['total_market'].tolist()
-    asset_data = data_df['total_asset'].tolist()
-    invest_data = data_df['total_invest'].tolist()
-    baseline_data = data_df['total_baseline'].tolist()
+    market_data = data_df['total_market'].round(0).astype(int).tolist()
+    asset_data = data_df['total_asset'].round(0).astype(int).tolist()
+    invest_data = data_df['total_invest'].round(0).astype(int).tolist()
+    baseline_data = data_df['total_baseline'].round(0).astype(int).tolist()
 
     # Step 2.b summary
     # Get the first and last rows of data_df

@@ -44,6 +44,9 @@ class ClosePosition(PositionBase):
         # Step 2.b Calculate risk/gain
         self.calc_risk_gain(final_df)
 
+        # Order by exit_date in descending order
+        final_df = final_df.sort_values(by='exit_date', ascending=False)
+
         return final_df
 
     def summary(self, final_df: pd.DataFrame) -> dict:
@@ -62,6 +65,8 @@ class ClosePosition(PositionBase):
                 'lose_trade': 0,
                 'lose_percent': 0,
                 'lose_invest': 0,
+                'win_avg_days': 0,
+                'lose_avg_days': 0,
             }
         }
 
@@ -82,9 +87,11 @@ class ClosePosition(PositionBase):
         if not win_trades.empty:
             summary['performance']['win_percent'] = (win_trades['trade_margin'].sum() / win_trades['buy_total_value'].sum()) * 100
             summary['performance']['win_invest'] = (win_trades['buy_total_value'].sum() / summary['performance']['win_trade'])
+            summary['performance']['win_avg_days'] = win_trades['held_day'].mean()
         if not lose_trades.empty:
             summary['performance']['lose_percent'] = (lose_trades['trade_margin'].sum() / lose_trades['buy_total_value'].sum()) * 100
             summary['performance']['lose_invest'] = (lose_trades['buy_total_value'].sum() / summary['performance']['lose_trade'])
+            summary['performance']['lose_avg_days'] = lose_trades['held_day'].mean()
 
         return summary
 

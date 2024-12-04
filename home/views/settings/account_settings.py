@@ -13,6 +13,8 @@ def default(request):
     portfolios = Portfolio.objects.filter(user=user_id).order_by('-is_default')
     form = PortfolioForm()
 
+
+
     return render(
         request=request,
         template_name='pages/settings/account_settings.html',
