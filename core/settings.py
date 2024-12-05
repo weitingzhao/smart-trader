@@ -46,7 +46,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:5085',
     'http://10.0.0.80:5085',
     'http://98.206.231.225:5085',
-    'http://152.32.172.45:5085/',
+    'http://152.32.172.45:5085',
+    'http://www.bifrostrader.com:5085',
+    'http://bifrostrader.com:5085',
+    'https://www.bifrostrader.com:5085',
+    'https://bifrostrader.com:5085',
 ]
 
 # Application definition

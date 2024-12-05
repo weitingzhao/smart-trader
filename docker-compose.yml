@@ -17,8 +17,11 @@ services:
     image: "nginx:latest"
     ports:
       - "5085:5085"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - /home/ubuntu/docker/nginx/html:/var/www/html
     networks:
       - web_network
     depends_on:
