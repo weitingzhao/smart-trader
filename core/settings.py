@@ -11,12 +11,17 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import sys
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from dotenv import load_dotenv
 from gunicorn.config import Config
 from str2bool       import str2bool
 import os, random, string
+
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
+
 
 load_dotenv()
 

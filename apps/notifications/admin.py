@@ -1,16 +1,21 @@
 ''' Django notifications admin file '''
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from django.utils.translation import gettext_lazy
 from apps.notifications.base.admin import AbstractNotificationAdmin
 from swapper import load_model
+
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
+
 
 Notification = load_model('notifications', 'Notification')
 
 
 def mark_unread(modeladmin, request, queryset):
     queryset.update(unread=True)
-mark_unread.short_description = gettext_lazy('Mark selected notifications as unread')
+mark_unread.short_description = _('Mark selected notifications as unread')
 
 
 class NotificationAdmin(AbstractNotificationAdmin):
