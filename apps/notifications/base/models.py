@@ -11,7 +11,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+
+#from django.utils.translation import gettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
+
 from django.utils.html import format_html
 
 from jsonfield.fields import JSONField
