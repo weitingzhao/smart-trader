@@ -17,7 +17,7 @@ class ScreeningService(BaseService):
         super().__init__(engine)
         self.API_KEY = self.config.API_KEY_Alphavantage
 
-    def screening_operation(self) -> QuerySet[ScreeningOperation]:
+    def screening_operation(self):
 
         # Step 0.
         # Step 0.a. prepare config and output
@@ -76,8 +76,12 @@ class ScreeningService(BaseService):
         except Exception as e:
             raise RuntimeError(f"An error occurred while preparing screening operations: {e}")
 
-        # Step 1.b. Fetch ScreeningOperation records with status = 1 and limit to 3 results for testing purposes
-        # return ScreeningOperation.objects.filter(status=1)[:3]
-        return ScreeningOperation.objects.filter(id=633)
 
 
+    def screening_snapshot(self, args: str = None)-> QuerySet[ScreeningOperation]:
+        # Step 1.b. Fetch ScreeningOperation records based on args
+        if args:
+            id_list = [int(id_str) for id_str in args.split(',')]
+            return ScreeningOperation.objects.filter(id__in=id_list)
+        else:
+            return ScreeningOperation.objects.filter(status=1).exclude(status="Bypass")[:20]

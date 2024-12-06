@@ -44,7 +44,7 @@ admin.site.register(Screening, ScreeningAdmin)
 class ScreeningOperationAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'time', 'file_name',  'processed_at', 'status', 'processed_result')
-    list_filter = ('time', 'screening_id')
+    list_filter = ('time', 'status', 'screening_id')
     actions = ['delete_selected']
     ordering = ('id', 'time', 'status')
     search_fields = ('id','time', 'file_name', 'processed_at', 'status', 'processed_result')

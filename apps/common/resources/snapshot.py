@@ -6,11 +6,63 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 
 
+# Market Symbol
+class SnapshotMarketSymbolResource(resources.ModelResource):
+
+    def before_import(self, dataset, **kwargs):
+        if 'Symbol' not in dataset.headers:
+            raise ValueError("The dataset must have a 'Symbol' column.")
+        # Make sure symbols all exist
+        # Replace "." with "-" in symbols
+        symbols = [symbol.replace('.', '-') for symbol in dataset['Symbol']]
+        market_symbols = MarketSymbol.objects.filter(symbol__in=symbols)
+        market_symbol_dict = {ms.symbol: ms for ms in market_symbols}
+        self.missing_symbols = [symbol for symbol in symbols if symbol not in market_symbol_dict]
+
+    @staticmethod
+    def get_symbol(row):
+        return row['Symbol'].strip().replace('.', '-')
+
+    def before_import_row(self, row, **kwargs):
+        row['Symbol'] = self.get_symbol(row)
+        row['name'] = self.get_symbol(row)
+        row['market'] = 'unknown'
+        row['asset_type'] = 'unknown'
+        row['status'] = 'reload'
+        row['has_company_info'] = False
+        row['is_delisted'] = False
+        row['daily_period_yfinance'] = '5d'
+        row['min_period_yfinance'] = '1d'
+
+
+    def get_instance(self, instance_loader, row):
+        # Allow creating new records if a match is not found
+        return self._meta.model.objects.filter(symbol=self.get_symbol(row)).first()
+
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        symbol = self.get_symbol(row)
+        return symbol not in self.missing_symbols
+
+    symbol = fields.Field(column_name='Symbol', attribute='symbol')
+
+    class Meta:
+        name = 'MarketSymbol'
+        model = MarketSymbol
+        import_id_fields = ['symbol']
+        exclude = ['id']
+        skip_unchanged = True  # Skip records that haven't changed
+        report_skipped = True  # Include skipped rows in the result report
+        fields = (
+            'symbol', 'name',
+            'market', 'asset_type', 'status', 'has_company_info',
+            'is_delisted', 'daily_period_yfinance', 'min_period_yfinance')
+
+
+
+
 class SnapshotResource(resources.ModelResource):
 
-
     def before_import(self, dataset,  **kwargs):
-
         try:
             filename = kwargs['file_name']
             match = re.search(r'_(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2}\.\d{3}Z)\.csv$', filename)
@@ -64,52 +116,11 @@ class SnapshotResource(resources.ModelResource):
 
 
 # Screening
-class SnapshotMarketSymbolResource(SnapshotResource):
-
-    def before_import(self, dataset, **kwargs):
-
-        super().before_import(dataset)
-        # Make sure symbols all exist
-        # Replace "." with "-" in symbols
-        symbols = [symbol.replace('.', '-') for symbol in dataset['Symbol']]
-        market_symbols = MarketSymbol.objects.filter(symbol__in=symbols)
-        market_symbol_dict = {ms.symbol: ms for ms in market_symbols}
-        self.missing_symbols = [symbol for symbol in symbols if symbol not in market_symbol_dict]
-
-
-    def before_import_row(self, row, **kwargs):
-        super().before_import_row(row, **kwargs)
-        row['name'] = row['Symbol']
-        row['market'] = 'unknown'
-        row['asset_type'] = 'unknown'
-        row['status'] = 'reload'
-        row['has_company_info'] = False
-        row['is_delisted'] = False
-        row['daily_period_yfinance'] = '5d'
-        row['min_period_yfinance'] = '1d'
-
-
-    def skip_row(self, instance, original, row, import_validation_errors=None):
-        symbol = row['Symbol'].replace('.', '-')
-        return symbol not in self.missing_symbols
-
-
-    class Meta:
-        name = 'MarketSymbol'
-        model = MarketSymbol
-        fields = (
-            'symbol', 'name',
-            'market', 'asset_type', 'status', 'has_company_info',
-            'is_delisted', 'daily_period_yfinance', 'min_period_yfinance')
-
-
-
-# Screening
 class SnapshotScreeningResource(SnapshotResource):
 
     def before_import(self, dataset, **kwargs):
 
-        super().before_import(dataset)
+        super().before_import(dataset, **kwargs)
         self.ref_screening_id = None  # Initialize screening_id as None
 
         try:
