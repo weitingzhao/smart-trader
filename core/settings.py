@@ -297,6 +297,10 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+
+def market_symbol_resource():  # Optional
+    from apps.common.resources import SnapshotMarketSymbolResource
+    return SnapshotMarketSymbolResource
 def screening_resource():  # Optional
     from apps.common.resources import SnapshotScreeningResource
     return SnapshotScreeningResource
@@ -317,6 +321,15 @@ def bull_flag_resource():  # Optional
     return SnapshotBullFlagResource
 
 ############# django-import-export############
+IMPORT_EXPORT_CELERY_MODEL_DEPENDENCY = {
+    "Snapshot Screening": [market_symbol_resource, screening_resource],
+    "Snapshot Overview": [market_symbol_resource, screening_resource, overview_resource],
+    "Snapshot Technical": [market_symbol_resource, screening_resource, technical_resource],
+    "Snapshot Fundamental": [market_symbol_resource, screening_resource, fundamental_resource],
+    "Snapshot Setup": [market_symbol_resource, screening_resource, setup_resource],
+    "Snapshot Bull Flag": [market_symbol_resource, screening_resource, bull_flag_resource]
+}
+
 IMPORT_EXPORT_CELERY_MODELS = {
     "Snapshot Screening": { "app_label": "common",  "model_name": "SnapshotScreening", 'resource': screening_resource},
     "Snapshot Overview": { "app_label": "common",  "model_name": "SnapshotOverview", 'resource': overview_resource},
@@ -325,7 +338,6 @@ IMPORT_EXPORT_CELERY_MODELS = {
     "Snapshot Setup": { "app_label": "common",  "model_name": "SnapshotSetup", 'resource': setup_resource},
     "Snapshot Bull Flag": { "app_label": "common",  "model_name": "SnapshotBullFlag", 'resource': bull_flag_resource}
 }
-
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Default import time limits (in seconds)

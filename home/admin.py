@@ -32,13 +32,23 @@ class ScreeningAdmin(admin.ModelAdmin):
     list_display = (
         'screening_id', 'name', 'status',  'ref_screening',
         'addendum_screening', 'file_pattern',
-        'celery_models', 'source', 'description')
-    list_filter = ('description', 'status', 'celery_models')
+        'import_models', 'source', 'description')
+    list_filter = ('description', 'status', 'import_models')
 
     actions = ['delete_selected']
     ordering = ('screening_id', 'name', 'ref_screening', 'addendum_screening', 'file_pattern', 'source')
     search_fields = ('name',)
 admin.site.register(Screening, ScreeningAdmin)
+
+
+class ScreeningOperationAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'time', 'file_name',  'processed_at', 'status', 'processed_result')
+    list_filter = ('time', 'screening_id')
+    actions = ['delete_selected']
+    ordering = ('id', 'time', 'status')
+    search_fields = ('id','time', 'file_name', 'processed_at', 'status', 'processed_result')
+admin.site.register(ScreeningOperation, ScreeningOperationAdmin)
 
 
 @admin.register(SnapshotScreening)

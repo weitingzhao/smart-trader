@@ -9,7 +9,7 @@ class IndexingTask(BaseTask):
         super().__init__(celery, data)
 
     def job_scripts(self) -> List:
-        return [{"name":"fetching-symbols"}]
+        return [{"name":"indexing-symbols"}]
 
     def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
         if script_name == 'indexing-symbols':

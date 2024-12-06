@@ -8,7 +8,7 @@ from logics.services.base_service import BaseService
 from datetime import datetime, timezone, timedelta
 
 
-class LoadingTradingService(BaseService):
+class TradingService(BaseService):
 
     def __init__(self, engine: Engine, path: Path):
         super().__init__(engine)

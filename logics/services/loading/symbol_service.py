@@ -6,7 +6,7 @@ from logics.services.base_service import BaseService
 from whoosh.qparser import MultifieldParser, WildcardPlugin, OrGroup
 from home.singleton import Instance
 
-class LoadingSymbolService(BaseService):
+class SymbolService(BaseService):
 
     def __init__(self, engine: Engine):
         super().__init__(engine)

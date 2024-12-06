@@ -9,7 +9,7 @@ from import_export.widgets import ForeignKeyWidget
 class SnapshotResource(resources.ModelResource):
 
 
-    def before_import(self, dataset, **kwargs):
+    def before_import(self, dataset,  **kwargs):
 
         try:
             filename = kwargs['file_name']
@@ -31,12 +31,15 @@ class SnapshotResource(resources.ModelResource):
             except AttributeError:
                 self.date_obj = None
 
+
     def before_import_row(self, row, **kwargs):
         for key, value in row.items():
             if value == "N/A":
                 row[key] = None
         if self.date_obj:
             row['time'] = self.date_obj
+        if 'Symbol' in row and '.' in row['Symbol']:
+            row['Symbol'] = row['Symbol'].replace('.', '-')
             # print(f"row - Date===========>: {row['time']}")
 
     def skip_row(self, instance, original, row, import_validation_errors=None):
@@ -59,12 +62,54 @@ class SnapshotResource(resources.ModelResource):
         abstract = True
         fields = ('id', 'symbol', 'time')
 
+
+# Screening
+class SnapshotMarketSymbolResource(SnapshotResource):
+
+    def before_import(self, dataset, **kwargs):
+
+        super().before_import(dataset)
+        # Make sure symbols all exist
+        # Replace "." with "-" in symbols
+        symbols = [symbol.replace('.', '-') for symbol in dataset['Symbol']]
+        market_symbols = MarketSymbol.objects.filter(symbol__in=symbols)
+        market_symbol_dict = {ms.symbol: ms for ms in market_symbols}
+        self.missing_symbols = [symbol for symbol in symbols if symbol not in market_symbol_dict]
+
+
+    def before_import_row(self, row, **kwargs):
+        super().before_import_row(row, **kwargs)
+        row['name'] = row['Symbol']
+        row['market'] = 'unknown'
+        row['asset_type'] = 'unknown'
+        row['status'] = 'reload'
+        row['has_company_info'] = False
+        row['is_delisted'] = False
+        row['daily_period_yfinance'] = '5d'
+        row['min_period_yfinance'] = '1d'
+
+
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        symbol = row['Symbol'].replace('.', '-')
+        return symbol not in self.missing_symbols
+
+
+    class Meta:
+        name = 'MarketSymbol'
+        model = MarketSymbol
+        fields = (
+            'symbol', 'name',
+            'market', 'asset_type', 'status', 'has_company_info',
+            'is_delisted', 'daily_period_yfinance', 'min_period_yfinance')
+
+
+
 # Screening
 class SnapshotScreeningResource(SnapshotResource):
 
     def before_import(self, dataset, **kwargs):
 
-        super().before_import(dataset, **kwargs)
+        super().before_import(dataset)
         self.ref_screening_id = None  # Initialize screening_id as None
 
         try:
