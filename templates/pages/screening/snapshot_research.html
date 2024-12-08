@@ -67,6 +67,7 @@
                                           <th>Name</th>
                                           <th>Setup Rating</th>
                                           <th>Technical Rating</th>
+                                          <th>Fundamental Rating</th>
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -154,7 +155,8 @@
             record.symbol_id,
             record.name,
             record.setup_rating,
-            record.technical_rating
+            record.technical_rating,
+            record.fundamental_rating,
         ]);
         snapshotDT.rows().add(transformedData);
         snapshotDT.update();

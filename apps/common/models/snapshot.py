@@ -188,8 +188,10 @@ class SnapshotIndicator(models.Model):
     # Foreign Keys
     snapshot_category = models.CharField(max_length=50, choices=SnapshotCategoryChoices.choices, default=SnapshotCategoryChoices.NONE, null=True, blank=True)
     # Data
-    snapshot_column = models.CharField(max_length=100)
-    name = models.CharField(max_length=200)
+    snapshot_column_group = models.CharField(max_length=100, null=True, blank=True)
+
+    snapshot_column = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
         db_table = 'snapshot_indicator'

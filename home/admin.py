@@ -43,42 +43,47 @@ class ScreeningOperationAdmin(admin.ModelAdmin):
 # Snapshots
 @admin.register(SnapshotIndicator)
 class SnapshotIndicatorAdmin(admin.ModelAdmin):
-    list_display = ('snapshot_indicator_id', 'snapshot_category', 'snapshot_column')
+    list_display = (
+        'snapshot_indicator_id', 'name', 'snapshot_category',
+        'snapshot_column_group', 'snapshot_column')
+    list_filter = ('snapshot_category','snapshot_column_group')
     actions = ['delete_selected']
-    ordering = ('snapshot_indicator_id', 'snapshot_category', 'snapshot_column')
-    search_fields = ('snapshot_category', 'snapshot_column')
+    ordering = (
+        'snapshot_indicator_id', 'name', 'snapshot_category',
+        'snapshot_column_group', 'snapshot_column')
+    search_fields = ('snapshot_category','snapshot_column_group', 'snapshot_column')
 
 
 # Snapshots detail tables
-@admin.register(SnapshotScreening)
-class SnapshotScreeningAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotScreeningResource]
-
-@admin.register(SnapshotOverview)
-class SnapshotOverviewAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotOverviewResource]
-
-@admin.register(SnapshotTechnical)
-class SnapshotTechnicalAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotTechnicalResource]
-
-@admin.register(SnapshotFundamental)
-class SnapshotFundamentalAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotFundamentalResource]
-
-@admin.register(SnapshotSetup)
-class SnapshotSetupAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotSetupResource]
-
-@admin.register(SnapshotBullFlag)
-class SnapshotBullFlagAdmin(ImportExportModelAdmin):
-    list_display = ("symbol","time")
-    resource_classes = [SnapshotBullFlagResource]
+# @admin.register(SnapshotScreening)
+# class SnapshotScreeningAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotScreeningResource]
+#
+# @admin.register(SnapshotOverview)
+# class SnapshotOverviewAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotOverviewResource]
+#
+# @admin.register(SnapshotTechnical)
+# class SnapshotTechnicalAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotTechnicalResource]
+#
+# @admin.register(SnapshotFundamental)
+# class SnapshotFundamentalAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotFundamentalResource]
+#
+# @admin.register(SnapshotSetup)
+# class SnapshotSetupAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotSetupResource]
+#
+# @admin.register(SnapshotBullFlag)
+# class SnapshotBullFlagAdmin(ImportExportModelAdmin):
+#     list_display = ("symbol","time")
+#     resource_classes = [SnapshotBullFlagResource]
 
 
 # @admin.register(ScreeningChartmillOverview)
