@@ -144,7 +144,7 @@ def fetching(request):
         summary sd
         LEFT JOIN pivot_last_showing pls ON sd.symbol_id = pls.symbol_id
         LEFT JOIN snapshot_overview so ON sd.symbol_id = so.symbol_id AND sd.time = so.time
-        LEFT JOIN snapshot_technical st ON sdblock.symbol_id = st.symbol_id AND sd.time = st.time
+        LEFT JOIN snapshot_technical st ON sd.symbol_id = st.symbol_id AND sd.time = st.time
         LEFT JOIN snapshot_setup ss ON sd.symbol_id = ss.symbol_id AND sd.time = ss.time
         LEFT JOIN snapshot_fundamental sf ON sd.symbol_id = sf.symbol_id AND sd.time = sf.time
         LEFT JOIN snapshot_bull_flag sbf ON sd.symbol_id = sbf.symbol_id AND sd.time = sbf.time
