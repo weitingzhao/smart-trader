@@ -29,6 +29,10 @@ class Portfolio(PositionBase):
         # Step 0. Convert holdings to DataFrame
         holding_df = pd.DataFrame(list(holdings.values()))
         holding_df.rename(columns={'symbol_id': 'symbol'}, inplace=True)
+        transactions_df = self.get_transactions(holding_df)
+        # Remove rows from holding_df where holding_id does not have corresponding transactions
+        holding_df = holding_df[holding_df['symbol'].isin(transactions_df['symbol'].unique())]
+        # Step 0.b Create a DataFrame with all symbols
         symbols_df = pd.DataFrame({'symbol': holding_df['symbol'].unique()})
 
 
@@ -65,6 +69,7 @@ class Portfolio(PositionBase):
         balance_df = self.cumulative_sum_pivoted_columns(symbols_df, balance_df)
         balance_df = self.calculate_balance(balance_df)
         balance_df = self.calculate_stop_limit(balance_df)
+
 
         # Filter data to include only dates greater than 2024-10-31
         if cutoff_date:
