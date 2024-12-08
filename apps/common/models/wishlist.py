@@ -1,5 +1,5 @@
 from django.db import models
-from .market import MarketSymbol
+from apps.common.models import *
 
 class Wishlist(models.Model):
     """

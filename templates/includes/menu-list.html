@@ -44,7 +44,7 @@
         <a data-bs-toggle="collapse" href="#screeningPanel"
            class="nav-link {% if 'screening' in parent %}active{% endif %}" aria-controls="screeningPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-flask-vial fs-7 {% if 'screening_criteria' in segment or 'screening_results' in segment or 'screening_upload' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'screening_criteria' in segment or 'screening_results' in segment or 'snapshot_research' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
           <span class="nav-link-text ms-1">Screening</span>
         </a>
@@ -56,10 +56,10 @@
                       <span class="sidenav-normal"> Screening Criteria </span>
                   </a>
               </li>
-              <li class="nav-item {% if 'screening_upload' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'screening_upload' in segment %}active{% endif %}" href="{% url 'screening_upload' %}" target="_self">
+              <li class="nav-item {% if 'snapshot_research' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'snapshot_research' in segment %}active{% endif %}" href="{% url 'snapshot_research' %}" target="_self">
                       <span class="sidenav-mini-icon"> SS </span>
-                      <span class="sidenav-normal"> Screening Upload </span>
+                      <span class="sidenav-normal"> Snapshot Research </span>
                   </a>
               </li>
               <li class="nav-item {% if 'screening_results' in segment %}active{% endif %}">

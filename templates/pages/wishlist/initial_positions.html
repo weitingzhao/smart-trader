@@ -96,84 +96,8 @@
                                       <input id='auto_complete_symbol_result'  name='holding_symbol' class="form-control" readonly>
                                   </div>
                                   <div class="button-row d-flex mt-4">
-                                      <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next">Next</button>
-                                  </div>
-                              </div>
-                          </div>
-                          <!--single form panel-->
-                          <div class="card multisteps-form__panel p-3 border-radius-xl bg-white" data-animation="FadeIn">
-                              <h5 id="selected_holding" class="font-weight-bolder mb-0">Initial Positions</h5>
-                              <p class="mb-0 text-sm">order for open position</p>
-                              <div class="multisteps-form__content">
-                                  <div class="row mt-3">
-                                      <div class="col-12 col-sm-4">
-                                          <label for="{{ form.action.id_for_label }}">Action</label>
-                                          <select class="form-select" id="{{ form.action.id_for_label }}" name="{{ form.action.name }}">
-                                            {% for choice in form.action.field.choices %}
-                                                {% if choice.0 == '0' or choice.0 == '1'  or choice.0 == '2' %}
-                                                    <option value="{{ choice.0 }}" {% if choice.0 == form.action.value %}selected{% endif %}>
-                                                        {{ choice.1 }}
-                                                    </option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                      </div>
-                                      <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.quality_target.id_for_label }}">Quantity target</label>
-                                          {{ form.quantity_target }}
-                                      </div>
-                                      <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.order_style.id_for_label }}">Order Style</label>
-                                          <select class="form-select" id="{{ form.order_style.id_for_label }}"
-                                                  name="{{ form.order_style.name }}">
-                                              {% for choice in form.order_style.field.choices %}
-                                                  <option value="{{ choice.0 }}"
-                                                          {% if choice.0 == form.order_style.value %}selected{% endif %}>
-                                                      {{ choice.1 }}
-                                                  </option>
-                                              {% endfor %}
-                                          </select>
-                                      </div>
-                                  </div>
-                                  <div class="row mt-3">
-                                      <div class="col-3 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.order_type.id_for_label }}">Order Type</label>
-                                          <select class="form-select" id="id_buy_order_type" name="{{ form.order_type.name }}" onchange="toggleCreateOrderPrice()">
-                                            {% for choice in form.order_type.field.choices %}
-                                                <option value="{{ choice.0 }}" {% if choice.0 == '1' %}selected{% endif %}>
-                                                    {{ choice.1 }}
-                                                </option>
-                                            {% endfor %}
-                                          </select>
-                                      </div>                                      
-                                      <div class="col-12 col-sm-4">
-                                          <label for="{{ form.price_market.id_for_label }}">Market Price</label>
-                                          {{ form.price_market }}
-                                      </div>
-                                      <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.price_stop.id_for_label }}">Stop Price</label>
-                                          {{ form.price_stop }}
-                                      </div>
-                                      <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.price_limit.id_for_label }}">Limit Price</label>
-                                          {{ form.price_limit }}
-                                      </div>
-                                  </div>
-                                  <div class="row mt-3">
-                                      <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                                          <label for="{{ form.timing.id_for_label }}">Timing</label>
-                                          <select class="form-select" id="{{ form.timing.id_for_label }}" name="{{ form.timing.name }}">
-                                            {% for choice in form.timing.field.choices %}
-                                                <option value="{{ choice.0 }}" {% if choice.0 == form.timing.value %}selected{% endif %}>
-                                                    {{ choice.1 }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                      </div>
-                                  </div>
-                                  <div class="button-row d-flex mt-4">
-                                      <button class="btn bg-gradient-light mb-0 js-btn-prev" type="button" title="Prev">Prev</button>
-                                      <button class="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
+                                      <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next" style="display:none;">Next</button>
+                                    <button class="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
                                   </div>
                               </div>
                           </div>

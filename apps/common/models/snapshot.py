@@ -1,5 +1,18 @@
+from django.db import models
 from apps.common.models import *
 from timescale.db.models.models import TimescaleModel
+
+
+class SnapshotCategoryChoices(models.TextChoices):
+    NONE = 'none', 'None'
+    SCREENING = 'screening', 'Screening'
+    OVERVIEW = 'overview', 'Overview'
+    SETUP = 'setup', 'Setup'
+    TECHNICAL = 'technical', 'Technical'
+    FUNDAMENTAL = 'fundamental', 'Fundamental'
+    BULL_FLAG = 'bull flag', 'Bull Flag'
+
+
 
 # Screening
 class SnapshotScreening(TimescaleModel):
@@ -88,7 +101,7 @@ class SnapshotTechnical(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
     time = models.DateField()
-
+    # Data
     lower_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     upper_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     RSI_14 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -111,7 +124,7 @@ class SnapshotFundamental(TimescaleModel):
     # Primary Key
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
     time = models.DateField()
-
+    # Data
     valuation_rating = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     price_FCF = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     PEG_next_year = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -140,6 +153,7 @@ class SnapshotBullFlag(TimescaleModel):
     symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
     time = models.DateField()
 
+    # Data
     # Bull Flag
     bull_indicator = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     bull_flag = models.BooleanField(null=True, blank=True)
@@ -150,7 +164,6 @@ class SnapshotBullFlag(TimescaleModel):
     bullish_engulfing_weekly = models.BooleanField(null=True, blank=True)
     bullish_hammer_weekly = models.BooleanField(null=True, blank=True)
     bullish_harami_weekly = models.BooleanField(null=True, blank=True)
-
     # Flag
     flag_type = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     flag_pole = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -166,5 +179,23 @@ class SnapshotBullFlag(TimescaleModel):
 
     def __str__(self):
         return f"Snapshot Bull Flag: {self.symbol.symbol} at {self.time}"
+
+
+
+class SnapshotIndicator(models.Model):
+    # Primary Key
+    snapshot_indicator_id = models.AutoField(primary_key=True)
+    # Foreign Keys
+    snapshot_category = models.CharField(max_length=50, choices=SnapshotCategoryChoices.choices, default=SnapshotCategoryChoices.NONE, null=True, blank=True)
+    # Data
+    snapshot_column = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'snapshot_indicator'
+
+    def __str__(self):
+        return f"Snapshot Indicator: {self.name} ({self.snapshot_category})"
+
 
 

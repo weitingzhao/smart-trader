@@ -7,6 +7,8 @@ from .signals import *
 from .wishlist import *
 from .screening import *
 from .snapshot import *
+from .strategy import *
+from .rating import *
 from .portfolio import *
 
 # Research
