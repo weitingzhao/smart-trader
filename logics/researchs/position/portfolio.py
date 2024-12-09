@@ -321,7 +321,7 @@ class Portfolio(PositionBase):
         balance_df = balance_df.drop(columns=['cash_mm'])
         # balance_df['funding']
         # Calculate total capital and market value
-        balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily'] + balance_df['funding'] # not  add funding here
+        balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily'] # not  add funding here
         balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily'] + balance_df['funding']
         balance_df['total_invest'] = balance_df['balance_holding']
         return balance_df
