@@ -1001,6 +1001,11 @@
     let performanceChart;
     let benchmarkChart;
 
+        // Helper function to format values
+    function formatValue(value) {
+        return value > 10000 ? (value / 1000).toFixed(1) + 'K' : value;
+    }
+
     async function fetchPerformanceChart(as_of_date) {
 
         var ctx = document.getElementById("performance-chart").getContext("2d");
@@ -1023,17 +1028,20 @@
         const json_data = await fetchJson(`/performance/portfolio/balance/history/?as_of_date=${as_of_date}`, '{{ csrf_token }}');
 
         // Extract summary data
-        const { margin, margin_pct, capital, capital_pct } = json_data.summary;
+        const { funding, margin, margin_pct, capital, capital_pct } = json_data.summary;
 
         // Update the HTML content
         const marginElement = document.querySelector('.portfolio-balance-summary');
         marginElement.innerHTML = `
             <span class="text-secondary"> Market:</span>
             <i class="fa ${margin >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${margin}&nbsp;${margin_pct}%
+            $${formatValue(margin)}&nbsp;${margin_pct}%
             <span class="text-secondary"> Capital:</span>
             <i class="fa ${capital >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${capital}&nbsp;${capital_pct}%
+            $${formatValue(capital)}&nbsp;${capital_pct}%
+            <span class="text-secondary"> Funding:</span>
+            <i class="fa ${funding >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
+            $${formatValue(funding)}
         `;
 
         // Update the chart data

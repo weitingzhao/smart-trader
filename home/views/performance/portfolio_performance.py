@@ -58,16 +58,21 @@ def get_balance_history(request):
     first_row = data_df.iloc[0]
     last_row = data_df.iloc[-1]
 
+    # Calculate the sum of funding
+    funding = data_df['funding'].sum()
+
     # Calculate differences
-    margin = round(last_row['total_market'] - first_row['total_market'], 0)
-    capital = round(last_row['total_asset'] - first_row['total_asset'], 0)
+    margin = round(last_row['total_market'] - first_row['total_market'] - funding, 0)
+    capital = round(last_row['total_asset'] - first_row['total_asset'] - funding, 0)
 
     # Calculate growth rates
     margin_pct = round((margin / first_row['total_market']) * 100, 2)
     capital_pct = round((capital / first_row['total_asset']) * 100, 2)
 
+
     data = {
         "summary": {
+            'funding': funding,
             "margin": margin,
             "margin_pct": margin_pct,
             "capital": capital,
