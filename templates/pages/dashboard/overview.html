@@ -305,6 +305,10 @@
                             <i class="bg-info"></i>
                             <span class="text-dark text-xs">invest</span>
                         </span>
+                        <span class="badge badge-md badge-dot me-4">
+                            <i style="background-color:#E6E6E6;"></i>
+                            <span class="text-dark text-xs">funding</span>
+                        </span>
                         <p class="text-xs portfolio-balance-summary font-weight-bold"></p>
                     </p>
                     <div class="ms-auto">
@@ -1033,15 +1037,15 @@
         // Update the HTML content
         const marginElement = document.querySelector('.portfolio-balance-summary');
         marginElement.innerHTML = `
-            <span class="text-secondary"> Market:</span>
+            <span class="text-black" style="color: black"> Market:</span>
             <i class="fa ${margin >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${formatValue(margin)}&nbsp;${margin_pct}%
-            <span class="text-secondary"> Capital:</span>
+            <b>$${formatValue(margin)}&nbsp;${margin_pct}%</b>
+            <span class="text-black" style="color: black"> Capital:</span>
             <i class="fa ${capital >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${formatValue(capital)}&nbsp;${capital_pct}%
-            <span class="text-secondary"> Funding:</span>
+            <b>$${formatValue(capital)}&nbsp;${capital_pct}%</b>
+            <span class="text-black" style="color: black"> Funding:</span>
             <i class="fa ${funding >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${formatValue(funding)}
+            <b>$${formatValue(funding)}</b>
         `;
 
         // Update the chart data
@@ -1057,7 +1061,7 @@
             performanceChart.update();
         } else {
             const config = {
-                type: "line",
+                type: "bar",
                 data: data,
                 options: {
                     responsive: true,
