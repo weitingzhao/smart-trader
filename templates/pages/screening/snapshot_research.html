@@ -1,0 +1,202 @@
+{% extends 'layouts/base.html' %}
+{% load static home_filter%}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="page-header min-height-100 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+            <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+            <div class="row gx-4">
+                <div class="col-auto">
+                    <div class="avatar avatar-xl position-relative">
+                        <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                    </div>
+                </div>
+                <div class="col-auto my-auto">
+                    <div class="h-100">
+                        <h5 class="mb-1">
+                            Snapshot Research
+                        </h5>
+                        <p class="mb-0 font-weight-bold text-sm">
+                            base on daily import screening snapshot data locate stock for wishlist
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                  <div class="nav-wrapper position-relative end-0">
+                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                        <li class="nav-item" role="tab" >
+                        <a id="snapshot_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:" aria-selected="true">
+                          <span class="ms-1">Snapshot</span>
+                        </a>
+                      </li>
+                      <li class="nav-item" role="tab" >
+                        <a id="buy_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
+                          <span class="ms-1">xxx</span>
+                        </a>
+                      </li>
+                      <li class="nav-item" role="tab" >
+                        <a id="sell_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
+                          <span class="ms-1">yyy</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="snapshot_panel" class="container-fluid py-4" style="display: none;">
+        <div class="row mt-3">
+            <div class="col-12 col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Snapshot Data</h6>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-flush table-hover" id="snapshot_table">
+                                    <thead class="thead-light">
+                                      <tr>
+                                          <th>No.</th>
+                                          <th>Symbol</th>
+                                          <th>Name</th>
+                                          <th>Setup Rating</th>
+                                          <th>Technical Rating</th>
+                                          <th>Fundamental Rating</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                  </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="buy_order_panel" class="container-fluid py-4">
+    </div>
+    <div id="sell_order_panel" class="container-fluid py-4">
+    </div>
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block extra_js %}
+<link href="https://cdn.jsdelivr.net/npm/simple-datatables-classic@latest/dist/style.css" rel="stylesheet" type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables-classic@latest" type="text/javascript"></script>
+<script>
+////////////////////////////////////////////// Table  html //////////////////////////////////////////////
+    const csrftoken = getCookie('csrftoken');
+
+    const snapshotDT = new simpleDatatables.DataTable(`#snapshot_table`, {
+        searchable: true,
+        fixedHeight: false,
+        perPage: 15,
+        pagination: true // Ensure pagination is enabled
+    });
+
+    snapshotDT.on('datatable.page', function(page) {
+        fetchData(page, snapshotDT.sortColumn, snapshotDT.sortDirection, function(response) {
+            snapshotDT.rows().remove();
+            snapshotDT.rows().add(response.data);
+            snapshotDT.update();
+            if (snapshotDT.pagination) {
+                snapshotDT.pagination.update(response.total, page);
+            }
+        });
+    });
+
+    snapshotDT.on('datatable.sort', function(column, direction) {
+        fetchData(snapshotDT.currentPage, column, direction, function(response) {
+            snapshotDT.rows().remove();
+            snapshotDT.rows().add(response.data);
+            snapshotDT.update();
+            if (snapshotDT.pagination) {
+                snapshotDT.pagination.update(response.total, snapshotDT.currentPage);
+            }
+        });
+    });
+
+    function fetchData(page, sortColumn, sortDirection, callback) {
+        const params = new URLSearchParams({
+            page: page,
+            sortColumn: sortColumn,
+            sortDirection: sortDirection
+        });
+
+        fetch(`/screening/snapshot/fetching/data?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            callback({
+                data: data.data,
+                total: data.total
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    fetchData(1, 'symbol_id', 'asc', function(response) {
+        {#console.log(response.data)#}
+        {#console.log(response.total)#}
+        const transformedData = response.data.map(record => [
+            record.row_num,
+            record.symbol_id,
+            record.name,
+            record.setup_rating,
+            record.technical_rating,
+            record.fundamental_rating,
+        ]);
+        snapshotDT.rows().add(transformedData);
+        snapshotDT.update();
+        if (snapshotDT.pagination) {
+            snapshotDT.pagination.update(response.total, 1);
+        }
+    });
+
+    ////////////////////////////////////////////// Quote html //////////////////////////////////////////////
+    const panels = [
+        'snapshot', 'buy_order','sell_order',
+    ];// Hide all panels
+
+    panels.forEach(panel => {
+        document.getElementById(panel + "_btn").addEventListener('click', function() {
+            showPanel(panel);
+        });
+    });
+
+    function showPanel(panelId) {
+        panels.forEach(panel => {
+            document.getElementById(panel + "_panel").style.display = 'none';
+            document.getElementById(panel + "_btn").classList.remove('active');
+        });
+        // Show the selected panel
+        const selectedPanel = document.getElementById(panelId + "_panel");
+        if (selectedPanel) {
+            selectedPanel.style.display = 'block';
+            document.getElementById(panelId + "_btn").classList.add('active');
+           if ("chart" === panelId) {
+                renderChart('{{ symbol }}', currentChartType, currentInterval);
+            }
+        }
+    }
+
+
+    ////////////////////////////////////////////// init Setup Chart Panel //////////////////////////////////////////////
+    {#showPanel("profile");#}
+    showPanel("snapshot");
+
+
+</script>
+{% endblock extra_js %}

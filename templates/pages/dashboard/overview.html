@@ -305,6 +305,10 @@
                             <i class="bg-info"></i>
                             <span class="text-dark text-xs">invest</span>
                         </span>
+                        <span class="badge badge-md badge-dot me-4">
+                            <i style="background-color:#E6E6E6;"></i>
+                            <span class="text-dark text-xs">funding</span>
+                        </span>
                         <p class="text-xs portfolio-balance-summary font-weight-bold"></p>
                     </p>
                     <div class="ms-auto">
@@ -1001,6 +1005,11 @@
     let performanceChart;
     let benchmarkChart;
 
+        // Helper function to format values
+    function formatValue(value) {
+        return value > 10000 ? (value / 1000).toFixed(1) + 'K' : value;
+    }
+
     async function fetchPerformanceChart(as_of_date) {
 
         var ctx = document.getElementById("performance-chart").getContext("2d");
@@ -1023,17 +1032,20 @@
         const json_data = await fetchJson(`/performance/portfolio/balance/history/?as_of_date=${as_of_date}`, '{{ csrf_token }}');
 
         // Extract summary data
-        const { margin, margin_pct, capital, capital_pct } = json_data.summary;
+        const { funding, margin, margin_pct, capital, capital_pct } = json_data.summary;
 
         // Update the HTML content
         const marginElement = document.querySelector('.portfolio-balance-summary');
         marginElement.innerHTML = `
-            <span class="text-secondary"> Market:</span>
+            <span class="text-black" style="color: black"> Market:</span>
             <i class="fa ${margin >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${margin}&nbsp;${margin_pct}%
-            <span class="text-secondary"> Capital:</span>
+            <b>$${formatValue(margin)}&nbsp;${margin_pct}%</b>
+            <span class="text-black" style="color: black"> Capital:</span>
             <i class="fa ${capital >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
-            $${capital}&nbsp;${capital_pct}%
+            <b>$${formatValue(capital)}&nbsp;${capital_pct}%</b>
+            <span class="text-black" style="color: black"> Funding:</span>
+            <i class="fa ${funding >= 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger'}"></i>
+            <b>$${formatValue(funding)}</b>
         `;
 
         // Update the chart data
@@ -1049,7 +1061,7 @@
             performanceChart.update();
         } else {
             const config = {
-                type: "line",
+                type: "bar",
                 data: data,
                 options: {
                     responsive: true,

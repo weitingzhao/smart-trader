@@ -1,8 +1,12 @@
-from . import Wishlist
 from django.db import models
-from .market import MarketSymbol
-from import_export_celery.models import ImportJob
+from apps.common.models import *
 from timescale.db.models.models import TimescaleModel
+
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
+from ..fields import ImportExportFileField
 
 
 class ScreeningChoices(models.TextChoices):
@@ -14,8 +18,7 @@ class ScreeningOperationChoices(models.TextChoices):
     NONE              = '0', 'None'
     BYPASS          = '-1', 'Bypass'
     QUEUE            = '1', 'Queue'
-    PROCESSING  = '2', 'Processing'
-    Done               = '4', 'Done'
+    DONE               = '4', 'Done'
     FAILED            = '5', 'Failed'
 
 
@@ -36,7 +39,7 @@ class Screening(models.Model):
     description = models.TextField()
     source = models.CharField(max_length=255, null=True, blank=True)
     file_pattern = models.CharField(max_length=255, null=True, blank=True)
-    celery_models = models.CharField(max_length=255, null=True, blank=True)
+    import_models = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'screening'
@@ -54,12 +57,17 @@ class ScreeningOperation(TimescaleModel):
 
     # Status
     status = models.CharField(max_length=8, choices=ScreeningOperationChoices.choices, default=ScreeningOperationChoices.NONE, null=True, blank=True)
-
     screening = models.ForeignKey(Screening, on_delete=models.DO_NOTHING, null=True, blank=True)
-    import_job = models.ForeignKey(ImportJob, on_delete=models.DO_NOTHING, null=True, blank=True)
 
+    change_summary = ImportExportFileField(
+        verbose_name=_("Summary of changes made by this import"),
+        upload_to="django-import-export-celery-import-change-summaries",
+        blank=True,
+        null=True,
+    )
     processed_at = models.DateTimeField(null=True, blank=True)
-    processed_result = models.CharField(max_length=200, null=True, blank=True)
+    processed_result = models.TextField(null=True, blank=True)
+    errors = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'screening_operation'

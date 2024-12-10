@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-
 from django.db.models import QuerySet
 from django.utils import timezone
 from logics.engine import Engine
@@ -18,7 +17,7 @@ class ScreeningService(BaseService):
         super().__init__(engine)
         self.API_KEY = self.config.API_KEY_Alphavantage
 
-    def fetching_screening_operation(self) -> QuerySet[ScreeningOperation]:
+    def screening_operation(self):
 
         # Step 0.
         # Step 0.a. prepare config and output
@@ -43,6 +42,10 @@ class ScreeningService(BaseService):
                     dir_daily_screening = os.path.join(root, dir_date)
                     for sub_root, sub_dirs, sub_files in os.walk(dir_daily_screening):
                         for file in sub_files:
+                            # Skip files that do not end with .csv
+                            if not file.endswith('.csv'):
+                                continue
+
                             file_path = os.path.join(sub_root, file)
                             file_name = os.path.basename(file_path)
                             time = datetime.strptime(dir_date, '%Y-%m-%d')
@@ -73,6 +76,12 @@ class ScreeningService(BaseService):
         except Exception as e:
             raise RuntimeError(f"An error occurred while preparing screening operations: {e}")
 
-        # Step 1.b. Fetch ScreeningOperation records with status = 1
-        return ScreeningOperation.objects.filter(status=1)
 
+
+    def screening_snapshot(self, args: str = None)-> QuerySet[ScreeningOperation]:
+        # Step 1.b. Fetch ScreeningOperation records based on args
+        if args:
+            id_list = [int(id_str) for id_str in args.split(',')]
+            return ScreeningOperation.objects.filter(id__in=id_list)
+        else:
+            return ScreeningOperation.objects.filter(status=1).exclude(status="Bypass")[:20]

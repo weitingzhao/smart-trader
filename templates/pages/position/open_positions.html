@@ -267,7 +267,8 @@
                                         </td>
                                         <td class="text-start">
                                             <a href="https://www.chartmill.com/stock/quote/{{ item.symbol }}/" target="_blank">
-                                                <b style="color:{% if item.chg_trend == 'UP' %}#007560{% elif item.chg_trend == 'DOWN' %}#bd1314{% else %}#000000{% endif %}">{% round_by_digits item.chg_position 0 '{0}' %}</b>
+                                                <b style="color:{% if item.chg_position > 0 %}#007560{% elif item.chg_position <= 0 %}#bd1314{% else %}#000000{% endif %}">
+                                                    {% round_by_digits item.chg_position 0 '{0}' %}</b>
                                             </a>
                                         </td>
                                         <!-- Current Status -->
@@ -308,8 +309,9 @@
                                         <td class="text-md mb-0 text-dark">{{ item.init_stop_date|format_date:'%m/%d/%Y' }}</td>
                                         <td class="text-md mb-0 text-dark">{% round_by_digits item.init_invest 0 '{0}' False %}</td>
                                         <td class="text-md mb-0 text-dark">
-                                            {% round_by_digits item.price 2 '{0}' False %}
-                                            @ {% round_by_digits item.init_quantity 0 '{0}' False %} <br>
+                                            <b style="color:#000;">{% round_by_digits item.price 2 '{0}' False %}</b>
+                                            @ <b style="color:#000;">{% round_by_digits item.init_quantity 0 '{0}' False %}</b>
+                                            <br>
                                             {% round_by_digits item.init_stop 2 '{0}' False %}
                                             / {% round_by_digits item.init_limit 2 '{0}' False %}
                                         </td>

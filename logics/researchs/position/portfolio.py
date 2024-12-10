@@ -29,6 +29,10 @@ class Portfolio(PositionBase):
         # Step 0. Convert holdings to DataFrame
         holding_df = pd.DataFrame(list(holdings.values()))
         holding_df.rename(columns={'symbol_id': 'symbol'}, inplace=True)
+        transactions_df = self.get_transactions(holding_df)
+        # Remove rows from holding_df where holding_id does not have corresponding transactions
+        holding_df = holding_df[holding_df['symbol'].isin(transactions_df['symbol'].unique())]
+        # Step 0.b Create a DataFrame with all symbols
         symbols_df = pd.DataFrame({'symbol': holding_df['symbol'].unique()})
 
 
@@ -66,6 +70,7 @@ class Portfolio(PositionBase):
         balance_df = self.calculate_balance(balance_df)
         balance_df = self.calculate_stop_limit(balance_df)
 
+
         # Filter data to include only dates greater than 2024-10-31
         if cutoff_date:
             balance_df = balance_df[balance_df['date'] > cutoff_date]
@@ -78,8 +83,8 @@ class Portfolio(PositionBase):
         # Step 1.
         # calculate margin
         # remove funding affect margin logic
-        balance_df['total_market_with_funding'] = balance_df['total_market'] + balance_df['funding']
-        balance_df['margin_diff'] = balance_df['total_market_with_funding'].diff()
+        balance_df['total_market_without_cash'] = balance_df['total_market']
+        balance_df['margin_diff'] = balance_df['total_market_without_cash'].diff()
         balance_df['margin_diff'] = balance_df['margin_diff'] - balance_df['funding']
 
         balance_df['margin_diff_pct'] = (balance_df['margin_diff'] / balance_df['total_market'].shift(1)) * 100
@@ -317,7 +322,7 @@ class Portfolio(PositionBase):
         # balance_df['funding']
         # Calculate total capital and market value
         balance_df['total_market'] = balance_df['balance_mv'].apply(Decimal) + balance_df['cash_mm_daily'] # not  add funding here
-        balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily'] + balance_df['funding']
+        balance_df['total_asset'] = balance_df['balance_holding'] + balance_df['cash_mm_daily']
         balance_df['total_invest'] = balance_df['balance_holding']
         return balance_df
 

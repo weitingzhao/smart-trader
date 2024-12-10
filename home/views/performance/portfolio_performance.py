@@ -52,22 +52,28 @@ def get_balance_history(request):
     asset_data = data_df['total_asset'].round(0).astype(int).tolist()
     invest_data = data_df['total_invest'].round(0).astype(int).tolist()
     baseline_data = data_df['total_baseline'].round(0).astype(int).tolist()
+    funding_data = data_df['funding'].round(0).astype(int).tolist()
 
     # Step 2.b summary
     # Get the first and last rows of data_df
     first_row = data_df.iloc[0]
     last_row = data_df.iloc[-1]
 
+    # Calculate the sum of funding
+    funding = data_df['funding'].sum()
+
     # Calculate differences
-    margin = round(last_row['total_market'] - first_row['total_market'], 0)
-    capital = round(last_row['total_asset'] - first_row['total_asset'], 0)
+    margin = round(last_row['total_market'] - first_row['total_market'] - funding, 0)
+    capital = round(last_row['total_asset'] - first_row['total_asset'] - funding, 0)
 
     # Calculate growth rates
     margin_pct = round((margin / first_row['total_market']) * 100, 2)
     capital_pct = round((capital / first_row['total_asset']) * 100, 2)
 
+
     data = {
         "summary": {
+            'funding': funding,
             "margin": margin,
             "margin_pct": margin_pct,
             "capital": capital,
@@ -78,6 +84,7 @@ def get_balance_history(request):
             "datasets": [
                 {
                     "label": "market",
+                    "type": "line",
                     "tension": 0,
                     "pointRadius": 0,
                     "borderColor": "#3A416F",
@@ -87,6 +94,7 @@ def get_balance_history(request):
                     "maxBarThickness": 6
                 }, {
                     "label": "assets",
+                    "type": "line",
                     "tension": 0,
                     "pointRadius": 0,
                     "borderColor": "#cb0c9f",
@@ -96,6 +104,7 @@ def get_balance_history(request):
                     "maxBarThickness": 6
                 }, {
                     "label": "invest",
+                    "type": "line",
                     "tension": 0,
                     "pointRadius": 0,
                     "borderColor": "#17c1e8",
@@ -104,14 +113,21 @@ def get_balance_history(request):
                     "data": invest_data,
                     "maxBarThickness": 6
                 }, {
-                "label": "baseline",
-                "tension": 0.1,
-                "pointRadius": 0,
-                "borderColor": "rgb(75, 192, 192)",
-                "borderWidth": 2,
-                "fill": False,
-                "data": baseline_data,
-                 "borderDash": [5, 5],  #This creates a dotted line(5px dash, 5px gap)
+                    "label": "baseline",
+                    "type": "line",
+                    "tension": 0.1,
+                    "pointRadius": 0,
+                    "borderColor": "rgb(75, 192, 192)",
+                    "borderWidth": 2,
+                    "fill": False,
+                    "data": baseline_data,
+                     "borderDash": [5, 5],  #This creates a dotted line(5px dash, 5px gap)
+                }, {
+                    "label": "funding",
+                    "borderColor": "rgb(77,224,15)", #4de00f
+                    "backgroundColor": "rgb(77,224,15)",
+                    "fill": True,
+                    "data": funding_data,
                 }
             ]
         }
@@ -135,8 +151,9 @@ def get_balance_calendar(request):
     # Create events based on balance_df
     events = []
     for _, row in data_df.iterrows():
+        funding_sign = '+' if row['funding'] > 0 else '-'
         events.append({
-            "title": f"$ {round(row['margin_diff'], 0)}",
+            "title": f"$ {round(row['margin_diff'], 0)}" + (f" ${funding_sign}{row['funding']}" if row['funding'] != 0 else ""),
             "start": row['date'].strftime('%Y-%m-%d'),
             "end": row['date'].strftime('%Y-%m-%d'),
             "textColor": "green" if row['margin_diff'] > 0 else "red",

@@ -28,7 +28,7 @@ class FetchingTask(BaseTask):
                  }
             ]},
             {"name":"company-info"},
-            {"name":"symbols"}
+            {"name":"symbols"},
         ]
 
     def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
