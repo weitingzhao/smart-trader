@@ -72,3 +72,5 @@ pytz~=2024.1
 signals~=0.0.2
 django-import-export~=4.3.3
 django-import-export-celery~=1.7.1
+
+bs4~=0.0.2
