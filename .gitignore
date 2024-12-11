@@ -173,6 +173,7 @@ apps/helpers
 #/media/
 !/media/mapper.json
 !/media/Sales.csv
+/media/django-import-export-celery-import-jobs
 
 celerybeat-schedule.bak
 celerybeat-schedule.dat
