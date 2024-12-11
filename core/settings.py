@@ -13,7 +13,6 @@ import sys
 from pathlib import Path
 from django.contrib import messages
 from dotenv import load_dotenv
-from gunicorn.config import Config
 from str2bool       import str2bool
 import os, random, string
 
