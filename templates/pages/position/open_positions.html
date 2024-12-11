@@ -243,8 +243,10 @@
                                                 data-phase="{{ item.trade_phase }}"
                                                 onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}', '{{ item.trade_phase_rating }}','{{ item.trade_source }}')">
                                                 {{ item.trade_phase_rating }}
-                                                {{ item.trade_source }}
                                             </i>
+                                            <span style="color: {% if item.trade_source == 'A' %}dodgerblue{% elif item.trade_source == 'B' %}saddlebrown{% elif item.trade_source == 'C' %}black{% endif %};">
+                                                <b>{{ item.trade_source }}</b>
+                                            </span>
                                         </td>
                                         <td class="text-start">
                                             <a href="{% url 'stock_quote' item.symbol %}"
