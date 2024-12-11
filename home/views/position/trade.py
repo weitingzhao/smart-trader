@@ -17,12 +17,14 @@ def update_phase(request, trade_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         trade_phase = data.get('trade_phase')
-        trade_phase_rating = data.get('trade_phase_rating')
+        trade_rating = data.get('trade_rating')
+        trade_source = data.get('trade_source')
 
         try:
             trade = Trade.objects.get(trade_id=trade_id)
             trade.trade_phase = trade_phase
-            trade.trade_phase_rating = trade_phase_rating
+            trade.trade_phase_rating = trade_rating
+            trade.trade_source = trade_source
             trade.save()
             return JsonResponse({'status': 'success', 'action': 'updated'})
         except Trade.DoesNotExist:

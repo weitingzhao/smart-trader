@@ -51,6 +51,11 @@ class  TradePhaseChoices(models.TextChoices):
     BREAKING    = '2', 'Breaking Out' # Breaking Out
     AFTER_BO    = '3', 'After Breakout' # After Breakout
 
+class  TradeSourceChoices(models.TextChoices):
+    PLATFORM_A  = 'A', 'PLATFORM A'
+    PLATFORM_B    = 'B', 'PLATFORM B'
+    PLATFORM_C   = 'C', 'PLATFORM C'
+
 class  TradePhaseRatingChoices(models.TextChoices):
     NONE      = '0', '0 None' # None
     First        = '1', '1 First' # Before Breakout
@@ -125,6 +130,7 @@ class Trade(models.Model):
     is_finished = models.BooleanField(null=True, blank=True)
     trade_phase = models.CharField(max_length=20, choices=TradePhaseChoices.choices, default=TradePhaseChoices.NONE)
     trade_phase_rating = models.CharField(max_length=20, choices=TradePhaseRatingChoices.choices, default=TradePhaseRatingChoices.NONE)
+    trade_source = models.CharField(max_length=20, choices=TradeSourceChoices.choices, default=TradeSourceChoices.PLATFORM_A)
 
     class Meta:
         db_table = 'trade'

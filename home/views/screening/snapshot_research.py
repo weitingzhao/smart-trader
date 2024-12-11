@@ -21,7 +21,7 @@ def fetching(request):
     if len(holdings) <= 0:
         return None, None
 
-    page_size = 20
+    page_size = 1000
 
     # Step 1. Prepare summary query script
     showing_repeat_times = {'agg': 'COUNT(ss.*)', 'column': 'showing_repeat_times'}

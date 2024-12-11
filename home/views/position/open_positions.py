@@ -42,6 +42,7 @@ def default(request):
             'portfolio': portfolio,
             'portfolio_items': final_json,
             'summary': summary,
+            'trade_source_choices': TradeSourceChoices.choices,
             'trade_phase_choices': TradePhaseChoices.choices,
             'trade_phase_rating_choices': TradePhaseRatingChoices.choices,
         })

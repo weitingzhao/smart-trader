@@ -29,6 +29,8 @@ class OpenPosition(PositionBase):
         final_df.rename(columns={'symbol_id': 'symbol'}, inplace=True)
 
         # Step 1. Attach data
+        # Step 1.a Attach Fundamentals
+        final_df = pd.merge(final_df, self.get_holding_fundamentals(final_df), on='symbol', how='left')
         # Step 1.a Merge the initial & current stop order into holdings_df
         final_df = pd.merge(final_df, self.get_holding_initial_stop(), on='holding_id', how='inner')
         final_df = pd.merge(final_df, self.get_holding_current_stop(), on='holding_id', how='left')
@@ -53,7 +55,14 @@ class OpenPosition(PositionBase):
         # Last Step: Sort by trade_phase in descending order
         final_df.replace({'trade_phase': {'': 0}}, inplace=True)
         final_df.replace({'trade_phase_rating': {'': 0}}, inplace=True)
-        final_df['sort_order'] = final_df['trade_phase'].apply(Decimal) + (1 - final_df['trade_phase_rating'].apply(Decimal)/100)
+
+        final_df['sort_order'] = (
+                final_df['trade_phase'].apply(Decimal) +
+                (1 - final_df['trade_phase_rating'].apply(Decimal) / 100) +
+                final_df['trade_source'].apply(lambda x: Decimal(0.007) if x == 'A' else (
+                    Decimal(0.006) if x == 'B' else (Decimal(0.005) if x == 'C' else Decimal(0))))
+        )
+
         final_df.sort_values(by='sort_order', ascending=False, inplace=True)
 
         return final_df, max_date
@@ -105,6 +114,18 @@ class OpenPosition(PositionBase):
         summary['water']['dist'] = summary['water']['above']  + summary['water']['below']
 
         return summary
+
+    def get_holding_fundamentals(self, holdings_df: DataFrame) -> pd.DataFrame:
+
+        # Fetch the sector information from MarketStock model
+        market_stock_data = MarketStock.objects.filter(
+            symbol__in=holdings_df['symbol'].tolist()
+        ).values('symbol', 'exchange', 'industry', 'sector')
+
+        # Convert the query result to a DataFrame
+        return pd.DataFrame(list(market_stock_data))
+
+
 
     def get_holding_initial_stop(self) -> pd.DataFrame:
 
@@ -180,7 +201,7 @@ class OpenPosition(PositionBase):
     def get_trading_info(self, holdings_df: DataFrame) -> pd.DataFrame:
         # Step 2. attach Trade info
         trade_phases = Trade.objects.filter(trade_id__in=holdings_df['trade_id'].tolist()
-        ).values('trade_id', 'trade_phase', 'trade_phase_rating')
+        ).values('trade_id', 'trade_phase', 'trade_phase_rating','trade_source')
         # Convert the query result to a DataFrame
         trade_phases_df = pd.DataFrame(list(trade_phases))
         return trade_phases_df

@@ -78,13 +78,13 @@ def format_date(value, date_format):
 @register.simple_tag
 def trade_phase_fa_icon(value, is_class=False):
     if value == TradePhaseChoices.BEFORE_BO:
-        return 'fas fa-hourglass-end fa-lg' if is_class else 'color:black'
+        return 'fas fa-hourglass-end fa-sm' if is_class else 'color:black'
     elif value == TradePhaseChoices.BREAKING:
-        return 'fas fa-hourglass-half fa-lg' if is_class else 'color:#8c0404'
+        return 'fas fa-hourglass-half fa-sm' if is_class else 'color:#8c0404'
     elif value == TradePhaseChoices.AFTER_BO:
-        return 'fas fa-hourglass-start fa-lg' if is_class else 'color:#8fda2d'
+        return 'fas fa-hourglass-start fa-sm' if is_class else 'color:#8fda2d'
     else:
-        return 'fas fa-stop fa-lg' if is_class else 'color:grey'
+        return 'fas fa-stop fa-sm' if is_class else 'color:grey'
 
 @register.simple_tag
 def round_by_digits(value, digits, template :str, need_plus=True):
