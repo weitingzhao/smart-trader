@@ -36,8 +36,8 @@ def add_portfolio(request):
             if not portfolio_name:
                 return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
 
-            # user = request.user
-            user = User.objects.get(pk=2)
+            user = request.user
+            # user = User.objects.get(pk=2)
 
             portfolio = Portfolio.objects.create(name=portfolio_name, user=user)
             return JsonResponse({'success': True, 'portfolio_id': portfolio.pk})
