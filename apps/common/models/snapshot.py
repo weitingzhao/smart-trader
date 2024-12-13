@@ -13,12 +13,18 @@ class SnapshotCategoryChoices(models.TextChoices):
     BULL_FLAG = 'bull flag', 'Bull Flag'
 
 
+class Snapshot(TimescaleModel):
+    # Primary Key
+    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.DO_NOTHING)
+    time = models.DateField()
+
+    class Meta:
+        abstract = True
 
 # Screening
-class SnapshotScreening(TimescaleModel):
+class SnapshotScreening(Snapshot):
+
     # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateField()
     screening = models.ForeignKey(Screening, on_delete=models.DO_NOTHING)
 
     class Meta:
@@ -37,10 +43,7 @@ class SnapshotScreening(TimescaleModel):
 
 
 # Overview
-class SnapshotOverview(TimescaleModel):
-    # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.DO_NOTHING)
-    time = models.DateField()
+class SnapshotOverview(Snapshot):
 
     name = models.CharField(max_length=255)
 
@@ -76,11 +79,9 @@ class SnapshotOverview(TimescaleModel):
         return f"Snapshot Overview: {self.symbol.symbol} - {self.name} at {self.time}"
 
 # Setup
-class SnapshotSetup(TimescaleModel):
-    # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateField()
+class SnapshotSetup(Snapshot):
 
+    # Data
     market_cap = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     high_52_week = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     weekly_support = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -97,10 +98,8 @@ class SnapshotSetup(TimescaleModel):
         return f"Snapshot Step: {self.symbol.symbol} at {self.time}"
 
 # Technical
-class SnapshotTechnical(TimescaleModel):
-    # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateField()
+class SnapshotTechnical(Snapshot):
+
     # Data
     lower_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     upper_bollinger_band = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -120,10 +119,8 @@ class SnapshotTechnical(TimescaleModel):
         return f"Snapshot Technical: {self.symbol.symbol} at {self.time}"
 
 # Fundamental
-class SnapshotFundamental(TimescaleModel):
-    # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateField()
+class SnapshotFundamental(Snapshot):
+
     # Data
     valuation_rating = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     price_FCF = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
@@ -148,10 +145,7 @@ class SnapshotFundamental(TimescaleModel):
         return f"Snapshot Fundamental: {self.symbol.symbol} at {self.time}"
 
 # Bull Flag
-class SnapshotBullFlag(TimescaleModel):
-    # Primary Key
-    symbol = models.ForeignKey(MarketSymbol, to_field='symbol', on_delete=models.CASCADE)
-    time = models.DateField()
+class SnapshotBullFlag(Snapshot):
 
     # Data
     # Bull Flag
@@ -180,6 +174,38 @@ class SnapshotBullFlag(TimescaleModel):
     def __str__(self):
         return f"Snapshot Bull Flag: {self.symbol.symbol} at {self.time}"
 
+
+class SnapshotEarning(Snapshot):
+
+    # Data
+    # Earnings
+    high_growth_momentum_rating = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    eps_growth_1y_ttm = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    eps_growth_q2q_q_minus_1 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    eps_growth_q2q = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    eps_growth_q2q_q_plus_1 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    sales_growth_q2q_q_minus_1 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    sales_growth_q2q = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    sales_growth_q2q_q_plus_1 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    profit_margin_q_minus_1 = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    profit_margin_q = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    percent_change = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    one_month_performance = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+
+    # Earning Date
+    earnings_last = models.DateField(null=True, blank=True)
+    earnings_last_bmo_amc = models.CharField(max_length=10, null=True, blank=True)
+    earnings_next = models.DateField(null=True, blank=True)
+    earnings_next_bmo_amc = models.CharField(max_length=10, null=True, blank=True)
+
+    class Meta:
+        db_table = 'snapshot_earning'
+        constraints = [
+            models.UniqueConstraint(fields=['symbol', 'time'], name='snapshot_earning_unique_symbol_time_pk')
+        ]
+
+    def __str__(self):
+        return f"Snapshot Earning: {self.symbol.symbol} at {self.time}"
 
 
 class SnapshotIndicator(models.Model):

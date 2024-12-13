@@ -318,6 +318,9 @@ def setup_resource():  # Optional
 def bull_flag_resource():  # Optional
     from apps.common.resources import SnapshotBullFlagResource
     return SnapshotBullFlagResource
+def earning_resource():  # Optional
+    from apps.common.resources import SnapshotEarningResource
+    return SnapshotEarningResource
 
 ############# django-import-export############
 IMPORT_EXPORT_CELERY_MODEL_DEPENDENCY = {
@@ -326,7 +329,8 @@ IMPORT_EXPORT_CELERY_MODEL_DEPENDENCY = {
     "Snapshot Technical": [market_symbol_resource, screening_resource, technical_resource],
     "Snapshot Fundamental": [market_symbol_resource, screening_resource, fundamental_resource],
     "Snapshot Setup": [market_symbol_resource, screening_resource, setup_resource],
-    "Snapshot Bull Flag": [market_symbol_resource, screening_resource, bull_flag_resource]
+    "Snapshot Bull Flag": [market_symbol_resource, screening_resource, bull_flag_resource],
+    "Snapshot Earning": [market_symbol_resource, screening_resource, earning_resource]
 }
 
 IMPORT_EXPORT_CELERY_MODELS = {
@@ -335,7 +339,8 @@ IMPORT_EXPORT_CELERY_MODELS = {
     "Snapshot Technical": { "app_label": "common",  "model_name": "SnapshotTechnical", 'resource': technical_resource},
     "Snapshot Fundamental": { "app_label": "common",  "model_name": "SnapshotFundamental", 'resource': fundamental_resource},
     "Snapshot Setup": { "app_label": "common",  "model_name": "SnapshotSetup", 'resource': setup_resource},
-    "Snapshot Bull Flag": { "app_label": "common",  "model_name": "SnapshotBullFlag", 'resource': bull_flag_resource}
+    "Snapshot Bull Flag": { "app_label": "common",  "model_name": "SnapshotBullFlag", 'resource': bull_flag_resource},
+    "Snapshot Earning": { "app_label": "common",  "model_name": "SnapshotEarning", 'resource': earning_resource}
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

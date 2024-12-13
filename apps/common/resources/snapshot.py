@@ -308,3 +308,46 @@ class SnapshotBullFlagResource(SnapshotResource):
             # Flag
             'flag_type', 'flag_pole', 'flag_length', 'flag_width', 'weekly_flag_type',
         )
+
+# Earnings
+class SnapshotEarningResource(SnapshotResource):
+
+    #Earnings
+    high_growth_momentum_rating = fields.Field(column_name='ChartMill High Growth Momentum Rating', attribute='high_growth_momentum_rating')
+
+    eps_growth_1y_ttm = fields.Field(column_name='EPS growth 1Y (TTM)', attribute='eps_growth_1y_ttm')
+    eps_growth_q2q_q_minus_1 = fields.Field(column_name='EPS growth Q2Q (Q-1)', attribute='eps_growth_q2q_q_minus_1')
+    eps_growth_q2q = fields.Field(column_name='EPS growth Q2Q', attribute='eps_growth_q2q')
+    eps_growth_q2q_q_plus_1 = fields.Field(column_name='EPS growth Q2Q (Q+1)', attribute='eps_growth_q2q_q_plus_1')
+
+    sales_growth_q2q_q_minus_1 = fields.Field(column_name='Sales growth Q2Q (Q-1)', attribute='sales_growth_q2q_q_minus_1')
+    sales_growth_q2q = fields.Field(column_name='Sales growth Q2Q', attribute='sales_growth_q2q')
+    sales_growth_q2q_q_plus_1 = fields.Field(column_name='Sales growth Q2Q (Q+1)', attribute='sales_growth_q2q_q_plus_1')
+
+    profit_margin_q_minus_1 = fields.Field(column_name='Profit Margin (Q -1)', attribute='profit_margin_q_minus_1')
+    profit_margin_q = fields.Field(column_name='Profit Margin (Q)', attribute='profit_margin_q')
+
+    percent_change = fields.Field(column_name='% Change', attribute='percent_change')
+    one_month_performance = fields.Field(column_name='1 Month Performance', attribute='one_month_performance')
+
+    #Earning Date
+    earnings_last = fields.Field(column_name='Earnings (Last)', attribute='earnings_last')
+    earnings_last_bmo_amc = fields.Field(column_name='Earnings (last) bmo/amc', attribute='earnings_last_bmo_amc')
+    earnings_next = fields.Field(column_name='Earnings (Next)', attribute='earnings_next')
+    earnings_next_bmo_amc = fields.Field(column_name='Earnings (next) bmo/amc', attribute='earnings_next_bmo_amc')
+
+    class Meta:
+        name = 'SnapshotBullFlag'
+        model = SnapshotEarning
+        fields = SnapshotResource.Meta.fields + (
+            #Earnings
+            'high_growth_momentum_rating',
+            'eps_growth_1y_ttm', 'eps_growth_q2q_q_minus_1', 'eps_growth_q2q', 'eps_growth_q2q_q_plus_1',
+            'sales_growth_q2q_q_minus_1', 'sales_growth_q2q', 'sales_growth_q2q_q_plus_1',
+            'profit_margin_q_minus_1', 'profit_margin_q',
+            'percent_change', 'one_month_performance',
+            #Earning Date
+            'earnings_last', 'earnings_last_bmo_amc', 'earnings_next', 'earnings_next_bmo_amc'
+        )
+        export_order = fields
+
