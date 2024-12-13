@@ -81,7 +81,8 @@ class Portfolio(PositionBase):
 
         balance_df = self.balance_history(portfolio)
         # Step 1.
-        # calculate margin
+        # calculate margin-*
+
         # remove funding affect margin logic
         balance_df['total_market_without_cash'] = balance_df['total_market']
         balance_df['margin_diff'] = balance_df['total_market_without_cash'].diff()
