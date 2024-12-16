@@ -103,6 +103,7 @@
     });
 
     snapshotDT.on('datatable.page', function(page) {
+        alert(page)
         fetchData(page, snapshotDT.sortColumn, snapshotDT.sortDirection, function(response) {
             snapshotDT.rows().remove();
             snapshotDT.rows().add(response.data);

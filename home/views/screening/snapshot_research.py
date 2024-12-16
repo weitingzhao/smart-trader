@@ -151,6 +151,7 @@ def fetching(request):
     ORDER BY sd.symbol_id, sd.time
     LIMIT {page_size} OFFSET {offset};
     """
+    print(data_query)
     snapshot_df = pd.read_sql_query(data_query, connection)
     snapshot_df = snapshot_df.replace({np.nan: None})  # Replace NaN with None
     snapshot_df = snapshot_df.applymap(lambda x: str(x) if isinstance(x, (int, decimal.Decimal, float)) else x)
