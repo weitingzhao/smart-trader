@@ -83,6 +83,8 @@ def trade_phase_fa_icon(value, is_class=False):
         return 'fas fa-hourglass-half fa-sm' if is_class else 'color:#8c0404'
     elif value == TradePhaseChoices.AFTER_BO:
         return 'fas fa-hourglass-start fa-sm' if is_class else 'color:#8fda2d'
+    elif value == TradePhaseChoices.Earning:
+        return 'fas fa-dollar-sign fa-sm' if is_class else 'color:red'
     else:
         return 'fas fa-stop fa-sm' if is_class else 'color:grey'
 

@@ -50,6 +50,7 @@ class  TradePhaseChoices(models.TextChoices):
     BEFORE_BO  = '1', 'Before Breakout' # Before Breakout
     BREAKING    = '2', 'Breaking Out' # Breaking Out
     AFTER_BO    = '3', 'After Breakout' # After Breakout
+    Earning         = '4', 'Earning' # Earning
 
 class  TradeSourceChoices(models.TextChoices):
     PLATFORM_A  = 'A', 'PLATFORM A'
