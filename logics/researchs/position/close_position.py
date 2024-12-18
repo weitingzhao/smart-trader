@@ -104,11 +104,14 @@ class ClosePosition(PositionBase):
         .annotate(
             trade_is_finished=Subquery(
                 Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
+            ),
+            trade_source=Subquery(
+                Trade.objects.filter(trade_id=OuterRef('trade_id')).values('trade_source')[:1]
             )
         )
         .filter(Q(trade_is_finished=True))
         .annotate(amount=F('quantity_final') * F('price_final'))
-        .values('trade_id', 'holding_id')
+        .values('trade_id', 'holding_id', 'trade_source')
         .annotate(
             init_quantity=Sum(Case(When(transaction_type=1, then=F('quantity_final')))),
             quantity=Sum(Case(When(transaction_type=2, then=F('quantity_final')))),
@@ -123,7 +126,7 @@ class ClosePosition(PositionBase):
             exit_date=Max('date'),
         ))
         trade_df = pd.DataFrame(list(trades), columns=[
-            'trade_id', 'holding_id', 'init_quantity', 'quantity',
+            'trade_id', 'holding_id', 'trade_source', 'init_quantity', 'quantity',
             'buy_total_value', 'buy_average_price',
             'sell_total_value', 'sell_average_price', 'sell_commission',
             'entry_date', 'exit_date'])
