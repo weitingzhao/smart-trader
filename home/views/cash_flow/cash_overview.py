@@ -28,6 +28,7 @@ def default(request):
             'cash_balance_data': cash_balance_data,
             'form_funding': form_funding,
             "form_cash_balance": form_cash_balance,
+            'page_title': 'Cash Overview'  # title
         }
     )
 

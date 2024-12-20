@@ -29,5 +29,6 @@ def default(request):
             'holdings': holdings,
             'parent': 'wishlist',
             'segment': 'initial_positions',
+            'page_title': 'Initial Holding'  # title
         })
 

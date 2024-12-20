@@ -45,6 +45,7 @@ def default(request):
             'trade_source_choices': TradeSourceChoices.choices,
             'trade_phase_choices': TradePhaseChoices.choices,
             'trade_phase_rating_choices': TradePhaseRatingChoices.choices,
+            'page_title': 'Open Position'  # title
         })
 
 def get_order(request, order_id):
