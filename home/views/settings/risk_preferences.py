@@ -13,6 +13,11 @@ def default(request):
 
     # Get symbols from Holding model
     holding_symbols = Holding.objects.values_list('symbol', flat=True)
+
+    # Add additional symbols
+    additional_symbols = ['^IXIC', '^DJI', '^GSPC', 'NQ=F']
+    holding_symbols.extend(additional_symbols)
+
     symbols = ','.join(holding_symbols)
 
     return render(

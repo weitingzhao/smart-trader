@@ -1,19 +1,58 @@
-{% extends 'layouts/../layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %}
+{% load static home_filter admin_soft%}
 
 {% block content %}
 
-    <div class="container-fluid py-4">
-        <div class="card-header pb-0">
-            <p>
-                {% include "layouts/screen-tools.html" %}
-            </p>
-          </div>
-        Position Sizing
-    
-        Pre-calculate position size based on portfolio balance, risk tolerance, or market volatility.
-
+    <div class="container-fluid">
+        <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+          <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+            <div class="row gx-4">
+                <div class="col-auto">
+                  <div class="avatar avatar-xl position-relative">
+                      <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                  </div>
+              </div>
+                <div class="col-auto my-auto">
+                  <div class="h-100">
+                      <h5 class="mb-1">
+                          Pisition Sizing
+                      </h5>
+                      <p class="mb-0 font-weight-bold text-sm">
+                              {{ portfolio.name }}
+                      </p>
+                  </div>
+              </div>
+            </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Main Section -->
+    <div class="container-fluid py-3">
+        <div class="row">
+            <div id="summary_panel" class="col-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                      <div class="d-flex align-items-center">
+                          <p class="text-sm">
+                              <span class="badge badge-md badge-dot me-4">
+                                  <span class="text-dark text-xs">Phase Legend:</span>
+                              </span>
+                          </p>
+                      </div>
+                  </div>
+                    <div class="card-body px-0 pb-0 p-0">
+                        <div class="table-responsive">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'includes/footer.html' %}
+    </div>
+
 
 {% endblock content %}
 
