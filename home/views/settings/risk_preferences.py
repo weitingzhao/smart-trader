@@ -12,7 +12,7 @@ def default(request):
         form_static_risk = UserStaticSettingForm()
 
     # Get symbols from Holding model
-    holding_symbols = Holding.objects.values_list('symbol', flat=True)
+    holding_symbols = list(Holding.objects.values_list('symbol', flat=True))
 
     # Add additional symbols
     additional_symbols = ['^IXIC', '^DJI', '^GSPC', 'NQ=F']
