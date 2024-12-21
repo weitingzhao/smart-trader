@@ -107,6 +107,12 @@ def add_cash_balance(request):
                 cash=cash
             )
             cash_balance.save()
+
+            # Save open_summary to portfolio investment column
+            portfolio.cash = cash
+            portfolio.money_market = money_market
+            portfolio.save()
+
             return JsonResponse({'status': 'success', 'cash_balance_id': cash_balance.cash_balance_id})
     return JsonResponse({'status': 'failed'}, status=400)
 
@@ -130,8 +136,16 @@ def edit_cash_balance(request, balance_id):
         cash_balance.as_of_date = data.get('as_of_date')
         cash_balance.money_market = data.get('money_market')
         cash_balance.cash = data.get('cash')
-
         cash_balance.save()
+
+        # Save open_summary to portfolio investment column
+        user_id = request.user.id  # Assuming you have the user_id from the request
+        portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+        portfolio.money_market = cash_balance.money_market
+        portfolio.cash = cash_balance.cash
+        portfolio.save()
+
+
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 

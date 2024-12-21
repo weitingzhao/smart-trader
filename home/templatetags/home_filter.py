@@ -32,6 +32,12 @@ def transaction_type_lookup(value, arg):
     # Lookup dictionaries
     return dict(TransactionTypeChoices.choices).get(arg)
 
+@register.filter
+def wishlist_purpose_lookup(value, arg):
+    # Lookup dictionaries
+    return dict(WishlistPurposeChoices.choices).get(arg)
+
+
 @register.filter(name='replace_value')
 def replace_value(value, arg):
     """Removes all values of arg from the given string"""

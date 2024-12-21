@@ -316,6 +316,27 @@ class TradingResearch(BaseResearch):
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in latest_rows]
 
+    def get_stock_full_hist_bars(self, is_day, symbols: list[str]):
+        table_name = 'day' if is_day else 'min'
+        with connection.cursor() as cursor:
+            cursor.execute(f"""
+            SELECT
+                symbol,
+                DATE(time) AS date,
+                MAX(close) AS close,
+                MAX(high) AS high,
+                MAX(low) AS low,
+                SUM(volume) AS volume
+            FROM
+                market_stock_hist_bars_{table_name}_ts
+            WHERE
+                symbol IN ('{"', '".join(symbols)}')
+            GROUP BY
+                symbol, DATE(time)
+                """)
+            rows = cursor.fetchall()
+            return rows
+
     def get_stock_prices(self, symbol_date_pairs: List[Tuple[str, str]], row_delta: int = 0) -> pd.DataFrame:
         """
         Retrieve stock prices from market_stock_hist_bars_day_ts based on symbol and date.

@@ -79,6 +79,8 @@ class Portfolio(models.Model):
     name = models.CharField(max_length=100)
     money_market = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     cash = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    investment = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    margin_loan = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     is_default = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
