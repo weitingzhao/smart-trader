@@ -56,12 +56,13 @@
                                     <th>PICK<br>AT</th>
                                     <th>PURPOSE</th>
                                     <!-- Fundamental -->
-                                    <th class="bg-primary text-white">$<br>Lower<br>Band</th>
+                                    <th class="bg-primary text-white">Price</th>
+                                    <th class="bg-primary text-white">$~$<br>Lower<br>Band</th>
                                     <th class="bg-primary text-white">$<br>ATR</th>
                                     <th class="bg-primary text-white">$~$<br>Tier 1<br>Range</th>
                                     <th class="bg-primary text-white">$~$<br>Tier 2<br>Range</th>
-                                    <th class="bg-primary text-white">$~$<br>Range 2<br>Band</th>
-                                    <th class="bg-primary text-white">$~$<br>Range 3<br>Band</th>
+                                    <th class="bg-primary text-white">$~$<br>LOWER<br>Band</th>
+                                    <th class="bg-primary text-white">$~$<br>UPPER<br>Band</th>
                                     <!-- Setup Indicator -->
                                     <th class="bg-info text-white">$<br>STOP</th>
                                     <th class="bg-info text-white">$<br>LIMIT</th>
@@ -75,21 +76,20 @@
                                     <th class="bg-success text-white">%</th>
                                     <th class="bg-success text-white">$</th>
                                     <!-- Opportunity Window -->
-                                    <th class="bg-dark text-white">ATR</th>
                                     <th class="bg-dark text-white">Upper<br>Band</th>
                                     <th class="bg-dark text-white">Range 2<br>Upper<br>Band</th>
                                     <th class="bg-dark text-white">Range 3<br>Upper<br>Band</th>
                                     <th class="bg-dark text-white">%<br>FIXED<br>RISK</th>
                                     <th class="bg-dark text-white">$<br>FIXED<br>RISK</th>
-                                    <th class="bg-dark text-white">$<br>ATR</th>
-                                    <th class="bg-dark text-white">Upper</th>
-                                    <th class="bg-dark text-white">Range 2</th>
-                                    <th class="bg-dark text-white">Range 3</th>
+                                    <th class="bg-dark text-white">$<br>Upper<br>Range</th>
+                                    <th class="bg-dark text-white">$<br>Upper<br>Range 2</th>
+                                    <th class="bg-dark text-white">$<br>Upper<br>Range 3</th>
                                 </tr>
                                 <tr class="subheader">
                                     <!-- Fundamental -->
                                     <th colspan="4"></th>
                                     <!-- Setup Indicator -->
+                                    <th colspan="1" class="bg-primary text-white">Share</th>
                                     <th colspan="1" class="bg-primary text-white">Bollinger</th>
                                     <th colspan="1" class="bg-primary text-white">ATR</th>
                                     <th colspan="2" class="bg-primary text-white">Support Resistance</th>
@@ -102,7 +102,6 @@
                                     <!-- Opportunity Window -->
                                     <th colspan="2" class="bg-success text-white"></th>
                                     <!-- Risk Model -->
-                                    <th colspan="1" class="bg-dark text-white">ATR</th>
                                     <th colspan="3" class="bg-dark text-white">Bollinger</th>
                                     <th colspan="2" class="bg-dark text-white">FIXED</th>
                                     <th colspan="1" class="bg-dark text-white">ATR</th>
@@ -112,6 +111,7 @@
                                     <!-- Fundamental -->
                                     <th colspan="4">Basic</th>
                                     <!-- Setup Indicator -->
+                                    <th colspan="1" class="bg-primary text-white">Current</th>
                                     <th colspan="2" class="bg-primary text-white">Buy Range</th>
                                     <th colspan="4" class="bg-primary text-white">Sell Range</th>
                                     <!-- Position Sizing -->
@@ -120,16 +120,16 @@
                                     <!-- Opportunity Window -->
                                     <th colspan="2" class="bg-success text-white">Distance to Open</th>
                                     <!-- Risk Model -->
-                                    <th colspan="4" class="bg-dark text-white">Gain</th>
+                                    <th colspan="3" class="bg-dark text-white">Gain</th>
                                     <th colspan="2" class="bg-dark text-white">Risk</th>
-                                    <th colspan="4" class="bg-dark text-white">Ratio</th>
+                                    <th colspan="3" class="bg-dark text-white">Ratio</th>
                                 </tr>
                                 <tr class="subheader">
                                     <th colspan="4">Fundamental</th>
-                                    <th colspan="6" class="bg-primary text-white">Setup Indicator</th>
+                                    <th colspan="7" class="bg-primary text-white">Setup Indicator</th>
                                     <th colspan="8" class="bg-info text-white">Position Sizing</th>
                                     <th colspan="2" class="bg-success text-white">Opportunity</th>
-                                    <th colspan="10" class="bg-dark text-white">Risk Model</th>
+                                    <th colspan="8" class="bg-dark text-white">Risk Model</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -157,58 +157,98 @@
                                         </td>
                                         <!-- Setup Indicator -->
                                         <td class="text-md mb-0 text-primary">
+                                            <b>{% round_by_digits item.current_price 0 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0 text-primary">
                                             <b>{% round_by_digits item.lower_band 0 '{0}' False %}</b>
+                                            <-1<br>
+                                            {% round_by_digits item.lower_band_2 2 '{0}' False %}
+                                            <-2<br>
+                                            {% round_by_digits item.lower_band_3 2 '{0}' False %}
+                                            <-3
                                         </td>
                                         <td class="text-md mb-0 text-primary">
                                             <b>{% round_by_digits item.ATR 2 '{0}' False %}</b>
                                         </td>
                                         <td class="text-md mb-0 text-primary">
                                             {% round_by_digits item.rs_upper_1 2 '{0}' False %}
-                                            &nbsp;/<br>/&nbsp;
+                                            &nbsp;~/<br>/~&nbsp;
                                             {% round_by_digits item.rs_lower_1 2 '{0}' False %}
                                         </td>
                                         <td class="text-md mb-0 text-primary">
                                             {% round_by_digits item.rs_upper_2 2 '{0}' False %}
-                                            &nbsp;/<br>/&nbsp;
+                                            &nbsp;~/<br>/~&nbsp;
                                             {% round_by_digits item.rs_lower_2 2 '{0}' False %}
                                         </td>
                                         <td class="text-md mb-0 text-primary">
-                                            <b>{% round_by_digits item.upper_band_2 2 '{0}' False %}</b>
-                                            &nbsp;/<br>/&nbsp;
+                                            {% round_by_digits item.lower_band 2 '{0}' False %}
+                                            <-1<br>
                                             <b>{% round_by_digits item.lower_band_2 2 '{0}' False %}</b>
+                                            <-2<br>
+                                            <b>{% round_by_digits item.lower_band_3 2 '{0}' False %}</b>
+                                            <-3
                                         </td>
                                         <td class="text-md mb-0 text-primary">
+                                            <b>{% round_by_digits item.upper_band 2 '{0}' False %}</b>
+                                            <-1<br>
+                                            <b>{% round_by_digits item.upper_band_2 2 '{0}' False %}</b>
+                                            <-2<br>
                                             <b>{% round_by_digits item.upper_band_3 2 '{0}' False %}</b>
-                                            &nbsp;/<br>/&nbsp;
-                                            <b>{% round_by_digits item.lower_band_3 2 '{0}' False %}</b>
+                                            <-3
                                         </td>
                                         <!-- Position Sizing -->
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
-                                        <td class="text-md mb-0" style="color: black"></td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.open_stop 2 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.open_limit 2 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.close_stop 2 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.close_limit 2 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            # <b>{% round_by_digits item.num_shares 0 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.capital_need 0 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.capital_need_pct 2 '{0}%' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0" style="color: black">
+                                            <b>{% round_by_digits item.size_weight 2 '{0}' False %}</b>
+                                        </td>
                                         <!-- Opportunity -->
                                         <td class="text-md mb-0"></td>
                                         <td class="text-md mb-0"></td>
                                         <!-- RiskModel -->
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.gain_upper_1 0 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.gain_upper_2 0 '{0}' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.gain_upper_3 0 '{0}' False %}</b>
+                                        </td>
                                         <td class="text-md mb-0 text-dark">
                                             <b>{% round_by_digits item.risk_pct 2 '{0}%' False %}</b>
                                         </td>
                                         <td class="text-md mb-0 text-dark">
                                             <b>{% round_by_digits item.risk 0 '{0}' False %}</b>
                                         </td>
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
-                                        <td class="text-md mb-0 text-dark"></td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.risk_ratio_1 2 '{0}%' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.risk_ratio_2 2 '{0}%' False %}</b>
+                                        </td>
+                                        <td class="text-md mb-0 text-dark">
+                                            <b>{% round_by_digits item.risk_ratio_3 2 '{0}%' False %}</b>
+                                        </td>
                                         <!--<div id="sliderDouble"></div>-->
                                     </tr>
                                 {% endfor %}

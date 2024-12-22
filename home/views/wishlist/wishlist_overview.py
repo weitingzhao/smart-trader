@@ -1,3 +1,5 @@
+import math
+
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -36,7 +38,8 @@ def default(request):
 
     # Step 1.c. Get Wishlist
     # here_need_help = Wishlist.objects.filter(pick_at=request.user).first()
-    symbols = ['OWL','CALM','YPF']
+    symbols = ['OWL','CALM','YPF','FOUR','DAVE']
+    # symbols = [ 'DAVE', ]
     timeframe = '1D'
     # Attach symbol name from MarketSymbol model
     final_df = pd.DataFrame(
@@ -54,8 +57,10 @@ def default(request):
 
     # Step 1.d. Get Data
     all_hist_df = getHistoricalData(symbols, timeframe)
+    # Calculate Current Price
+    current_price_df = pd.DataFrame(getCurrentPrice(symbols, all_hist_df))
     # Calculate Bollinger Bands
-    indicator_df = pd.DataFrame(getBollinger(symbols, all_hist_df))
+    indicator_df = pd.DataFrame(getBollinger(symbols, all_hist_df, window=20))
     # Calculate ATR
     atr_df = pd.DataFrame(getATR(symbols, all_hist_df, period=14))
     # Calculate Support and Resistance
@@ -63,6 +68,7 @@ def default(request):
 
     # Merge the DataFrames
     final_df = pd.merge(final_df, industry_df, on='symbol')
+    final_df = pd.merge(final_df, current_price_df, on='symbol')
     final_df = pd.merge(final_df, indicator_df, on='symbol')
     final_df = pd.merge(final_df, atr_df, on='symbol')
     final_df = pd.merge(final_df, sr_df, on='symbol')
@@ -70,19 +76,71 @@ def default(request):
 
     # #########################
 
-    # Step 2. Calculate
+    # Step 2. Calculate Positions
     # Step 2.a. calculate Position Size for each symbol
     def ideal_position_size():
         return total / (min_position + max_position)/2
     def default_risk():
-        return total * (risk / 100)
+        return float(total * (risk / 100))
     def default_risk_pct():
-        return (total * (risk / 100) / total) * 100
+        return float(total * (risk / 100) / total) * 100
 
+    # Step 2.b. calculate the risk
     final_df['risk'] = final_df.apply(lambda row: default_risk() , axis=1)
     final_df['risk_pct'] = final_df.apply(lambda row: default_risk_pct(), axis=1)
 
+    # step 2.c. calculate the open position
+    # use lower band as buy price ( consider add some buffer from true range
+    # for possible open positions
+    final_df['open_stop'] = final_df['lower_band'] + final_df['ATR'] * 0.02
+    final_df['open_limit'] = final_df['open_stop']  - final_df['current_price'] * 0.005
 
+    # step 2.d. calculate the stop limit
+    final_df['open_rs_distance_1'] = abs(final_df['open_stop'] - final_df['rs_lower_1'])
+    final_df['open_rs_distance_2'] = abs(final_df['open_stop'] - final_df['rs_lower_2'])
+
+    def calculate_stop_limit(row):
+        distance_1 = abs(row['open_stop'] - row['rs_lower_1'])
+        distance_2 = abs(row['open_stop'] - row['rs_lower_2'])
+        atr_threshold = 2 * row['ATR']
+
+        if distance_1 > atr_threshold and distance_2 > atr_threshold:
+            return min(distance_1, distance_2)
+        elif distance_1 > atr_threshold:
+            return distance_1
+        elif distance_2 > atr_threshold:
+            return distance_2
+        else:
+            return atr_threshold  # or some default value if neither condition is met
+
+    final_df['close_stop'] = final_df.apply(
+        lambda row: row['open_stop'] - calculate_stop_limit(row), axis=1)
+    final_df['close_limit'] =  final_df['close_stop'] - final_df['current_price'] * 0.005
+
+    # step 2.e. calculate the # Shares base on risk
+    def calculate_shares(row):
+        return math.floor(float(row['risk']) / (row['open_stop'] - row['close_stop']))
+    final_df['num_shares'] = final_df.apply(calculate_shares, axis=1)
+
+    # step 2.f. calculate the $ & % CAPITAL NEED
+    final_df['capital_need'] = final_df['num_shares'] * final_df['open_stop']
+    final_df['capital_need_pct'] = final_df['capital_need'] / float(total) * 100
+
+    # step 2.g. calculate # Size Need
+    size = float(total) / ((min_position + max_position) / 2)
+    final_df['size_weight'] = final_df['capital_need'] / size
+
+    # #########################
+    # Risk Model
+    # Step 3.a Calculate Gain Bollinger Band
+    final_df['gain_upper_1'] = (final_df['upper_band'] - final_df['current_price']) * final_df['num_shares']
+    final_df['gain_upper_2'] = (final_df['upper_band_2'] - final_df['current_price']) * final_df['num_shares']
+    final_df['gain_upper_3'] = (final_df['upper_band_3'] - final_df['current_price']) * final_df['num_shares']
+
+    # Step 3.b Calculate Ratio
+    final_df['risk_ratio_1'] = final_df['gain_upper_1'] / final_df['risk'] * 100
+    final_df['risk_ratio_2'] = final_df['gain_upper_2'] / final_df['risk'] * 100
+    final_df['risk_ratio_3'] = final_df['gain_upper_3'] / final_df['risk'] * 100
 
     return render(
         request=request,
@@ -90,10 +148,9 @@ def default(request):
         context= {
             'parent': 'wishlist',
             'segment': 'wishlist_overview',
-
             'watchlist_items': final_df.to_dict(orient='records'),
-
         })
+
 
 
 def getHistoricalData(symbols, timeframe='1D'):
@@ -105,15 +162,32 @@ def getHistoricalData(symbols, timeframe='1D'):
 
     return df
 
-def getBollinger(symbols:list, df: DataFrame):
+def getCurrentPrice(symbols,  df: DataFrame):
+    results = []
+
+    for symbol in symbols:
+        data = df[df['symbol'] == symbol]
+        latest_data = data.loc[data['date'].idxmax()]  # Get the row with the latest date
+
+        results.append({
+            'symbol': symbol,
+            'current_price': latest_data['close']
+        })
+
+    return results
+
+def getBollinger(symbols:list, df: DataFrame, window=20):
     results = []
 
     for symbol in symbols:
         data = df[df['symbol'] == symbol]
 
+        # Ensure the data is sorted by date
+        data = data.sort_values(by='date')
+
         # Calculate the moving average and standard deviation
-        data['MA'] = data['close'].rolling(window=20).mean()
-        data['STD'] = data['close'].rolling(window=20).std()
+        data['MA'] = data['close'].rolling(window=window).mean()
+        data['STD'] = data['close'].rolling(window=window).std()
 
         # Calculate the Bollinger Bands
         data['Upper'] = data['MA'] + (data['STD'] * 2)

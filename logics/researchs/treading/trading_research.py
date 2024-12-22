@@ -330,7 +330,8 @@ class TradingResearch(BaseResearch):
             FROM
                 market_stock_hist_bars_{table_name}_ts
             WHERE
-                symbol IN ('{"', '".join(symbols)}')
+                symbol IN ('{"', '".join(symbols)}') 
+                AND time > '2010-01-01'
             GROUP BY
                 symbol, DATE(time)
                 """)
