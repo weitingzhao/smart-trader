@@ -2,136 +2,224 @@
 {% load static home_filter%}
 
 {% block content %}
-    <div class="container-fluid">
-        <div class="page-header min-height-100 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
-            <span class="mask bg-gradient-primary opacity-6"></span>
-        </div>
-        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
-            <div class="row gx-4">
-                <div class="col-auto">
-                    <div class="avatar avatar-xl position-relative">
-                        <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
-                    </div>
+<div class="container-fluid">
+    <div class="page-header min-height-100 border-radius-xl mt-4"
+        style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+        <span class="mask bg-gradient-primary opacity-6"></span>
+    </div>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+                    <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image"
+                        class="w-100 border-radius-lg shadow-sm">
                 </div>
-                <div class="col-auto my-auto">
-                    <div class="h-100">
-                        <h5 class="mb-1">
-                            Snapshot Research
-                        </h5>
-                        <p class="mb-0 font-weight-bold text-sm">
-                            base on daily import screening snapshot data locate stock for wishlist
-                        </p>
-                    </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        Snapshot Research
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        base on daily import screening snapshot data locate stock for wishlist
+                    </p>
                 </div>
-                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-                  <div class="nav-wrapper position-relative end-0">
+            </div>
+            <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                <div class="nav-wrapper position-relative end-0">
                     <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-                        <li class="nav-item" role="tab" >
-                        <a id="snapshot_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:" aria-selected="true">
-                          <span class="ms-1">Snapshot</span>
-                        </a>
-                      </li>
-                      <li class="nav-item" role="tab" >
-                        <a id="buy_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
-                          <span class="ms-1">xxx</span>
-                        </a>
-                      </li>
-                      <li class="nav-item" role="tab" >
-                        <a id="sell_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" aria-selected="true" >
-                          <span class="ms-1">yyy</span>
-                        </a>
-                      </li>
+                        <li class="nav-item" role="tab">
+                            <a id="snapshot_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:"
+                                aria-selected="true">
+                                <span class="ms-1">Snapshot</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="tab">
+                            <a id="buy_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
+                                href="javascript:" aria-selected="true">
+                                <span class="ms-1">xxx</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="tab">
+                            <a id="sell_order_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
+                                href="javascript:" aria-selected="true">
+                                <span class="ms-1">yyy</span>
+                            </a>
+                        </li>
                     </ul>
-                  </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="snapshot_panel" class="container-fluid py-4" style="display: none;">
-        <div class="row mt-3">
-            <div class="col-12 col-lg-12">
-                <div class="card mb-4">
-                    <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Snapshot Data</h6>
-                        </div>
+</div>
+<div id="snapshot_panel" class="container-fluid py-4" style="display: none;">
+    <div class="row mt-3">
+        <div class="col-12 col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Snapshot Data</h6>
                     </div>
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="table-responsive">
-                                <table class="table table-flush table-hover" id="snapshot_table">
-                                    <thead class="thead-light">
-                                      <tr>
-                                          <th>No.</th>
-                                          <th>Symbol</th>
-                                          <th>Name</th>
-                                          <th>Setup Rating</th>
-                                          <th>Technical Rating</th>
-                                          <th>Fundamental Rating</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-flush table-hover" id="snapshot_table">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>Setup Rating</th>
+                                        <th>Technical Rating</th>
+                                        <th>Fundamental<br />Rating</th>
+                                        <th>Base</th>
+                                        <th>Relative Strength</th>
+                                        <th>Percent Change</th>
+                                        <th>1Mon performance</th>
+                                        <th>3Mon performance</th>
+                                        <th>6Mon performance</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                    </tbody>
-                                  </table>
-                            </div>
+                                </tbody>
+                            </table>
+                            <div id="paginationContainer"></div> <!-- 分页控件将渲染在这里 -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="buy_order_panel" class="container-fluid py-4">
+</div>
+<div id="buy_order_panel" class="container-fluid py-4">
+</div>
+<div id="sell_order_panel" class="container-fluid py-4">
+</div>
+
+<!-- Wishlist 弹出层 -->
+<div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wishlistModalLabel">添加到愿望单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="wishlistForm">
+                    <div class="mb-3">
+                        <label for="wishlistItem" class="form-label">物品名称</label>
+                        <input type="text" class="form-control" id="wishlistItem" placeholder="请输入物品名称" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wishlistPriority" class="form-label">优先级</label>
+                        <select class="form-select" id="wishlistPriority" required>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wishlistNotes" class="form-label">备注</label>
+                        <textarea class="form-control" id="wishlistNotes" rows="3" placeholder="请输入备注"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="addWishlistItem">添加</button>
+            </div>
+        </div>
     </div>
-    <div id="sell_order_panel" class="container-fluid py-4">
-    </div>
+</div>
+
 {% endblock content %}
 
 <!-- Specific JS goes HERE -->
 {% block extra_js %}
-<link href="https://cdn.jsdelivr.net/npm/simple-datatables-classic@latest/dist/style.css" rel="stylesheet" type="text/css">
-<script src="https://cdn.jsdelivr.net/npm/simple-datatables-classic@latest" type="text/javascript"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
 <script>
-////////////////////////////////////////////// Table  html //////////////////////////////////////////////
+    ////////////////////////////////////////////// Table  html //////////////////////////////////////////////
     const csrftoken = getCookie('csrftoken');
+    var dt;
+    $(document).ready(function () {
+        dt = $('#snapshot_table').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "pageLength": 20, // 每页显示的记录数
+            "lengthMenu": [[20, 40, 60], [20, 40, 60]], // 分页选项
+            "pagingType": "full_numbers" ,
+            "columns": [{ "data": "row_num" },
+                        { "data": "symbol_id" },
+                        { "data": "name" },
+                        { "data": "setup_rating" },
+                        { "data": "technical_rating" },
+                        { "data": "fundamental_rating" },
+                        { "data": "base" },
+                        { "data": "relative_strength" },
+                        { "data": "percent_change" },
+                        { "data": "one_month_performance" },
+                        { "data": "three_month_performance" },
+                        { "data": "six_month_performance" },
+                        {
+                        "data": "symbol_id",
+                        "title": "Action",
+                        "className":"text-center",
+                        "render": function (data, type, row) {
+                            return '<a href="javascript:void(0)" sid="'+data+'" onclick="javascript:ssss(this)"><i class="fa fa-add me-sm-2" aria-hidden="true"></i</a> '  
+                            }
+                        }
+                    ],
+            ajax: function (data, callback, settings) {
+                //封装请求参数
+                var sortColumn,sortDirection,keywords="";
+                if(data.order&&data.order.length>0){ 
+                    sortColumn= data.columns[data.order[0].column].data;
+                    sortDirection =data.order[0].dir; 
+                }
+                 
+                    keywords=data.search.value;
+                
 
-    const snapshotDT = new simpleDatatables.DataTable(`#snapshot_table`, {
-        searchable: true,
-        fixedHeight: false,
-        perPage: 15,
-        pagination: true // Ensure pagination is enabled
-    });
-
-    snapshotDT.on('datatable.page', function(page) {
-        alert(page)
-        fetchData(page, snapshotDT.sortColumn, snapshotDT.sortDirection, function(response) {
-            snapshotDT.rows().remove();
-            snapshotDT.rows().add(response.data);
-            snapshotDT.update();
-            if (snapshotDT.pagination) {
-                snapshotDT.pagination.update(response.total, page);
+                var params = new URLSearchParams({
+                    page:  (data.start / data.length) + 1,
+                    start:data.start,
+                    sortColumn: sortColumn,
+                    sortDirection: sortDirection,
+                    pageSize: data.length,
+                    keywords:keywords
+                });
+                
+                fetchData(params, function (response) { 
+                    callback({
+                            // draw: response.total,
+                             recordsTotal: response.total,
+                            recordsFiltered: response.total,
+                            data: response.data
+                        });  
+                   // data: response.data   
+                })
             }
-        });
-    });
+        }) 
+    })
 
-    snapshotDT.on('datatable.sort', function(column, direction) {
-        fetchData(snapshotDT.currentPage, column, direction, function(response) {
-            snapshotDT.rows().remove();
-            snapshotDT.rows().add(response.data);
-            snapshotDT.update();
-            if (snapshotDT.pagination) {
-                snapshotDT.pagination.update(response.total, snapshotDT.currentPage);
-            }
-        });
-    });
+    function ssss(obj) { 
+        alert($(obj).attr("sid"))
+        $('#wishlistModal').modal('show');
+    }
 
-    function fetchData(page, sortColumn, sortDirection, callback) {
-        const params = new URLSearchParams({
-            page: page,
-            sortColumn: sortColumn,
-            sortDirection: sortDirection
-        });
-
+    
+    function fetchData(params, callback) {
         fetch(`/screening/snapshot/fetching/data?${params.toString()}`, {
             method: 'GET',
             headers: {
@@ -148,31 +236,13 @@
         .catch(error => console.error('Error fetching data:', error));
     }
 
-    fetchData(1, 'symbol_id', 'asc', function(response) {
-        {#console.log(response.data)#}
-        {#console.log(response.total)#}
-        const transformedData = response.data.map(record => [
-            record.row_num,
-            record.symbol_id,
-            record.name,
-            record.setup_rating,
-            record.technical_rating,
-            record.fundamental_rating,
-        ]);
-        snapshotDT.rows().add(transformedData);
-        snapshotDT.update();
-        if (snapshotDT.pagination) {
-            snapshotDT.pagination.update(response.total, 1);
-        }
-    });
-
     ////////////////////////////////////////////// Quote html //////////////////////////////////////////////
     const panels = [
-        'snapshot', 'buy_order','sell_order',
+        'snapshot', 'buy_order', 'sell_order',
     ];// Hide all panels
 
     panels.forEach(panel => {
-        document.getElementById(panel + "_btn").addEventListener('click', function() {
+        document.getElementById(panel + "_btn").addEventListener('click', function () {
             showPanel(panel);
         });
     });
@@ -187,15 +257,11 @@
         if (selectedPanel) {
             selectedPanel.style.display = 'block';
             document.getElementById(panelId + "_btn").classList.add('active');
-           if ("chart" === panelId) {
+            if ("chart" === panelId) {
                 renderChart('{{ symbol }}', currentChartType, currentInterval);
             }
         }
     }
-
-
-    ////////////////////////////////////////////// init Setup Chart Panel //////////////////////////////////////////////
-    {#showPanel("profile");#}
     showPanel("snapshot");
 
 

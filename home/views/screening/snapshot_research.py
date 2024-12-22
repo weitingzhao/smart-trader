@@ -6,13 +6,19 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import decimal
+from sqlalchemy import create_engine
+from django.conf import settings
+from django.db.utils import (
+    DEFAULT_DB_ALIAS
+)
+
 
 @csrf_exempt
 def fetching(request):
-
-    # Step 0. Check input parameters
+    engine = create_engine(conStr_sqlalchemy())
     user_id = request.user.id  # Assuming you have the user_id from the request
-    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+    portfolio = Portfolio.objects.filter(
+        user=user_id, is_default=True).order_by('-portfolio_id').first()
 
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
@@ -21,11 +27,28 @@ def fetching(request):
     if len(holdings) <= 0:
         return None, None
 
-    page_size = 1000
+    page_size = int(request.GET.get('pageSize'))
+
+    sortColumn = request.GET.get('sortColumn')
+    sortDirection = request.GET.get('sortDirection')
+
+    keyWords = request.GET.get('keywords')
+    whereStr = " where 1=1 "
+    params = ()
+    if len(keyWords) > 0:
+        params = (f'%{keyWords}%',)
+        whereStr += " and ( sd.symbol_id) ILIKE %s"
+
+    sort_criteria = " sd.symbol_id, sd.time"
+    if sortColumn and sortDirection:
+        # 将它们连接起来，通常可以用逗号或其他分隔符
+        sort_criteria = f" {sortColumn} {sortDirection}"
 
     # Step 1. Prepare summary query script
-    showing_repeat_times = {'agg': 'COUNT(ss.*)', 'column': 'showing_repeat_times'}
+    showing_repeat_times = {
+        'agg': 'COUNT(ss.*)', 'column': 'showing_repeat_times'}
     last_showing = {'agg': 'MAX(ss.time)', 'column': 'last_showing'}
+
     def summary_query(field) -> str:
         return f"""
         SELECT
@@ -49,10 +72,16 @@ def fetching(request):
     # Step 2.b. Get the total count
     count_query = f"""
         WITH summary AS ( {summary_query(showing_repeat_times)})
-        , count AS (SELECT symbol_id FROM summary GROUP BY symbol_id)
-        SELECT COUNT(*) FROM count;
+        , count AS (SELECT symbol_id FROM summary  GROUP BY symbol_id)
+        SELECT COUNT(*) FROM count sd {whereStr};
     """
-    total_count = pd.read_sql_query(count_query, connection).iloc[0, 0]
+    total_count = 0
+    try:
+        total_count = pd.read_sql_query(
+            count_query, engine, params=params).iloc[0, 0]
+    except Exception as e:
+        print(e.args)
+
     paginator = Paginator(range(total_count), page_size)
 
     # Step 3. Sorting parameters
@@ -109,7 +138,7 @@ def fetching(request):
         FROM
             pivot_screening ps
             LEFT JOIN pivot_last_showing pls on ps.symbol_id = pls.symbol_id
-    )
+    ),result_table as (
     SELECT
            ROW_NUMBER() OVER (ORDER BY sd.symbol_id, sd.time) AS row_num,
            /*Summary*/
@@ -148,29 +177,48 @@ def fetching(request):
         LEFT JOIN snapshot_setup ss ON sd.symbol_id = ss.symbol_id AND sd.time = ss.time
         LEFT JOIN snapshot_fundamental sf ON sd.symbol_id = sf.symbol_id AND sd.time = sf.time
         LEFT JOIN snapshot_bull_flag sbf ON sd.symbol_id = sbf.symbol_id AND sd.time = sbf.time
-    ORDER BY sd.symbol_id, sd.time
+    )
+    select * from result_table sd
+    {whereStr}
+    ORDER BY {sort_criteria}
     LIMIT {page_size} OFFSET {offset};
     """
-    print(data_query)
-    snapshot_df = pd.read_sql_query(data_query, connection)
-    snapshot_df = snapshot_df.replace({np.nan: None})  # Replace NaN with None
-    snapshot_df = snapshot_df.applymap(lambda x: str(x) if isinstance(x, (int, decimal.Decimal, float)) else x)
-    snapshot_data = snapshot_df.to_dict(orient='records')
+    # print(data_query)
+    try:
+        snapshot_df = pd.read_sql_query(data_query, engine, params=params)
+        snapshot_df = snapshot_df.replace({np.nan: None})  # Replace NaN with None
+        snapshot_df = snapshot_df.applymap(lambda x: str(
+            x) if isinstance(x, (int, decimal.Decimal, float)) else x)
+        snapshot_data = snapshot_df.to_dict(orient='records')
 
-    # Prepare the response data
-    response_data = {
-        'data': snapshot_data,
-        'total': paginator.count
-    }
+        # Prepare the response data
+        response_data = {
+            'data': snapshot_data,
+            'total': paginator.count
+        }
 
-    return JsonResponse(response_data)
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(e.args)
+        return JsonResponse([])
 
+
+def conStr_sqlalchemy():
+    db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
+    db_name = db_config['NAME']
+    db_user = db_config['USER']
+    db_password = db_config['PASSWORD']
+    db_host = db_config['HOST']
+    db_port = db_config['PORT']
+    conStr = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+    return conStr
 
 
 def default(request):
 
     user_id = request.user.id  # Assuming you have the user_id from the request
-    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+    portfolio = Portfolio.objects.filter(
+        user=user_id, is_default=True).order_by('-portfolio_id').first()
 
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
@@ -178,7 +226,7 @@ def default(request):
     return render(
         request=request,
         template_name='pages/screening/snapshot_research.html',
-        context= {
+        context={
             'parent': 'screening',
             'segment': 'snapshot_research'
         })
