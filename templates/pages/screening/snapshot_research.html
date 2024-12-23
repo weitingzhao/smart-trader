@@ -100,40 +100,32 @@
 </div>
 
 <!-- Wishlist 弹出层 -->
-<div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="wishlistModalLabel">添加到愿望单</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="wishlistForm">
-                    <div class="mb-3">
-                        <label for="wishlistItem" class="form-label">物品名称</label>
-                        <input type="text" class="form-control" id="wishlistItem" placeholder="请输入物品名称" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="wishlistPriority" class="form-label">优先级</label>
-                        <select class="form-select" id="wishlistPriority" required>
-                            <option value="high">高</option>
-                            <option value="medium">中</option>
-                            <option value="low">低</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="wishlistNotes" class="form-label">备注</label>
-                        <textarea class="form-control" id="wishlistNotes" rows="3" placeholder="请输入备注"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" id="addWishlistItem">添加</button>
-            </div>
+ <!-- Add Portfolio Modal -->
+ <div class="modal fade" id="modal-add-wishlist" tabindex="-1" role="dialog" aria-labelledby="modal-add-wishlist" aria-hidden="true">
+    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title" id="modal-title-default">Add wishlist</h6>
+          <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <input type="hidden" id="a_symbol_id" value="">
         </div>
+        <div class="modal-body">
+          <form id="addPortfolioForm">
+            <div class="form-group">
+              <label for="portfolioName">Portfolio Name</label>
+              <input type="text" class="form-control" id="portfolioName" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-gradient-primary" onclick="submitAddPortfolio()">Add Portfolio</button>
+          <button type="button" class="btn btn-link ml-auto" data-bs-dismiss="modal" aria-label="Close">Close</button>
+        </div>
+      </div>
     </div>
-</div>
+  </div> 
 
 {% endblock content %}
 
@@ -176,7 +168,7 @@
                         "title": "Action",
                         "className":"text-center",
                         "render": function (data, type, row) {
-                            return '<a href="javascript:void(0)" sid="'+data+'" onclick="javascript:ssss(this)"><i class="fa fa-add me-sm-2" aria-hidden="true"></i</a> '  
+                            return '<a href="javascript:void(0)" sid="'+data+'" s_name="'+row.name+'" onclick="javascript:ssss(this)"><i class="fa fa-add me-sm-2" aria-hidden="true"></i</a> '  
                             }
                         }
                     ],
