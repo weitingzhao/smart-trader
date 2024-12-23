@@ -33,6 +33,10 @@ def default(request):
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
 
+        # Save open_summary to portfolio investment column
+        portfolio.investment = summary['mv']['value']
+        portfolio.save()
+
     return render(
         request = request,
         template_name='pages/position/open_positions.html',
@@ -45,6 +49,7 @@ def default(request):
             'trade_source_choices': TradeSourceChoices.choices,
             'trade_phase_choices': TradePhaseChoices.choices,
             'trade_phase_rating_choices': TradePhaseRatingChoices.choices,
+            'page_title': 'Open Position'  # title
         })
 
 def get_order(request, order_id):

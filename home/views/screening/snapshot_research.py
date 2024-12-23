@@ -179,5 +179,6 @@ def default(request):
         template_name='pages/screening/snapshot_research.html',
         context= {
             'parent': 'screening',
-            'segment': 'snapshot_research'
+            'segment': 'snapshot_research',
+            'page_title': 'Research'  # title
         })

@@ -45,7 +45,7 @@ class SnapshotScreening(Snapshot):
 # Overview
 class SnapshotOverview(Snapshot):
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     # Rating
     setup_rating = models.FloatField(null=True, blank=True)

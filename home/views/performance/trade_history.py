@@ -49,5 +49,6 @@ def default(request):
             'transaction_data': transaction_data,
             'holding_sell_orders': holding_sell_orders,
             'holding_buy_orders': holding_buy_orders,
+            'page_title': 'Trade History'  # title
         }
     )
