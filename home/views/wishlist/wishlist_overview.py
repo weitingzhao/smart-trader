@@ -4,18 +4,24 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from apps.common.models import *
+from apps.common.models import Wishlist
+from apps.common.models import MarketSymbol
 from logics.logic import Logic
 from django.shortcuts import get_object_or_404
 import pandas as pd
 from pandas import DataFrame
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 instance = Logic()
+
 
 def default(request):
 
     user_id = request.user.id  # Assuming you have the user_id from the request
-    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+    portfolio = Portfolio.objects.filter(
+        user=user_id, is_default=True).order_by('-portfolio_id').first()
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
@@ -35,20 +41,18 @@ def default(request):
     margin_loan = portfolio.margin_loan
     total = cash + money_market + investment
 
-
     # Step 1.c. Get Wishlist
     # here_need_help = Wishlist.objects.filter(pick_at=request.user).first()
-    symbols = ['OWL','CALM','YPF','FOUR','DAVE']
+    symbols = ['OWL', 'CALM', 'YPF', 'FOUR', 'DAVE']
     # symbols = [ 'DAVE', ]
     timeframe = '1D'
     # Attach symbol name from MarketSymbol model
     final_df = pd.DataFrame(
         MarketSymbol.objects.filter(symbol__in=symbols).values('symbol', 'name'))
     # put dummy column for now
-    final_df['pick_at'] =  timezone.now().date()
+    final_df['pick_at'] = timezone.now().date()
     final_df["purpose"] = WishlistPurposeChoices.SEPA
     final_df["add_by"] = get_object_or_404(User, id=user_id).username
-
 
     # Step 1. d. Get Industry
     industry_df = pd.DataFrame(list(MarketStock.objects.filter(
@@ -73,31 +77,37 @@ def default(request):
     final_df = pd.merge(final_df, atr_df, on='symbol')
     final_df = pd.merge(final_df, sr_df, on='symbol')
 
-
     # #########################
 
     # Step 2. Calculate Positions
     # Step 2.a. calculate Position Size for each symbol
+
     def ideal_position_size():
         return total / (min_position + max_position)/2
+
     def default_risk():
         return float(total * (risk / 100))
+
     def default_risk_pct():
         return float(total * (risk / 100) / total) * 100
 
     # Step 2.b. calculate the risk
-    final_df['risk'] = final_df.apply(lambda row: default_risk() , axis=1)
-    final_df['risk_pct'] = final_df.apply(lambda row: default_risk_pct(), axis=1)
+    final_df['risk'] = final_df.apply(lambda row: default_risk(), axis=1)
+    final_df['risk_pct'] = final_df.apply(
+        lambda row: default_risk_pct(), axis=1)
 
     # step 2.c. calculate the open position
     # use lower band as buy price ( consider add some buffer from true range
     # for possible open positions
     final_df['open_stop'] = final_df['lower_band'] + final_df['ATR'] * 0.02
-    final_df['open_limit'] = final_df['open_stop']  - final_df['current_price'] * 0.005
+    final_df['open_limit'] = final_df['open_stop'] - \
+        final_df['current_price'] * 0.005
 
     # step 2.d. calculate the stop limit
-    final_df['open_rs_distance_1'] = abs(final_df['open_stop'] - final_df['rs_lower_1'])
-    final_df['open_rs_distance_2'] = abs(final_df['open_stop'] - final_df['rs_lower_2'])
+    final_df['open_rs_distance_1'] = abs(
+        final_df['open_stop'] - final_df['rs_lower_1'])
+    final_df['open_rs_distance_2'] = abs(
+        final_df['open_stop'] - final_df['rs_lower_2'])
 
     def calculate_stop_limit(row):
         distance_1 = abs(row['open_stop'] - row['rs_lower_1'])
@@ -115,7 +125,8 @@ def default(request):
 
     final_df['close_stop'] = final_df.apply(
         lambda row: row['open_stop'] - calculate_stop_limit(row), axis=1)
-    final_df['close_limit'] =  final_df['close_stop'] - final_df['current_price'] * 0.005
+    final_df['close_limit'] = final_df['close_stop'] - \
+        final_df['current_price'] * 0.005
 
     # step 2.e. calculate the # Shares base on risk
     def calculate_shares(row):
@@ -124,7 +135,8 @@ def default(request):
 
     # step 2.f. calculate the $ & % CAPITAL NEED
     final_df['capital_need'] = final_df['num_shares'] * final_df['open_stop']
-    final_df['capital_need_pct'] = final_df['capital_need'] / float(total) * 100
+    final_df['capital_need_pct'] = final_df['capital_need'] / \
+        float(total) * 100
 
     # step 2.g. calculate # Size Need
     size = float(total) / ((min_position + max_position) / 2)
@@ -133,24 +145,29 @@ def default(request):
     # #########################
     # Risk Model
     # Step 3.a Calculate Gain Bollinger Band
-    final_df['gain_upper_1'] = (final_df['upper_band'] - final_df['current_price']) * final_df['num_shares']
-    final_df['gain_upper_2'] = (final_df['upper_band_2'] - final_df['current_price']) * final_df['num_shares']
-    final_df['gain_upper_3'] = (final_df['upper_band_3'] - final_df['current_price']) * final_df['num_shares']
+    final_df['gain_upper_1'] = (
+        final_df['upper_band'] - final_df['current_price']) * final_df['num_shares']
+    final_df['gain_upper_2'] = (
+        final_df['upper_band_2'] - final_df['current_price']) * final_df['num_shares']
+    final_df['gain_upper_3'] = (
+        final_df['upper_band_3'] - final_df['current_price']) * final_df['num_shares']
 
     # Step 3.b Calculate Ratio
-    final_df['risk_ratio_1'] = final_df['gain_upper_1'] / final_df['risk'] * 100
-    final_df['risk_ratio_2'] = final_df['gain_upper_2'] / final_df['risk'] * 100
-    final_df['risk_ratio_3'] = final_df['gain_upper_3'] / final_df['risk'] * 100
+    final_df['risk_ratio_1'] = final_df['gain_upper_1'] / \
+        final_df['risk'] * 100
+    final_df['risk_ratio_2'] = final_df['gain_upper_2'] / \
+        final_df['risk'] * 100
+    final_df['risk_ratio_3'] = final_df['gain_upper_3'] / \
+        final_df['risk'] * 100
 
     return render(
         request=request,
         template_name='pages/wishlist/wishlist_overview.html',
-        context= {
+        context={
             'parent': 'wishlist',
             'segment': 'wishlist_overview',
             'watchlist_items': final_df.to_dict(orient='records'),
         })
-
 
 
 def getHistoricalData(symbols, timeframe='1D'):
@@ -158,16 +175,19 @@ def getHistoricalData(symbols, timeframe='1D'):
     data = instance.research.treading().get_stock_full_hist_bars(True, symbols)
 
     # Convert the fetched rows into a DataFrame
-    df = pd.DataFrame(data, columns=['symbol', 'date', 'close', 'high','low', 'volume'])
+    df = pd.DataFrame(
+        data, columns=['symbol', 'date', 'close', 'high', 'low', 'volume'])
 
     return df
+
 
 def getCurrentPrice(symbols,  df: DataFrame):
     results = []
 
     for symbol in symbols:
         data = df[df['symbol'] == symbol]
-        latest_data = data.loc[data['date'].idxmax()]  # Get the row with the latest date
+        # Get the row with the latest date
+        latest_data = data.loc[data['date'].idxmax()]
 
         results.append({
             'symbol': symbol,
@@ -176,7 +196,8 @@ def getCurrentPrice(symbols,  df: DataFrame):
 
     return results
 
-def getBollinger(symbols:list, df: DataFrame, window=20):
+
+def getBollinger(symbols: list, df: DataFrame, window=20):
     results = []
 
     for symbol in symbols:
@@ -217,7 +238,8 @@ def getBollinger(symbols:list, df: DataFrame, window=20):
 
     return results
 
-def getATR(symbols:list, df: DataFrame, period=14):
+
+def getATR(symbols: list, df: DataFrame, period=14):
     results = []
 
     for symbol in symbols:
@@ -246,7 +268,8 @@ def getATR(symbols:list, df: DataFrame, period=14):
     # Return the data with ATR values
     return results
 
-def getSupportResistance(symbols:list, df: DataFrame):
+
+def getSupportResistance(symbols: list, df: DataFrame):
     results = []
 
     for symbol in symbols:
@@ -282,3 +305,36 @@ def getSupportResistance(symbols:list, df: DataFrame):
     return results
 
 
+@csrf_exempt
+def add_wishlist(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            symbol = data.get('symbol')
+            purpose = data.get('purpose')
+            target_buy_price = data.get('target_buy_price')
+            target_sell_stop = data.get('target_sell_stop')
+            target_sell_limit = data.get('target_sell_limit')
+            list_on = data.get('list_on')
+            is_filled = data.get('is_filled')
+            quantity= data.get('quantity')
+
+            if not symbol:                
+                return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
+
+            user = request.user
+
+            symbol_martet= MarketSymbol.objects.get(pk=symbol)
+            # user = User.objects.get(pk=2)
+
+            try:
+                portfolio = Wishlist.objects.create(
+                    symbol=symbol_martet, quantity=quantity, target_buy_price=target_buy_price,
+                    target_sell_stop=target_sell_stop,is_filled=is_filled, target_sell_limit=target_sell_limit,
+                    list_on=list_on , add_by=user)
+                return JsonResponse({'success': True, 'portfolio_id': portfolio.pk})
+            except Exception as e:
+                print(e.args)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)

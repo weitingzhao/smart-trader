@@ -3,6 +3,12 @@
 import os
 import sys
 
+if os.name == 'posix':
+    import grp
+    # 仅在 Unix 系统上执行的代码
+else:
+    # 在 Windows 上执行的替代代码
+    pass
 
 def main():
     """Run administrative tasks."""
