@@ -208,7 +208,9 @@
                                             <b>{{ item.symbol }}</b>
                                         </a>
                                     </td>
-                                    <td class="text-start">{{ item.trade_id }}</td>
+                                    <td class="text-start">
+                                        <b>[{{ item.trade_source }}]</b>-{{ item.trade_id }}
+                                    </td>
                                     <td class="text-start" style="color:000000">{{ item.quantity }}</td>
                                     <!-- Entry -->
                                     <td class="text-md mb-0 bg-gray-200 text-dark">{{ item.entry_date|format_date:'%m/%d/%Y' }}</td>

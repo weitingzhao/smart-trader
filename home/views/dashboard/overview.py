@@ -49,4 +49,5 @@ def default(request):
             'perf_tracking_date': perf_tracking_date,
             'open_summary': open_summary,
             'close_summary': close_summary,
+            'page_title': 'Overview',  # title
         })

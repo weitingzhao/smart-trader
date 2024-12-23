@@ -265,7 +265,7 @@ class OpenPosition(PositionBase):
         max_date = final_df['date'].max()
         max_date = datetime.combine(max_date, datetime.min.time())
         max_date = timezone.make_aware(max_date, timezone.get_current_timezone())
-        today_transactions = Transaction.objects.filter(date=max_date)
+        today_transactions = Transaction.objects.filter(date=max_date, transaction_type=1)
         if today_transactions.exists():
             today_transactions_df = pd.DataFrame(list(today_transactions.values('holding_id', 'quantity_final', 'price_final')))
             today_transactions_df.rename(columns={'price_final': 'today_price', 'quantity_final': 'today_quantity'}, inplace=True)

@@ -50,6 +50,7 @@ class  TradePhaseChoices(models.TextChoices):
     BEFORE_BO  = '1', 'Before Breakout' # Before Breakout
     BREAKING    = '2', 'Breaking Out' # Breaking Out
     AFTER_BO    = '3', 'After Breakout' # After Breakout
+    Earning         = '4', 'Earning' # Earning
 
 class  TradeSourceChoices(models.TextChoices):
     PLATFORM_A  = 'A', 'PLATFORM A'
@@ -78,6 +79,8 @@ class Portfolio(models.Model):
     name = models.CharField(max_length=100)
     money_market = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     cash = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    investment = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    margin_loan = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     is_default = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)

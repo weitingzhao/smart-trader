@@ -12,7 +12,12 @@ def default(request):
         form_static_risk = UserStaticSettingForm()
 
     # Get symbols from Holding model
-    holding_symbols = Holding.objects.values_list('symbol', flat=True)
+    holding_symbols = list(Holding.objects.values_list('symbol', flat=True))
+
+    # Add additional symbols
+    additional_symbols = ['^IXIC', '^DJI', '^GSPC', 'NQ=F']
+    holding_symbols.extend(additional_symbols)
+
     symbols = ','.join(holding_symbols)
 
     return render(
@@ -23,7 +28,8 @@ def default(request):
             'segment': 'risk_preferences',
             'static_risk_form': form_static_risk,
             'messages': messages.get_messages(request),
-            'holding_symbols': symbols,  # Add symbols to context
+            'holding_symbols': symbols,  # Add symbols to context,
+            'page_title': 'Risk Setting'  # title
         })
 
 

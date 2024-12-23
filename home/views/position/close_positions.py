@@ -42,5 +42,6 @@ def default(request):
             'segment': 'close_positions',
             'portfolio': portfolio,
             'portfolio_items': final_json,
-            'summary': summary
+            'summary': summary,
+            'page_title': 'Close Position'  # title
         })
