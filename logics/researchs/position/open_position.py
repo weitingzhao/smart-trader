@@ -90,6 +90,17 @@ class OpenPosition(PositionBase):
                 'above': 0,
                 'below': 0,
                 'dist': 0,
+            },
+            'category': {
+                'total': 0,
+                'earning': 0,
+                'earning_pct': 0,
+                'before_breakout': 0,
+                'before_breakout_pct': 0,
+                'breaking_out': 0,
+                'breaking_out_pct': 0,
+                'after_breakout': 0,
+                'after_breakout_pct': 0,
             }
         }
 
@@ -112,6 +123,19 @@ class OpenPosition(PositionBase):
         summary['water']['above'] = final_df[final_df['risk'] > 0]['risk'].sum()
         summary['water']['below'] = final_df[final_df['risk'] < 0]['risk'].sum()
         summary['water']['dist'] = summary['water']['above']  + summary['water']['below']
+
+        # Part 6. category
+        summary['category']['earning'] =  round(final_df[final_df['trade_phase'] == '4']['market'].sum(),0)
+        summary['category']['before_breakout'] =  round(final_df[final_df['trade_phase'] == '1']['market'].sum(),0)
+        summary['category']['breaking_out'] =  round(final_df[final_df['trade_phase'] == '2']['market'].sum(),0)
+        summary['category']['after_breakout'] =  round(final_df[final_df['trade_phase'] == '3']['market'].sum(),0)
+
+        summary['category']['total'] = final_df['market'].sum()
+        summary['category']['earning_pct'] = summary['category']['earning'] / summary['category']['total'] * 100
+        summary['category']['before_breakout_pct'] = summary['category']['before_breakout'] / summary['category']['total'] * 100
+        summary['category']['breaking_out_pct'] = summary['category']['breaking_out'] / summary['category']['total'] * 100
+        summary['category']['after_breakout_pct'] = summary['category']['after_breakout'] / summary['category']['total'] * 100
+
 
         return summary
 
