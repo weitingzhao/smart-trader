@@ -35,7 +35,7 @@ def default(request):
     margin_loan = portfolio.margin_loan
     total = cash + money_market + investment
 
-
+    Wishlist.objects.filter(pick_at=request.user).first()
     # Step 1.c. Get Wishlist
     # here_need_help = Wishlist.objects.filter(pick_at=request.user).first()
     symbols = ['OWL','CALM','YPF','FOUR','DAVE']
