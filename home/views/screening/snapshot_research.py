@@ -217,16 +217,17 @@ def conStr_sqlalchemy():
 def default(request):
 
     user_id = request.user.id  # Assuming you have the user_id from the request
-    portfolio = Portfolio.objects.filter(
-        user=user_id, is_default=True).order_by('-portfolio_id').first()
+    try:
+        portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
-    if not portfolio:
-        return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+        if not portfolio:
+            return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    return render(
-        request=request,
-        template_name='pages/screening/snapshot_research.html',
-        context={
-            'parent': 'screening',
-            'segment': 'snapshot_research'
-        })
+        return render(
+            request=request,
+            template_name='pages/screening/snapshot_research.html',
+            context= {
+                'parent': 'screening',
+                'segment': 'snapshot_research'})
+    except Exception as e:
+        print(e.args)
