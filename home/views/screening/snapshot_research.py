@@ -213,10 +213,11 @@ def conStr_sqlalchemy():
     DB_PASS     = os.getenv('DB_PASS'     , None)
     DB_HOST     = os.getenv('DB_HOST'     , None)
     DB_PORT     = os.getenv('DB_PORT'     , None)
+
     # db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
     db_name = DB_NAME
     db_user = DB_USERNAME
-    db_password = DB_PASS
+    db_password = DB_PASS.replace('@', '%40')
     db_host = DB_HOST
     db_port = DB_PORT
     conStr = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'

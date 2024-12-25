@@ -41,12 +41,13 @@ def add_wishlist(request):
             data = json.loads(request.body)
             symbol = data.get('symbol')
             purpose = data.get('purpose')
-            target_buy_price = data.get('target_buy_price')
-            target_sell_stop = data.get('target_sell_stop')
-            target_sell_limit = data.get('target_sell_limit')
-            list_on = data.get('list_on')
-            is_filled = data.get('is_filled')
-            quantity= data.get('quantity')
+
+            # target_buy_price = data.get('target_buy_price')
+            # target_sell_stop = data.get('target_sell_stop')
+            # target_sell_limit = data.get('target_sell_limit')
+            # list_on = data.get('list_on')
+            # is_filled = data.get('is_filled')
+            # quantity= data.get('quantity')
 
             if not symbol:                
                 return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
@@ -58,9 +59,14 @@ def add_wishlist(request):
 
             try:
                 portfolio = Wishlist.objects.create(
-                    symbol=symbol_martet, quantity=quantity, target_buy_price=target_buy_price,
-                    target_sell_stop=target_sell_stop,is_filled=is_filled, target_sell_limit=target_sell_limit,
-                    list_on=list_on , add_by=user)
+                    symbol=symbol_martet,
+                    # quantity=quantity,
+                    # target_buy_price=target_buy_price,
+                    # target_sell_stop=target_sell_stop,
+                    # is_filled=is_filled,
+                    # target_sell_limit=target_sell_limit,
+                    # list_on=list_on ,
+                    add_by=user)
                 return JsonResponse({'success': True, 'portfolio_id': portfolio.pk})
             except Exception as e:
                 print(e.args)
