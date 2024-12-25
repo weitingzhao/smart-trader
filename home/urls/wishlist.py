@@ -6,17 +6,11 @@ urlpatterns = [
 
     ####### wishlist.wishlist_overview #######
     # Wishlist Overview -> Default
-    path(
-        'wishlist_overview/',
-        wishlist.wishlist_overview.default,
-        name='wishlist_overview'),
+    path('wishlist_overview/', wishlist.wishlist_overview.default, name='wishlist_overview'),
 
     ####### wishlist.position_sizing #######
     # Saved Screeners -> Default
-    path(
-        'position_sizing/',
-        wishlist.position_sizing.default,
-        name='position_sizing'),
+    path('position_sizing/', wishlist.position_sizing.default, name='position_sizing'),
 
     ####### wishlist.initial_positions #######
     # Screening Result -> Default
@@ -29,4 +23,5 @@ urlpatterns = [
         'wishlist_overview/add_wishlist/',
         wishlist.wishlist_overview.add_wishlist,
         name='add_wishlist'),
+    path('initial_positions/', wishlist.initial_positions.default, name='initial_positions'),
 ]

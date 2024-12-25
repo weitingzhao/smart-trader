@@ -369,109 +369,101 @@
               </div>
           </div>
           <div class="col-lg-5 col-md-12 mt-4 mt-lg-0">
-              <div class="card h-100">
-                  <div class="card-header pb-0 p-3">
-                    <div class="d-flex align-items-center">
-                      <h6 class="mb-0">Referrals</h6>
-                      <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="See which websites are sending traffic to your website">
-                        <i class="fas fa-info"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="card-body p-3">
-                    <div class="row">
-                      <div class="col-lg-5 col-12 text-center">
-                        <div class="chart mt-5">
-                          <canvas id="chart-doughnut" class="chart-canvas" height="200"></canvas>
-                        </div>
-                        <a class="btn btn-sm bg-gradient-secondary mt-4">See all referrals</a>
-                      </div>
-                      <div class="col-lg-7 col-12">
-                        <div class="table-responsive">
-                          <table class="table align-items-center mb-0">
-                            <tbody>
-                              <tr>
-                                <td>
-                                  <div class="d-flex px-2 py-1">
-                                    <div>
-                                      <img src="{% static 'assets/img/small-logos/logo-xd.svg' %}" class="avatar avatar-sm me-2" alt="logo_xd">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                      <h6 class="mb-0 text-sm">Adobe</h6>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                  <span class="text-xs font-weight-bold"> 25% </span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <div class="d-flex px-2 py-1">
-                                    <div>
-                                      <img src="{% static 'assets/img/small-logos/logo-atlassian.svg' %}" class="avatar avatar-sm me-2" alt="logo_atlassian">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                      <h6 class="mb-0 text-sm">Atlassian</h6>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                  <span class="text-xs font-weight-bold"> 3% </span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <div class="d-flex px-2 py-1">
-                                    <div>
-                                      <img src="{% static 'assets/img/small-logos/logo-slack.svg' %}" class="avatar avatar-sm me-2" alt="logo_slack">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                      <h6 class="mb-0 text-sm">Slack</h6>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                  <span class="text-xs font-weight-bold"> 12% </span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <div class="d-flex px-2 py-1">
-                                    <div>
-                                      <img src="{% static 'assets/img/small-logos/logo-spotify.svg' %}" class="avatar avatar-sm me-2" alt="logo_spotify">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                      <h6 class="mb-0 text-sm">Spotify</h6>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                  <span class="text-xs font-weight-bold"> 7% </span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <div class="d-flex px-2 py-1">
-                                    <div>
-                                      <img src="{% static 'assets/img/small-logos/logo-jira.svg' %}" class="avatar avatar-sm me-2" alt="logo_jira">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                      <h6 class="mb-0 text-sm">Jira</h6>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                  <span class="text-xs font-weight-bold"> 10% </span>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div class="card h-100">
+              <div class="card-header pb-0 p-3">
+                <div class="d-flex align-items-center">
+                  <h6 class="mb-0">Open Position by Category</h6>
+                  <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="See the consumption per room">
+                    <i class="fas fa-info"></i>
+                  </button>
+                </div>
               </div>
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-5 text-center">
+                    <div class="chart">
+                      <canvas id="chart-portfolio-category" class="chart-canvas" height="197"></canvas>
+                    </div>
+                    <h4 class="font-weight-bold mt-n8">
+                      <span>{% round_by_digits open_summary.category.total 0 '$ {0}' False %}</span>
+                      <span class="d-block text-body text-sm">Dollars</span>
+                    </h4>
+                  </div>
+                  <div class="col-7">
+                    <div class="table-responsive">
+                      <table class="table align-items-center mb-0">
+                        <tbody>
+                          <tr>
+                            <td>
+                              <div class="d-flex px-2 py-0">
+                                <span class="badge bg-gradient-primary me-3"> </span>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">Earning</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                              <span class="text-xs font-weight-bold">
+                                  {% round_by_digits open_summary.category.earning 0 '${0}' False %} -
+                                  {% round_by_digits open_summary.category.earning_pct 0 '{0}%' False %}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="d-flex px-2 py-0">
+                                <span class="badge bg-gradient-success me-3"> </span>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">After Breakout</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                              <span class="text-xs font-weight-bold">
+                                  {% round_by_digits open_summary.category.after_breakout 0 '${0}' False %} -
+                                  {% round_by_digits open_summary.category.after_breakout_pct 0 '{0}%' False %}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="d-flex px-2 py-0">
+                                <span class="badge bg-gradient-info me-3"> </span>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">Breaking Out</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                              <span class="text-xs font-weight-bold">
+                                  {% round_by_digits open_summary.category.breaking_out 0 '${0}' False %} -
+                                  {% round_by_digits open_summary.category.breaking_out_pct 0 '{0}%' False %}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="d-flex px-2 py-0">
+                                <span class="badge bg-gradient-secondary me-3"> </span>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">Before Breakout</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                              <span class="text-xs font-weight-bold">
+                                  {% round_by_digits open_summary.category.before_breakout 0 '${0}' False %} -
+                                  {% round_by_digits open_summary.category.before_breakout_pct 0 '{0}%' False %}
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
       </div>
 
@@ -1005,7 +997,7 @@
     let performanceChart;
     let benchmarkChart;
 
-        // Helper function to format values
+    // Helper function to format values
     function formatValue(value) {
         return value > 10000 ? (value / 1000).toFixed(1) + 'K' : value;
     }
@@ -1264,6 +1256,74 @@
     },
     });
 
+
+    // Chart Doughnut Consumption by room
+    var ctx1 = document.getElementById("chart-portfolio-category").getContext("2d");
+    var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
+
+    new Chart(ctx1, {
+      type: "doughnut",
+      data: {
+        labels: ['Earning', 'Before Breakout', 'Breaking Out', 'After Breakout'],
+        datasets: [{
+          label: "Portfolio Category",
+          weight: 9,
+          cutout: 90,
+          tension: 0.9,
+          pointRadius: 2,
+          borderWidth: 2,
+          backgroundColor: ['#ff667c', '#A8B8D8', '#21d4fd', '#98ec2d'],
+          data: [
+              {{ open_summary.category.earning }},
+              {{ open_summary.category.before_breakout }},
+              {{ open_summary.category.breaking_out }},
+              {{ open_summary.category.after_breakout }},
+          ],
+          fill: false
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+            },
+            ticks: {
+              display: false
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+            },
+            ticks: {
+              display: false,
+            }
+          },
+        },
+      },
+    });
 
 </script>
 
