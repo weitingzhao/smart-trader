@@ -14,5 +14,14 @@ urlpatterns = [
 
     ####### wishlist.initial_positions #######
     # Screening Result -> Default
+    path(
+        'initial_positions/',
+        wishlist.initial_positions.default,
+        name='initial_positions'),
+    # Account Settings -> Add Portfolio
+    path(
+        'wishlist_overview/add_wishlist/',
+        wishlist.wishlist_overview.add_wishlist,
+        name='add_wishlist'),
     path('initial_positions/', wishlist.initial_positions.default, name='initial_positions'),
 ]
