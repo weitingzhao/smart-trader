@@ -8,10 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 import decimal
 from sqlalchemy import create_engine
 from django.conf import settings
+from dotenv import load_dotenv
+import os
 from django.db.utils import (
     DEFAULT_DB_ALIAS
 )
 
+load_dotenv()
 
 @csrf_exempt
 def fetching(request):
@@ -204,12 +207,18 @@ def fetching(request):
 
 
 def conStr_sqlalchemy():
-    db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
-    db_name = db_config['NAME']
-    db_user = db_config['USER']
-    db_password = db_config['PASSWORD']
-    db_host = db_config['HOST']
-    db_port = db_config['PORT']
+    DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
+    DB_NAME     = os.getenv('DB_NAME'     , None)
+    DB_USERNAME = os.getenv('DB_USERNAME' , None)
+    DB_PASS     = os.getenv('DB_PASS'     , None)
+    DB_HOST     = os.getenv('DB_HOST'     , None)
+    DB_PORT     = os.getenv('DB_PORT'     , None)
+    # db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
+    db_name = DB_NAME
+    db_user = DB_USERNAME
+    db_password = DB_PASS
+    db_host = DB_HOST
+    db_port = DB_PORT
     conStr = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
     return conStr
 
