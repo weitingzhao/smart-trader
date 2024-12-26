@@ -2,7 +2,7 @@ from backtrader_plotting.bokeh.datatable import ColummDataType
 
 
 def datatable(self):
-    cols1 = [['Year', ColummDataType.STRING], ['Return', ColummDataType.FLOAT]]
+    cols1 = [['Period', ColummDataType.STRING], ['Return', ColummDataType.FLOAT]]
 
     if getattr(self, 'ret', None) is None:
         # analyzer is only filled on 'stop'. So empty in live mode

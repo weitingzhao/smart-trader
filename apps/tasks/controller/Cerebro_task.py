@@ -34,12 +34,25 @@ class CerebroTask(BaseTask):
 
     def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
         if script_name == 'Test Daily':
-            run_cerebro('DAVE', '2024-01-01')
+            run_cerebro_strategy('DAVE', '2024-01-01')
 
 
+def run_cerebro_strategy(symbol, cut_over):
+    cerebro = init_cerebro(symbol, cut_over)
+    cerebro.addstrategy(TestStrategy, map_period=13)
+    # Run over everything
+    results = cerebro.run(optreturn=True)
+    return plot_cerebro(cerebro, results)
 
-def run_cerebro(symbol, cut_over):
+def opt_cerebro_strategy(symbol, cut_over):
+    cerebro = init_cerebro(symbol, cut_over)
+    cerebro.optstrategy(TestStrategy, map_period=range(7,15,1))
+    # Run over everything
+    results = cerebro.run(optreturn=True)
+    opt_cerebro(cerebro, results)
 
+
+def init_cerebro(symbol, cut_over):
     stock_data = (MarketStockHistoricalBarsByDay.objects
                   .filter(symbol=symbol, time__gte=cut_over).order_by('time'))
 
@@ -54,14 +67,66 @@ def run_cerebro(symbol, cut_over):
     # Create a cerebro entity
     cerebro = bt.Cerebro() #stdstats=False
 
-    # Add a strategy
-    # strats = cerebro.optstrategy(TestStrategy, map_period=range(10, 31))
-
-    strats = cerebro.addstrategy(TestStrategy)
-
+    # Add the Data Feed to Cerebro
     data = bt.feeds.PandasData(dataname=stock_data_df)
     data._name = f"{symbol}_{cut_over}"
+    cerebro.adddata(data)
+    # Set our desired cash start
+    cerebro.broker.setcash(1000.0)
+    # Add a FixedSize sizer according to the stake
+    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
+    # Set the Commission - 0.1% ... divide by 100 to remove the %
+    cerebro.broker.setcommission(commission=0.001)
+    # Add the Analyzers
+    cerebro.addanalyzer(bt.analyzers.SQN)
+    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer)  # visualize the drawdown evol
+    cerebro.addobserver(bt.observers.DrawDown)  # visualize the drawdown evol
 
+    return cerebro
+
+def plot_cerebro(cerebro, results):
+
+    st0 = results[0]
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+        for alyzer in st0.analyzers:
+            alyzer.print()
+    analysis_result = output.getvalue()
+    output.close()
+
+    # Print out the starting conditions
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+    # Save the plot as an image
+    # Plot the result
+    bokeh = Bokeh(
+        style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
+    cerebro.plot(bokeh, iplot=False)
+    plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
+
+    return analysis_result, plot
+
+def opt_cerebro(cerebro, results):
+    # output = io.StringIO()
+    # with contextlib.redirect_stdout(output):
+    #     for alyzer in st0.analyzers:
+    #         alyzer.print()
+    # analysis_result = output.getvalue()
+    # output.close()
+
+    # Print out the starting conditions
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+    # Optimization Browser
+    b = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
+    browser = OptBrowser(b, results)
+    browser.start()
+
+
+
+def get_data_csv_example():
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     # modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -74,53 +139,7 @@ def run_cerebro(symbol, cut_over):
     #     # Do not pass values after this date
     #     todate=datetime.datetime(2000, 12, 31),
     #     reverse=False)
-
-    # Add the Data Feed to Cerebro
-    cerebro.adddata(data)
-
-    # Set our desired cash start
-    cerebro.broker.setcash(1000.0)
-
-    # Add a FixedSize sizer according to the stake
-    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
-
-    # Set the Commission - 0.1% ... divide by 100 to remove the %
-    cerebro.broker.setcommission(commission=0.001)
-
-    # Add the Analyzers
-    cerebro.addanalyzer(bt.analyzers.SQN)
-    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer)  # visualize the drawdown evol
-    cerebro.addobserver(bt.observers.DrawDown)  # visualize the drawdown evol
-
-    # Run over everything
-    results = cerebro.run()
-    st0 = results[0]
-
-
-    output = io.StringIO()
-    with contextlib.redirect_stdout(output):
-        for alyzer in st0.analyzers:
-            alyzer.print()
-    analysis_result = output.getvalue()
-    output.close()
-
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    # tframes = dict(
-    #     days=bt.TimeFrame.Days,
-    #     weeks=bt.TimeFrame.Weeks,
-    #     months=bt.TimeFrame.Months,
-    #     years=bt.TimeFrame.Years)
-    # Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Save the plot as an image
-    bokeh = Bokeh(style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
-    cerebro.plot(bokeh, iplot=False)
-    plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
-
-    return analysis_result, plot
-
+    pass
 
 class TestStrategy(bt.Strategy):
     params = (

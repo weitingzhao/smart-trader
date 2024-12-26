@@ -29,6 +29,8 @@ that accepts these same parameters.
         {%if show_headline %}
             <div id="headline">Backtrader Backtesting Results ({{ now }})</div>
         {%endif%}
+
         {{ plot_div|indent(8) }}
+
         {{ plot_script|indent(8) }}
 

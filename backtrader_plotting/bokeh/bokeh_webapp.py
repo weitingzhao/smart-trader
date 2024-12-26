@@ -13,7 +13,7 @@ from backtrader_plotting.bokeh import utils
 
 
 class BokehWebapp:
-    def __init__(self, title, html_template, scheme, model_factory_fnc, on_session_destroyed=None, port=80):
+    def __init__(self, title, html_template, scheme, model_factory_fnc, on_session_destroyed=None, port=8098):
         self._title = title
         self._html_template = html_template
         self._scheme = scheme

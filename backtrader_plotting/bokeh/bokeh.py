@@ -433,9 +433,7 @@ class Bokeh(metaclass=bt.MetaParams):
                             startidx: int = 0):
         """startidx: index number to write into the dataframe for the index column"""
         strategydf = pd.DataFrame()
-
         master_clock = build_master_clock(strategy, start, end)
-
         start, end = get_strategy_start_end(strategy, start, end)
 
         if num_back is None:
@@ -456,18 +454,14 @@ class Bokeh(metaclass=bt.MetaParams):
         for data in strategy.datas:
             source_id = get_source_id(data)
             df_data = convert_to_pandas(master_clock, data, start, end, source_id)
-
             strategydf = strategydf.join(df_data)
-
             df_colors = Figure.build_color_lines(df_data, self.p.scheme, col_open=source_id + 'open', col_close=source_id + 'close', col_prefix=source_id)
             strategydf = strategydf.join(df_colors)
 
         for obj in itertools.chain(strategy.getindicators(), strategy.getobservers()):
             for lineidx, line, source_id in get_lines(obj):
                 dataline = line.plotrange(start, end)
-
                 plottype = get_plottype(obj, lineidx)
-
                 line_clk = get_clock_line(obj).plotrange(start, end)
                 dataline = convert_to_master_clock(dataline, line_clk, master_clock, forward_fill=plottype == PlotType.LINE)
                 strategydf[source_id] = dataline

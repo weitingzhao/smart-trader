@@ -6,7 +6,7 @@ from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
-from apps.tasks.controller.Cerebro_task import run_cerebro
+from apps.tasks.controller import Cerebro_task as cerebro
 
 instance = Logic()
 
@@ -23,7 +23,10 @@ def default(request, symbol, cut_over):
     if not symbol:
         return JsonResponse({'success': False, 'error': 'Symbol not provided'}, status=400)
 
-    analysis_result, plot  =  run_cerebro(symbol, cut_over)
+    analysis_result, plot  =  cerebro.run_cerebro_strategy(symbol, cut_over)
+
+    # cerebro.opt_cerebro_strategy(symbol, cut_over)
+
 
     return render(
         request=request,
