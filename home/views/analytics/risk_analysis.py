@@ -23,7 +23,7 @@ def default(request, symbol, cut_over):
     if not symbol:
         return JsonResponse({'success': False, 'error': 'Symbol not provided'}, status=400)
 
-    analysis_result, chart =   run_cerebro(symbol, cut_over)
+    analysis_result, plot  =  run_cerebro(symbol, cut_over)
 
     return render(
         request=request,
@@ -32,5 +32,5 @@ def default(request, symbol, cut_over):
             'parent': 'analytics',
             'segment': 'risk_analysis',
             'analysis_result': analysis_result,
-            'chart': chart,
+            'plot': plot
         })

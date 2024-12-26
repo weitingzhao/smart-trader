@@ -19,6 +19,13 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/tasks_logs" />
       <excludeFolder url="file://$MODULE_DIR$/tar_docker" />
+      <excludeFolder url="file://$MODULE_DIR$/media/django-import-export-celery-import-jobs" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/admin" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/assets" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/django_quill" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/import_export" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/notifications" />
+      <excludeFolder url="file://$MODULE_DIR$/staticfiles/rest_framework" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -13,6 +13,8 @@ from django_celery_results.models import TaskResult
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from backtrader_plotting import Bokeh,OptBrowser
+from backtrader_plotting.schemes import Tradimo
 
 class CerebroTask(BaseTask):
 
@@ -58,6 +60,7 @@ def run_cerebro(symbol, cut_over):
     strats = cerebro.addstrategy(TestStrategy)
 
     data = bt.feeds.PandasData(dataname=stock_data_df)
+    data._name = f"{symbol}_{cut_over}"
 
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
@@ -112,23 +115,11 @@ def run_cerebro(symbol, cut_over):
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Save the plot as an image
-    # fig = cerebro.plot()[0][0]  # Returns a Matplotlib figure
-    # buf = io.BytesIO()
-    # plt.savefig(buf, format='png')  # Save the figure to a buffer
-    # buf.seek(0)  # Move to the beginning of the buffer
-    # image_base64 = base64.b64encode(buf.read()).decode('utf-8')  # Convert to base64
-    # buf.close()
-    # plt.close(fig)  # Close the figure to free memory
+    bokeh = Bokeh(style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
+    cerebro.plot(bokeh, iplot=False)
+    plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
 
-    # Create your plot as usual
-    plt.plot([1, 2, 3], [4, 5, 6])
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')  # Save the figure to a buffer
-    buf.seek(0)  # Move to the beginning of the buffer
-    image_base64 = base64.b64encode(buf.read()).decode('utf-8')  # Convert to base64
-    buf.close()
-
-    return analysis_result, image_base64
+    return analysis_result, plot
 
 
 class TestStrategy(bt.Strategy):
