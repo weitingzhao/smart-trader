@@ -546,11 +546,11 @@ class Bokeh(metaclass=bt.MetaParams):
             else:
                 raise RuntimeError(f'Invalid parameter "output_mode" with value: {self.p.output_mode}')
 
+        if self.p.output_mode == 'memory':
+            return
         self._reset()
 
     def _reset(self):
-        if self.p.output_mode == 'memory':
-            return
         self.figurepages = []
         self._is_optreturn = False
     #  endregion

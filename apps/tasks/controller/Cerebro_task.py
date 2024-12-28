@@ -9,11 +9,13 @@ from .base_task import BaseTask
 from apps.common.models import *
 from django_celery_results.models import TaskResult
 
+from bokeh.document import Document
+from bokeh.plotting import figure, curdoc
 # import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from backtrader_plotting import Bokeh,OptBrowser
+from backtrader_plotting import Bokeh, OptBrowser, OptComponents
 from backtrader_plotting.schemes import Tradimo
 
 class CerebroTask(BaseTask):
@@ -42,14 +44,39 @@ def run_cerebro_strategy(symbol, cut_over):
     cerebro.addstrategy(TestStrategy, map_period=13)
     # Run over everything
     results = cerebro.run(optreturn=True)
-    return plot_cerebro(cerebro, results)
+
+    st0 = results[0]
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+        for alyzer in st0.analyzers:
+            alyzer.print()
+    analysis_result = output.getvalue()
+    output.close()
+
+    # Print out the starting conditions
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+    # Save the plot as an image
+    # Plot the result
+    bokeh = Bokeh(
+        style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
+    cerebro.plot(bokeh, iplot=False)
+    plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
+
+    return analysis_result, plot
+
 
 def opt_cerebro_strategy(symbol, cut_over):
     cerebro = init_cerebro(symbol, cut_over)
     cerebro.optstrategy(TestStrategy, map_period=range(7,15,1))
     # Run over everything
     results = cerebro.run(optreturn=True)
-    opt_cerebro(cerebro, results)
+    # Optimization Browser
+    b = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
+    return b, results
+    opt_components =  OptComponents(b, results)
+    return opt_components.attach_to_page(doc)
 
 
 def init_cerebro(symbol, cut_over):
@@ -83,46 +110,6 @@ def init_cerebro(symbol, cut_over):
     cerebro.addobserver(bt.observers.DrawDown)  # visualize the drawdown evol
 
     return cerebro
-
-def plot_cerebro(cerebro, results):
-
-    st0 = results[0]
-    output = io.StringIO()
-    with contextlib.redirect_stdout(output):
-        for alyzer in st0.analyzers:
-            alyzer.print()
-    analysis_result = output.getvalue()
-    output.close()
-
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Save the plot as an image
-    # Plot the result
-    bokeh = Bokeh(
-        style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
-    cerebro.plot(bokeh, iplot=False)
-    plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
-
-    return analysis_result, plot
-
-def opt_cerebro(cerebro, results):
-    # output = io.StringIO()
-    # with contextlib.redirect_stdout(output):
-    #     for alyzer in st0.analyzers:
-    #         alyzer.print()
-    # analysis_result = output.getvalue()
-    # output.close()
-
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Optimization Browser
-    b = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
-    browser = OptBrowser(b, results)
-    browser.start()
 
 
 

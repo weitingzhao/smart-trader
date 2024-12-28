@@ -52,7 +52,7 @@
     <div id="toastContainer"></div>
   </div>
 
-  <script src="{% static " assets/js/dark-theme.js" %}"></script>
+  <script src="{% static "assets/js/dark-theme.js" %}"></script>
   <script>
     if ('{{ request.user.profile.dark_mode }}' === 'True') {
       document.addEventListener('DOMContentLoaded', function () {
