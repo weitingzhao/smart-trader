@@ -16,7 +16,7 @@
                 <div class="col-auto my-auto">
                   <div class="h-100">
                       <h5 class="mb-1">
-                          Risk Analysis
+                          Strategy Optimize
                       </h5>
                       <p class="mb-0 font-weight-bold text-sm">
                           <a href="javascript:void(0);" onclick="refreshSymbol('{{ summary.holding_symbols }}','5d', '1d','{{ csrf_token }}');">
@@ -49,13 +49,8 @@
             </div>
         </div>
     </div>
-
     <div class="container-fluid py-4">
-        {{ plot|safe }}
-    </div>
-
-    <div class="container-fluid py-4">
-        {{ plot_script|safe }}
+        {{ script|safe }}
     </div>
 {% endblock content %}
 

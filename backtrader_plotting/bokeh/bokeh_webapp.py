@@ -10,7 +10,7 @@ from bokeh.io import show
 from jinja2 import Environment, PackageLoader
 
 from backtrader_plotting.bokeh import utils
-
+import logging
 
 class BokehWebapp:
     def __init__(self, title, html_template, scheme, model_factory_fnc, on_session_destroyed=None, port=8098):
@@ -47,6 +47,11 @@ class BokehWebapp:
         handler = FunctionHandler(fnc_make_document)
         app = Application(handler)
 
+        # Set log level to TRACE
+        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger('bokeh').setLevel(logging.DEBUG)
+
+
         if iplot and 'ipykernel' in sys.modules:
             show(app, notebook_url=notebook_url)
         else:
@@ -55,7 +60,7 @@ class BokehWebapp:
             print(f"Browser is launching at: http://localhost:{port}")
             threading.Timer(2, lambda: webbrowser.open(f'http://localhost:{port}')).start()
             
-            server = Server(apps, port=port, io_loop=ioloop)
+            server = Server(apps, port=port, io_loop=ioloop, allow_websocket_origin=["*"])
             if ioloop is None:
                 server.run_until_shutdown()
             else:
