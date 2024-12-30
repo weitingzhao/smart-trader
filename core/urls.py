@@ -33,6 +33,10 @@ handler500 = 'home.views.accounts.error_500'
 
 urlpatterns = [
 
+    path(r"boken", bokeh_views.index),
+    path("shapes", bokeh_views.shapes),
+    path("shapes/<str:arg1>/<str:arg2>", bokeh_views.shapes_with_args),
+
     # API
     path("api/", include("apps.api.urls")),
 
@@ -49,7 +53,7 @@ urlpatterns = [
     path('tasks/', include('apps.tasks.urls')),
 
     # Bokeh
-    path('bokeh/', include('apps.bokehs.urls')),
+    # path('bokeh/', include('apps.bokehs.urls')),
 
     path('i18n/', include('django.conf.urls.i18n')),
     path('accounts/', include('allauth.urls')),
@@ -67,4 +71,12 @@ urlpatterns += i18n_patterns(
 if not DEBUG:
     urlpatterns += debug_toolbar_urls()
 
+base_path = settings.BASE_DIR
+apps_path = base_path / "apps/bokehs/app"
 
+bokeh_apps = [
+    *directory(apps_path),
+    document("shape_viewer", bokeh_views.shape_viewer_handler),
+    autoload("shapes", bokeh_views.shape_viewer_handler),
+    autoload(r"shapes/(?P<arg1>[\w_\-]+)/(?P<arg2>[\w_\-]+)", bokeh_views.shape_viewer_handler_with_args),
+]
