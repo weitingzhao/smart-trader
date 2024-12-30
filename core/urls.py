@@ -25,6 +25,9 @@ from home import views
 from django.views.static import serve
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+from bokeh_django import autoload, directory, document, static_extensions
+from apps.bokehs import views as bokeh_views
+
 handler404 = 'home.views.accounts.error_404'
 handler500 = 'home.views.accounts.error_500'
 
@@ -45,6 +48,8 @@ urlpatterns = [
     # Tasks
     path('tasks/', include('apps.tasks.urls')),
 
+    # Bokeh
+    path('bokeh/', include('apps.bokehs.urls')),
 
     path('i18n/', include('django.conf.urls.i18n')),
     path('accounts/', include('allauth.urls')),
@@ -61,3 +66,5 @@ urlpatterns += i18n_patterns(
 
 if not DEBUG:
     urlpatterns += debug_toolbar_urls()
+
+

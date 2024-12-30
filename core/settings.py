@@ -22,6 +22,15 @@ except ImportError:
     from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
 
 
+from bokeh.settings import settings as bokeh_settings
+try:
+    bokeh_js_dir = bokeh_settings.bokehjs_path()
+except AttributeError:
+    # support bokeh versions < 3.4
+    bokeh_js_dir = bokeh_settings.bokehjsdir()
+
+
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -81,6 +90,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
 
+    # Bokeh
+    'daphne',
+    'channels',
+    'bokeh_django',
+
     'django_celery_results',
     'django_quill',
 
@@ -132,7 +146,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+# to utilize bokeh apps, need disable WSGI and use ASGI
+# WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Enable/Disable DEBUG Mode
 DEBUG = str2bool(os.environ.get('DEBUG'))
@@ -201,8 +217,17 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static'),
 ]
 
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    'bokeh_django.static.BokehExtensionFinder',
+)
+
+THEMES_DIR = BASE_DIR / "themes"
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+bokeh_settings.resources = 'server'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
