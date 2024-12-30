@@ -216,6 +216,7 @@ def conStr_sqlalchemy():
     DB_PASS     = os.getenv('DB_PASS'     , None)
     DB_HOST     = os.getenv('DB_HOST'     , None)
     DB_PORT     = os.getenv('DB_PORT'     , None)
+
     # db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
     db_name = DB_NAME
     db_user = DB_USERNAME
