@@ -6,6 +6,7 @@ import re
 import os
 import sys
 import tempfile
+from sys import meta_path
 from typing import List, Dict, Optional, Union, Tuple
 
 import backtrader as bt
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from bokeh.models import ColumnDataSource, Model
-from bokeh.models.widgets import Panel, Tabs
+from bokeh.models import Panel, Tabs, TabPanel
 from bokeh.layouts import column, gridplot
 
 from bokeh.embed import file_html
@@ -341,7 +342,7 @@ class Bokeh(metaclass=bt.MetaParams):
                          toolbar_location=self.p.scheme.toolbar_location,
                          sizing_mode=self.p.scheme.plot_sizing_mode,
                          )
-            panels.append(Panel(title=panel_title, child=g))
+            panels.append(TabPanel(title=panel_title, child=g))
             self._on_post_generate_tab(panel_title, objects)
 
         for tabname, figures in tabgroups:
@@ -369,8 +370,7 @@ class Bokeh(metaclass=bt.MetaParams):
         if not self._is_optreturn:
             assert figurepage.strategy is not None
             meta = Div(text=metadata.get_metadata_div(figurepage.strategy, self.p.scheme.strategysrc))
-            metapanel = Panel(child=meta, title="Meta")
-            panels.append(metapanel)
+            panels.append(TabPanel(title="Meta", child=meta))
 
         model = Tabs(tabs=panels)
 
@@ -380,7 +380,7 @@ class Bokeh(metaclass=bt.MetaParams):
         return model
     # endregion
 
-    def get_analyzer_panel(self, analyzers: List[bt.Analyzer]) -> Optional[Panel]:
+    def get_analyzer_panel(self, analyzers: List[bt.Analyzer]) -> Optional[TabPanel]:
         if len(analyzers) == 0:
             return None
 
@@ -391,7 +391,7 @@ class Bokeh(metaclass=bt.MetaParams):
             acolumns.append(column([table_header] + elements, sizing_mode='stretch_width'))
 
         root = gridplot(acolumns, ncols=self.p.scheme.analyzer_tab_num_cols, toolbar_options={'logo': None}, sizing_mode='stretch_width')
-        return Panel(child=root, title='Analyzers')
+        return TabPanel(title='Analyzers', child=root)
 
     def _output_stylesheet(self, template="basic.css.j2"):
         return generate_stylesheet(self.p.scheme, template)

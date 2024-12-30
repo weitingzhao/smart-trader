@@ -75,4 +75,4 @@ class TableGenerator(object):
                 columns.append(TableColumn(field=col_name, title=c[0], formatter=self._get_formatter(c[1])))
             column_height = len(table_columns[0]) * 25
             elems.append(DataTable(source=cds, columns=columns, index_position=None, height=column_height))
-        return Paragraph(text=title, style={'font-size': 'large'}), elems
+        return Paragraph(text=title, styles={'font-size': 'large'}), elems

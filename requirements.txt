@@ -102,7 +102,7 @@ sqlparse==0.5.1
 sseclient-py==1.8.0
 str2bool==1.1
 swapper==1.4.0
-TA-Lib==0.4.32
+TA-Lib==0.5.2
 tablib==3.7.0
 tenacity==9.0.0
 threadpoolctl==3.5.0

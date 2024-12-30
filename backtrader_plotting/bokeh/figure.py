@@ -9,8 +9,11 @@ import pandas as pd
 
 from bokeh.models import Span
 from bokeh.plotting import figure
-from bokeh.models import HoverTool, CrosshairTool, LinearAxis, DataRange1d, Renderer, ColumnDataSource, FuncTickFormatter, DatetimeTickFormatter
-from bokeh.models.formatters import NumeralTickFormatter
+from bokeh.models import (
+    HoverTool, CrosshairTool, LinearAxis, DataRange1d,
+    Renderer, ColumnDataSource, DatetimeTickFormatter
+)
+from bokeh.models.formatters import CustomJSTickFormatter, NumeralTickFormatter
 
 from backtrader_plotting.bokeh.utils import convert_color, sanitize_source_name, get_bar_width, convert_linestyle
 from backtrader_plotting.utils import get_plotlineinfo, get_tradingdomain, get_ind_areas, get_source_id
@@ -72,17 +75,17 @@ class Figure(object):
 
         # mechanism for proper date axis without gaps, thanks!
         # https://groups.google.com/a/continuum.io/forum/#!topic/bokeh/t3HkalO4TGA
-        f.xaxis.formatter = FuncTickFormatter(
+        f.xaxis.formatter = CustomJSTickFormatter(
             args=dict(
                 axis=f.xaxis[0],
-                formatter=DatetimeTickFormatter(days=[self._scheme.axis_tickformat_days],
-                                                hourmin=[self._scheme.axis_tickformat_hourmin],
-                                                hours=[self._scheme.axis_tickformat_hours],
-                                                minsec=[self._scheme.axis_tickformat_minsec],
-                                                minutes=[self._scheme.axis_tickformat_minutes],
-                                                months=[self._scheme.axis_tickformat_months],
-                                                seconds=[self._scheme.axis_tickformat_seconds],
-                                                years=[self._scheme.axis_tickformat_years],
+                formatter=DatetimeTickFormatter(days=self._scheme.axis_tickformat_days,
+                                                hourmin=self._scheme.axis_tickformat_hourmin,
+                                                hours=self._scheme.axis_tickformat_hours,
+                                                minsec=self._scheme.axis_tickformat_minsec,
+                                                minutes=self._scheme.axis_tickformat_minutes,
+                                                months=self._scheme.axis_tickformat_months,
+                                                seconds=self._scheme.axis_tickformat_seconds,
+                                                years=self._scheme.axis_tickformat_years,
                                                 ),
                 source=self._cds,
             ),
