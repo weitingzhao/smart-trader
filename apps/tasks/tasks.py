@@ -4,9 +4,6 @@ from .controller import *
 from celery.contrib.abortable import AbortableTask
 from celery import current_app
 
-from .controller.Cerebro_task import CerebroTask
-
-
 def get_tasks() -> List:
     return [
         no_01_fetching,
@@ -14,7 +11,6 @@ def get_tasks() -> List:
         no_03_indexing,
         no_04_screening,
         no_05_snapshot,
-        no_06_cerebro,
     ]
 
 def get_task_scripts(task_name) -> List:
@@ -28,8 +24,6 @@ def get_task_scripts(task_name) -> List:
         return ScreeningTask(None, None).job_scripts()
     elif task_name == "no_05_snapshot":
         return SnapshotTask(None, None).job_scripts()
-    elif task_name == "no_06_cerebro":
-        return CerebroTask(None, None).job_scripts()
 
 @app.task(bind=True, base=AbortableTask)
 def no_01_fetching(self, data):
@@ -54,11 +48,6 @@ def no_04_screening(self, data):
 @app.task(bind=True, base=AbortableTask)
 def no_05_snapshot(self, data):
     task = SnapshotTask(self, data)
-    task.run()
-
-@app.task(bind=True, base=AbortableTask)
-def no_06_cerebro(self, data):
-    task = CerebroTask(self, data)
     task.run()
 
 # Unregister the task

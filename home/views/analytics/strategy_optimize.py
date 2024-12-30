@@ -16,11 +16,11 @@ def default(request):
 
 
 
-    session = pull_session(url="http://localhost:8092/")
+    session = pull_session(url="http://localhost:8090/")
     script = server_session(
         model=None,
         session_id = session.id,
-        url = "http://localhost:8092/",
+        url = "http://localhost:8090/",
     )
 
 

@@ -1,8 +1,8 @@
+from cerebro.strategy_profile import StrategyProfile
 from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
-from apps.tasks.controller import Cerebro_task as cerebro
 
 from bokeh.plotting import figure
 from bokeh.embed import components
@@ -22,7 +22,7 @@ def default(request, symbol, cut_over):
         return JsonResponse({'success': False, 'error': 'Symbol not provided'}, status=400)
 
     # Part A. Run the default strategy
-    analysis_result, plot  =  cerebro.run_cerebro_strategy(symbol, cut_over)
+    analysis_result, plot = StrategyProfile().run(symbol, cut_over)
 
     return render(
         request=request,
