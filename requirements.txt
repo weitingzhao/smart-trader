@@ -25,7 +25,7 @@ cycler==0.12.1
 DateTime==5.5
 defusedxml==0.7.1
 diff-match-patch==20241021
-Django==5.1
+Django==5.1.4
 django-allauth==0.60.1
 django-api-generator==1.0.17
 django-author==1.2.0
