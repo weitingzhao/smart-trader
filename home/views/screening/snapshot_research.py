@@ -10,6 +10,9 @@ from sqlalchemy import create_engine
 from django.conf import settings
 from dotenv import load_dotenv
 import os
+
+from urllib.parse import quote 
+
 from django.db.utils import (
     DEFAULT_DB_ALIAS
 )
@@ -216,7 +219,7 @@ def conStr_sqlalchemy():
     # db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
     db_name = DB_NAME
     db_user = DB_USERNAME
-    db_password = DB_PASS
+    db_password = quote(DB_PASS)
     db_host = DB_HOST
     db_port = DB_PORT
     conStr = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
