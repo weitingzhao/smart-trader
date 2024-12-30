@@ -24,8 +24,6 @@ def get_task_scripts(task_name) -> List:
         return ScreeningTask(None, None).job_scripts()
     elif task_name == "no_05_snapshot":
         return SnapshotTask(None, None).job_scripts()
-    elif task_name ==  "run_import_job":
-        return [{"name":"None"}]
 
 @app.task(bind=True, base=AbortableTask)
 def no_01_fetching(self, data):
@@ -51,7 +49,6 @@ def no_04_screening(self, data):
 def no_05_snapshot(self, data):
     task = SnapshotTask(self, data)
     task.run()
-
 
 # Unregister the task
 current_app.tasks.unregister('import_export_celery.tasks.run_export_job')

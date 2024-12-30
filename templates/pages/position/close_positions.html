@@ -25,119 +25,97 @@
     </div>
     <div class="container-fluid py-3">
         <div class="row py-3">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                <div class="d-flex align-items-center">
-                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Realized Margin</p>
-                    &nbsp;&nbsp;&nbsp;
-                    <p class="text-sm mb-0">Gain / Loss</p>
-                </div>                  
-                <h5 class="font-weight-bolder mb-0">
-                    {%round_by_digits summary.realized.net 2 '$ {0}' False%}
-                    <span class="text-success text-sm font-weight-bolder">
-                        {%round_by_digits summary.realized.gain 0 '$ {0}' False%}&nbsp;
-                    </span>
-                    <span class="text-danger text-sm font-weight-bolder">
-                        {%round_by_digits summary.realized.lost 0 '$ {0}' False%}
-                    </span>
-                </h5>
+            <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                      <div class="row">
+                        <div class="col-8">
+                          <div class="numbers">
+                            <div class="d-flex align-items-center">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Realized Margin</p>
+                                &nbsp;&nbsp;&nbsp;
+                                <p class="text-sm mb-0">Gain / Loss</p>
+                            </div>
+                            <h5 class="font-weight-bolder mb-0">
+                                {%round_by_digits summary.realized.net 2 '$ {0}' False%}
+                                <span class="text-success text-sm font-weight-bolder">
+                                    {%round_by_digits summary.realized.gain 0 '$ {0}' False%}&nbsp;
+                                </span>
+                                <span class="text-danger text-sm font-weight-bolder">
+                                    {%round_by_digits summary.realized.lost 0 '$ {0}' False%}
+                                </span>
+                            </h5>
+                          </div>
+                        </div>
+                        <div class="col-4 text-end">
+                          <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                            <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
               </div>
-            </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                  <div class="d-flex align-items-center">
-                      <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Win Rate</p>
-                      &nbsp;&nbsp;&nbsp;
-                      <p class="text-sm mb-0">trade / invest / rate / days</p>
+            <div class="col-xl-5 col-sm-6 mb-xl-0 mb-4">
+              <div class="card">
+                <div class="card-body p-3">
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="numbers">
+                          <div class="d-flex align-items-center">
+                              <p class="text-sm mb-0 text-capitalize font-weight-bold">Realized Win Rate</p>
+                              &nbsp;&nbsp;&nbsp;
+                              <p class="text-sm mb-0">trade / invest / rate / days</p>
+                          </div>
+                        <h5 class="font-weight-bolder mb-0">
+                            {%round_by_digits summary.performance.rate 2 '{0}%' False%}
+                            <span class="text-success text-sm font-weight-bolder">
+                                {%round_by_digits summary.performance.win_trade 0 '{0}' False%}
+                                {%round_by_digits summary.performance.win_invest 0 '${0}' False%}
+                                {%round_by_digits summary.performance.win_percent 0 '{0}%' False%}
+                                {%round_by_digits summary.performance.win_avg_days 0 '{0}' False%}
+                            </span>
+                            <span class="text-danger text-sm font-weight-bolder">
+                                {%round_by_digits summary.performance.lose_trade 0 '{0}' False%}
+                                {%round_by_digits summary.performance.lose_invest 0 '${0}' False%}
+                                {%round_by_digits summary.performance.lose_percent 0 '{0}%' False%}
+                                {%round_by_digits summary.performance.lose_avg_days 0 '{0}' False%}
+                            </span>
+                        </h5>
+                      </div>
+                    </div>
+                    <div class="col-4 text-end">
+                      <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                        <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
+                      </div>
+                    </div>
                   </div>
-                <h5 class="font-weight-bolder mb-0">
-                    {%round_by_digits summary.performance.rate 2 '{0}%' False%}
-                    <span class="text-success text-sm font-weight-bolder">
-                        {%round_by_digits summary.performance.win_trade 0 '{0}' False%}
-                        {%round_by_digits summary.performance.win_invest 0 '${0}' False%}
-                        {%round_by_digits summary.performance.win_percent 0 '{0}%' False%}
-                        {%round_by_digits summary.performance.win_avg_days 0 '{0}' False%}
-                    </span>
-                    <span class="text-danger text-sm font-weight-bolder">
-                        {%round_by_digits summary.performance.lose_trade 0 '{0}' False%}
-                        {%round_by_digits summary.performance.lose_invest 0 '${0}' False%}
-                        {%round_by_digits summary.performance.lose_percent 0 '{0}%' False%}
-                        {%round_by_digits summary.performance.lose_avg_days 0 '{0}' False%}
-                    </span>
-                </h5>
+                </div>
               </div>
             </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
+            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+              <div class="card">
+                <div class="card-body p-3">
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="numbers">
+                        <p class="text-sm mb-0 text-capitalize font-weight-bold">xxx xxxx</p>
+                        <h5 class="font-weight-bolder mb-0">
+                          +x,xxx
+                          <span class="text-danger text-sm font-weight-bolder">-x%</span>
+                        </h5>
+                      </div>
+                    </div>
+                    <div class="col-4 text-end">
+                      <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                        <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">xxx xxxx</p>
-                <h5 class="font-weight-bolder mb-0">
-                  +x,xxx
-                  <span class="text-danger text-sm font-weight-bolder">-x%</span>
-                </h5>
-              </div>
-            </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-        <div class="col-xl-3 col-sm-6">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">xxx xxx</p>
-                <h5 class="font-weight-bolder mb-0">
-                  $xx,xxx
-                  <span class="text-success text-sm font-weight-bolder">+x%</span>
-                </h5>
-              </div>
-            </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
         <div class="row">
             <div id="detail_panel" class="col-lg-6 col-md-10 col-12">
                 <div class="nav-wrapper position-relative end-0">

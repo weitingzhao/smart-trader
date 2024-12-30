@@ -4,24 +4,15 @@ from home.views import analytics
 #all below path with [analytics]
 urlpatterns = [
 
-    ####### analytics.risk_analysis #######
+    ####### analytics.strategy_analysis #######
     # Wishlist Overview -> Default
-    path(
-        'risk_analysis/',
-        analytics.risk_analysis.default,
-        name='risk_analysis'),
+    path('strategy_analysis/<str:symbol>/<str:cut_over>/',analytics.strategy_analysis.default, name='strategy_analysis'),
 
-    ####### analytics.performance_analytics #######
+    ####### analytics.strategy_optimize #######
     # Saved Screeners -> Default
-    path(
-        'performance_analytics/',
-        analytics.performance_analytics.default,
-        name='performance_analytics'),
+    path('strategy_optimize/', analytics.strategy_optimize.default, name='strategy_optimize'),
 
     ####### analytics.market_comparison #######
     # Screening Result -> Default
-    path(
-        'market_comparison/',
-        analytics.market_comparison.default,
-        name='market_comparison'),
+    path('market_comparison/', analytics.market_comparison.default, name='market_comparison'),
 ]

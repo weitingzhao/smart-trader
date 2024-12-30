@@ -236,22 +236,22 @@
         <a data-bs-toggle="collapse" href="#analyticsPanel"
            class="nav-link {% if 'analytics' in parent %}active{% endif %}" aria-controls="analyticsPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-flask-vial fs-7 {% if 'risk_analysis' in segment or 'performance_analytics' in segment or 'market_comparison' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'strategy_analysis' in segment or 'strategy_optimize' in segment or 'market_comparison' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
           <span class="nav-link-text ms-1">Analytics</span>
         </a>
         <div class="collapse {% if 'analytics' in parent %}show{% endif %} " id="analyticsPanel">
           <ul class="nav ms-4 ps-3">
-              <li class="nav-item {% if 'risk_analysis' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'risk_analysis' in segment %}active{% endif %}" href="{% url 'risk_analysis' %}" target="_self">
+              <li class="nav-item {% if 'strategy_analysis' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'strategy_analysis' in segment %}active{% endif %}" href="{% url 'strategy_analysis' symbol='DAVE' cut_over='2024-05-01' %}" target="_self">
                       <span class="sidenav-mini-icon"> RA </span>
-                      <span class="sidenav-normal"> Risk Analysis </span>
+                      <span class="sidenav-normal"> Strategy Analysis </span>
                   </a>
               </li>
-              <li class="nav-item {% if 'performance_analytics' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'performance_analytics' in segment %}active{% endif %}" href="{% url 'performance_analytics' %}" target="_self">
+              <li class="nav-item {% if 'strategy_optimize' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'strategy_optimize' in segment %}active{% endif %}" href="{% url 'strategy_optimize' %}" target="_self">
                       <span class="sidenav-mini-icon"> PA </span>
-                      <span class="sidenav-normal"> Performance Analytics </span>
+                      <span class="sidenav-normal">Strategy Optimize</span>
                   </a>
               </li>
               <li class="nav-item {% if 'market_comparison' in segment %}active{% endif %}">
