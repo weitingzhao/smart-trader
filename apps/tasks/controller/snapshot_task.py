@@ -3,7 +3,8 @@ import os
 from typing import List
 from django.conf import settings
 from tablib import Dataset
-from logics.logic import Logic
+from .instance import Instance
+import business.logic as Logic
 from apps.common.models import *
 from django.core.files.base import ContentFile
 from django.utils import timezone
@@ -12,6 +13,7 @@ try:
     from django.utils.translation import ugettext_lazy as _
 except ImportError:
     from django.utils.translation import gettext_lazy as _  # Django 4.0.0 and more
+
 
 class SnapshotTask(BaseTask):
 
@@ -24,17 +26,17 @@ class SnapshotTask(BaseTask):
             {"name":"Import (oldest 20 or customize)"}
         ]
 
-    def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
+    def _worker_run(self, script_name: str, instance : Instance, task_result: TaskResult, meta: dict, args: str = None):
         if script_name == 'dry run (oldest 20 or customize)':
-            self.fetching_snapshot(dry_run=True, args=args)
+            self.fetching_snapshot(dry_run=True, instance=instance, args=args)
         elif script_name == 'Import (oldest 20 or customize)':
-            self.fetching_snapshot(dry_run=False, args=args)
+            self.fetching_snapshot(dry_run=False, instance=instance, args=args)
 
 
-    def fetching_snapshot(self,  dry_run, args: str = None):
+    def fetching_snapshot(self,  dry_run, instance : Instance, args: str = None):
 
         # Step 1.  Get the screening operations
-        operations = instance.service.fetching().screening().screening_snapshot(args)
+        operations = Logic.service().fetching().screening().screening_snapshot(args)
 
         # Initialize the count
         total_operations = 0
@@ -233,5 +235,4 @@ class SnapshotTask(BaseTask):
 #     return storage_class
 
 
-# Create your views here.
-instance = Logic()
+

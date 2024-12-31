@@ -1,5 +1,4 @@
 from cerebro.strategy_profile import StrategyProfile
-from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
@@ -8,7 +7,6 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource
 
-instance = Logic()
 
 def default(request, symbol, cut_over):
     user_id = request.user.id  # Assuming you have the user_id from the request

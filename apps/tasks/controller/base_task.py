@@ -3,11 +3,11 @@ import time
 import urllib.parse
 import os, datetime
 from typing import List
-from logics.logic import Logic
 from django.conf import settings
 from abc import ABC, abstractmethod
 from celery.utils.log import get_task_logger
-from logics.engines.notify_engine import Level
+from .instance import Instance
+from business.engines.notify_engine import Level
 from django.contrib.auth import get_user_model
 from django_celery_results.models import TaskResult
 
@@ -22,12 +22,12 @@ class BaseTask(ABC):
 
     @abstractmethod
     def _worker_run(
-            self, script_name: str, logic : Logic,
+            self, script_name: str, instance : Instance,
             task_result: TaskResult, meta: dict, args: str = None):
         """
         Abstract method that must be implemented in any subclass
         :param script_name: str
-        :param logic: Logic
+        :param instance: Instance
         :param task_result: TaskResult
         :param meta: dict
         :param args: str
@@ -95,7 +95,7 @@ class BaseTask(ABC):
         meta = self.data.get('data', None)
 
         # Step 2.a. Setup logic
-        logic = Logic("celery task", get_task_logger(__name__), need_progress= True)
+        instance = Instance("celery task", get_task_logger(__name__), need_progress= True)
 
         # Step 2.b. Base on status of task_result, prepare init load
         if args and "symbols" in args:   # if Symbols has values, means it's a direct pull
@@ -119,9 +119,9 @@ class BaseTask(ABC):
                     "initial": "true", "leftover": [], "done": []
                 }
             # Step 2.c Setup logic's progress & logger
-            logic.progress.init_progress(log_file)
+            instance.progress.init_progress(log_file)
 
-        logic.logger.info(
+        instance.logger.info(
             f"==[START] task_id:{self.celery.request.id} "
             f"leftover_count: {len(meta['leftover'])} done_count: {len(meta['done'])} "
             f"at {datetime.datetime.now()}=======>")
@@ -134,12 +134,12 @@ class BaseTask(ABC):
 
         # Step 4. (Main) Run Job
         def end_log(is_success: bool = False):
-            logic.logger.info(
+            instance.logger.info(
                 f"==[END] leftover_count: {len(meta['leftover'])} done_count: {len(meta['done'])} "
                 f"cost {(time.time() - self.start_time):2f} seconds=======>")
-            if logic.progress.log_flush is not None:
-                logic.progress.log_flush()
-                logic.engine.notify(user).send(
+            if instance.progress.log_flush is not None:
+                instance.progress.log_flush()
+                instance.engine().notify(user).send(
                     recipient=user,
                     verb=f'{script_name} Job {("done" if is_success else "failed")}!',
                     level=Level.INFO if is_success else Level.ERROR,
@@ -147,19 +147,19 @@ class BaseTask(ABC):
                                 f'onclick="showFileView(\'{log_file_name}\')">here</a> to view log'
                 )
             else:
-                logic.engine.notify(user).send(
+                instance.engine().notify(user).send(
                     recipient=user,
                     verb=f'{script_name} Job {("done" if is_success else "failed")}!',
                     level=Level.INFO if is_success else Level.ERROR,
                     description=f'job finished'
                 )
         try:
-            self._worker_run(script_name, logic, task_result, meta, args)
+            self._worker_run(script_name, instance, task_result, meta, args)
             # Done. sent notification
             end_log(is_success=True)
             return meta
         except Exception as e:
             # Error. sent notification
-            logic.logger.info(f"run task_id:{self.celery.request.id} Error: {str(e)}")
+            instance.logger.info(f"run task_id:{self.celery.request.id} Error: {str(e)}")
             end_log(is_success=False)
             raise Exception(meta)

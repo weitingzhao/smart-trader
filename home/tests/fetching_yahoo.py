@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from logics.logic import Logic
+import business.logic as Logic
 
 
 class FetchingYahooTestCase(TestCase):
@@ -8,8 +8,7 @@ class FetchingYahooTestCase(TestCase):
 
     def setUp(self):
         # Set up any initial data here, like creating stock tickers, etc.
-        logic = Logic()
-        self.stock_hist_bars_yahoo =  logic.service.fetching().stock_hist_bars_yahoo()
+        self.stock_hist_bars_yahoo =  Logic.service().fetching().stock_hist_bars_yahoo()
 
     def test_stock_hist_bars_yahoo(self):
 
@@ -32,8 +31,7 @@ class FetchingYahooTestCase(TestCase):
 
     # def setUp(self):
     #     # Set up any initial data here, like creating stock tickers, etc.
-    #     # instance = Logic()
-    #     # self.stock_hist_bars_yahoo =  instance.service.fetching().stock_hist_bars_yahoo()
+    #     # self.stock_hist_bars_yahoo =  Logic.service.fetching().stock_hist_bars_yahoo()
     #     pass
 
     # def test_create_product(self):

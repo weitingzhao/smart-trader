@@ -1,13 +1,10 @@
 import os
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from logics.logic import Logic
+import business.logic as Logic
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-
-# Create your views here.
-instance = Logic()
 
 def index(request):
     context = {
@@ -28,7 +25,7 @@ def i18n_view(request):
 @require_GET
 def auto_reminder(request):
     query = request.GET.get('query', '')
-    return JsonResponse(instance.service.loading().symbol().match_symbol(query, 20), safe=False)
+    return JsonResponse(Logic.service().loading().symbol().match_symbol(query, 20), safe=False)
 
 @require_GET
 def get_task_log(request):

@@ -1,20 +1,15 @@
-import pandas as pd
-from decimal import Decimal
 from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from home.templatetags.home_filter import order_price
-from django.db.models import (
-    F,Case, When, Value, IntegerField, Sum, Max,
-    FloatField, Q, BooleanField,Subquery, OuterRef)
-from logics.logic import Logic
+import business.logic as Logic
 from apps.common.models import *
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 
-# Create your views here.
-instance = Logic()
 
 def default(request):
+
+    a = Logic.engine()
+
     return render(
         request=request,
         template_name='pages/performance/portfolio_performance.html',
@@ -43,7 +38,7 @@ def get_balance_history(request):
         return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
 
     # Step 1. Main: Get the balance history
-    data_df = instance.research.position().Portfolio().balance_history(portfolio, as_of_date)
+    data_df = Logic.research().position().Portfolio().balance_history(portfolio, as_of_date)
 
     # Step 2. Extract: Prepare the data for the chart
     # Step 2.a chart
@@ -143,7 +138,7 @@ def get_balance_calendar(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    data_df = instance.research.position().Portfolio().balance_calendar(portfolio)
+    data_df = Logic.research().position().Portfolio().balance_calendar(portfolio)
 
     # Get the minimum date from balance_df
     initial_date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
@@ -204,7 +199,7 @@ def get_benchmark(request):
         return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
 
     # Step 1. Main: Get the balance history
-    data_df = instance.research.position().Portfolio().benchmark(portfolio, as_of_date)
+    data_df = Logic.research().position().Portfolio().benchmark(portfolio, as_of_date)
 
     # Step 2. Extract: Prepare the data for the chart
     # Step 2.a chart

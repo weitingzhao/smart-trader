@@ -1,5 +1,5 @@
 from typing import List
-from logics.logic import Logic
+from .instance import Instance
 from .base_task import BaseTask
 from django_celery_results.models import TaskResult
 
@@ -31,11 +31,11 @@ class FetchingTask(BaseTask):
             {"name":"symbols"},
         ]
 
-    def _worker_run(self, script_name: str, logic : Logic, task_result: TaskResult, meta: dict, args: str = None):
+    def _worker_run(self, script_name: str, instance : Instance, task_result: TaskResult, meta: dict, args: str = None):
 
         if script_name == 'stock-hist-bars':
-            logic.service.fetching().stock_hist_bars_yahoo().run(meta, task_result, args, is_test=False)
+            instance.service().fetching().stock_hist_bars_yahoo().run(meta, task_result, args, is_test=False)
         elif script_name == 'company-info':
-            logic.service.fetching().company_info_yahoo().run(meta, task_result, args, is_test=False)
+            instance.service().fetching().company_info_yahoo().run(meta, task_result, args, is_test=False)
         if script_name == 'symbols':
-            logic.service.fetching().symbol().fetching_symbol()
+            instance.service().fetching().symbol().fetching_symbol()

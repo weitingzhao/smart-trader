@@ -1,20 +1,10 @@
-import math
-
 from django.shortcuts import render
-from django.utils import timezone
-
 from apps.common.models import *
 from apps.common.models import Wishlist
 from apps.common.models import MarketSymbol
-from logics.logic import Logic
-from django.shortcuts import get_object_or_404
-import pandas as pd
-from pandas import DataFrame
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
-
-instance = Logic()
 
 
 def default(request):

@@ -2,17 +2,11 @@ import pandas as pd
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from home.forms.portfolio import *
-from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.db.models import F
 import json
-
-from logics.utilities.dates import Dates
-
-# Create your views here.
-instance = Logic()
+from business.utilities.dates import Dates
 
 
 def default(request):

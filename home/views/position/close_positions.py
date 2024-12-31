@@ -1,19 +1,8 @@
-import json
-import pandas as pd
-from decimal import Decimal
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from home.templatetags.home_filter import order_price
-from django.db.models import (
-    F,Case, When, Value, IntegerField, Sum, Min, Max,
-    FloatField, Q, BooleanField,Subquery, OuterRef)
 from apps.common.models import *
-from django.shortcuts import render, get_object_or_404
-from logics.logic import Logic
-import datetime
+from django.shortcuts import render
+import business.logic as Logic
 
-# Create your views here.
-instance = Logic()
 
 def default(request):
     user_id = request.user.id  # Assuming you have the user_id from the request
@@ -23,14 +12,14 @@ def default(request):
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
     ##### Calculate Open Position ##############
-    final_df = instance.research.position().Close().Position(portfolio)
+    final_df = Logic.research().position().Close().Position(portfolio)
 
     if final_df is None:
         summary = {}
         final_json = []
     else:
         ##### Calculate the summary tab ##############
-        summary = instance.research.position().Close().summary(final_df)
+        summary = Logic.research().position().Close().summary(final_df)
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
 

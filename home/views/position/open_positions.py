@@ -1,17 +1,12 @@
 import json
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta, date
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import business.logic as Logic
 from home.templatetags.home_filter import order_price
 from django.db.models import (Sum)
-from logics.logic import Logic
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
 
-# Create your views here.
-instance = Logic()
 
 def default(request):
 
@@ -22,14 +17,14 @@ def default(request):
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
     ##### Calculate Open Position ##############
-    final_df, max_date = instance.research.position().Open().Position(portfolio)
+    final_df, max_date = Logic.research().position().Open().Position(portfolio)
 
     if final_df is None:
         summary = {}
         final_json = []
     else:
         ##### Calculate the summary tab ##############
-        summary = instance.research.position().Open().summary(portfolio, final_df)
+        summary = Logic.research().position().Open().summary(portfolio, final_df)
         # Convert the DataFrame to JSON
         final_json = final_df.to_json(orient='records', date_format='iso')
 

@@ -1,16 +1,8 @@
-import pandas as pd
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from home.forms.portfolio import *
-from logics.logic import Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.db.models import F,Case, When, Value, IntegerField, Sum, FloatField, Q, BooleanField
 from django.db.models.functions import Cast
-import json
-
-from logics.utilities.dates import Dates
 
 
 def default(request, symbol):

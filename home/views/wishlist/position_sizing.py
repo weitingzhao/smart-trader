@@ -1,16 +1,14 @@
 import math
-
+import numpy as np
 from django.shortcuts import render
 from django.utils import timezone
-
 from apps.common.models import *
-from logics.logic import Logic
+import business.logic as Logic
 from django.shortcuts import get_object_or_404
 import pandas as pd
 from pandas import DataFrame
 from django.http import JsonResponse
 
-instance = Logic()
 
 def default(request):
 
@@ -154,7 +152,7 @@ def default(request):
 
 def getHistoricalData(symbols, timeframe='1D'):
     # Fetch historical data for the symbol and timeframe
-    data = instance.research.treading().get_stock_full_hist_bars(True, symbols)
+    data = Logic.research().treading().get_stock_full_hist_bars(True, symbols)
 
     # Convert the fetched rows into a DataFrame
     df = pd.DataFrame(data, columns=['symbol', 'date', 'close', 'high','low', 'volume'])

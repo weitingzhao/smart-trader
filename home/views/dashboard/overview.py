@@ -1,10 +1,9 @@
 import pandas as pd
-from logics.logic import Logic
+import business.logic as Logic
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
 
-instance = Logic()
 
 def default(request):
 
@@ -33,11 +32,11 @@ def default(request):
 
     # Step 3. Get widget data
     ##### Calculate Open Position ##############
-    open_final_df, max_date = instance.research.position().Open().Position(portfolio)
-    close_final_df = instance.research.position().Close().Position(portfolio)
+    open_final_df, max_date = Logic.research().position().Open().Position(portfolio)
+    close_final_df = Logic.research().position().Close().Position(portfolio)
 
-    open_summary = instance.research.position().Open().summary(portfolio, open_final_df)
-    close_summary = instance.research.position().Close().summary(close_final_df)
+    open_summary = Logic.research().position().Open().summary(portfolio, open_final_df)
+    close_summary = Logic.research().position().Close().summary(close_final_df)
 
     return render(
         request=request,
