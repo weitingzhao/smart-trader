@@ -29,6 +29,9 @@ from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
 
 
 from bokeh.themes import Theme
+
+from home.views.analytics.market_comparison import ray_sample_pi, ray_strategy_optimize
+
 theme = Theme(filename=join(settings.THEMES_DIR, "theme.yaml"))
 
 
@@ -40,20 +43,8 @@ def default(request, symbol, cut_over):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-
-    # Optimization Browser
-    # bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
-    # browser = OptBrowser(bokeh, result)
-    # model = browser.build_optresult_model()
-
-    # browser.start()
-
-    # result = StrategyOptimize().run(symbol, cut_over)
-
     # sample
     script = server_document(request.get_full_path())
-    # , arguments = {'symbol': symbol, 'cut_over': cut_over}
-
 
     return render(
         request=request,
@@ -66,26 +57,17 @@ def default(request, symbol, cut_over):
 
 @with_url_args
 def bokeh_optimize(doc: Document, symbol, cut_over) -> None:
+
+    # pi = ray_sample_pi()
     doc.theme = theme
 
-    # Deserialize the results from the blob file
-    result_file_path = os.path.join(settings.BASE_DIR, 'media', f'{symbol}_{cut_over}.pkl')
-    with open(result_file_path, 'rb') as result_file:
-        results = pickle.load(result_file)
+    results = ray_strategy_optimize(symbol, cut_over)
 
     # get strategy optimize request Assign the model to the global variable
     bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
     browser = OptBrowser(bokeh, results)
     model = browser.build_optresult_model()
     doc.add_root(model)
-
-    # sample ver 1.
-    # slider, plot = prepare_plot()
-    # doc.add_root(column(slider, plot))
-    # sample ver 2.
-    # panel = shape_viewer()
-    # panel.server_doc(doc)
-
 
 
 def prepare_plot():

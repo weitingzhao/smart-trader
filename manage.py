@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import ray
 
 if os.name == 'posix':
     import grp
@@ -25,4 +26,7 @@ def main():
 
 
 if __name__ == '__main__':
+    # init ray
+    ray.init()
+    # Django
     main()

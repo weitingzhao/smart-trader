@@ -1,4 +1,6 @@
 import pandas as pd
+from numpy.ma.core import get_data
+
 import backtrader as bt
 from apps.common.models import *
 
@@ -25,7 +27,7 @@ class cerebroBase():
         #     reverse=False)
         pass
 
-    def add_data(self, symbol, cut_over):
+    def get_data(self, symbol, cut_over):
         stock_data = (MarketStockHistoricalBarsByDay.objects
                       .filter(symbol=symbol, time__gte=cut_over).order_by('time'))
 
@@ -37,7 +39,11 @@ class cerebroBase():
         stock_data_df.set_index('datetime', inplace=True)
         stock_data_df = stock_data_df[['open', 'high', 'low', 'close', 'volume']]
 
+        return stock_data_df
 
+    def add_data(self, symbol, cut_over):
+
+        stock_data_df = get_data(symbol, cut_over)
 
         # Add the Data Feed to Cerebro
         self.data = bt.feeds.PandasData(dataname=stock_data_df)

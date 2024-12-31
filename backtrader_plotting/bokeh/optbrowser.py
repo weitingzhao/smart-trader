@@ -50,10 +50,8 @@ class OptBrowser:
         tab_columns = []
         for colname in data_dict.keys():
             formatter = NumberFormatter(format='0.000')
-
             if len(data_dict[colname]) > 0 and isinstance(data_dict[colname][0], int):
                 formatter = StringFormatter()
-
             tab_columns.append(TableColumn(field=colname, title=f'{colname}', sortable=False, formatter=formatter))
 
         # TODO: currently table size is hardcoded
