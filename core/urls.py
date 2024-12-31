@@ -81,7 +81,8 @@ urlpatterns +=([
 
 bokeh_apps = [
 
-    autoload(r"analytics/strategy_optimize/", views.analytics.strategy_optimize.bokeh_optimize),
+    autoload(r"analytics/strategy_optimize/(?P<symbol>[\w_\-]+)/(?P<cut_over>[\w_\-]+)",
+             views.analytics.strategy_optimize.bokeh_optimize),
 
     #below all sample
     *directory(apps_path),

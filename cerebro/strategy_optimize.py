@@ -1,7 +1,12 @@
 import io
 import contextlib
+import json
+import os
+import pickle
+
 from bokeh.document import Document
 from cerebro.base import cerebroBase
+from core import settings
 from .strategy.test_strategy_1st import TestStrategy
 
 from backtrader_plotting import Bokeh, OptBrowser, OptComponents
@@ -16,6 +21,7 @@ class StrategyOptimize(cerebroBase):
         super().__init__(stdstats)
 
     def run(self, symbol, cut_over):
+        result_file_path = os.path.join(settings.BASE_DIR, 'media', f'{symbol}_{cut_over}.pkl')
 
         self.add_data(symbol, cut_over)
 
@@ -27,12 +33,8 @@ class StrategyOptimize(cerebroBase):
         # Run over everything
         results = self.cerebro.run(optreturn=True)
 
-        # Optimization Browser
-        bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
+        # Save the result to a local file
+        with open(result_file_path, 'wb') as result_file:
+            pickle.dump(results, result_file)
 
-        browser = OptBrowser(bokeh, results)
-        model = browser.build_optresult_model()
-
-        # browser.start()
-
-        return model, results
+        return results

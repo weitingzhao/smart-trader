@@ -1,8 +1,13 @@
+import os
+import pickle
 from django.shortcuts import render
 
 from apps.bokeh.views import with_url_args
 from apps.common.models import *
 from django.http import JsonResponse
+
+from backtrader_plotting import Bokeh, OptBrowser
+from backtrader_plotting.schemes import Tradimo
 from cerebro.strategy_optimize import StrategyOptimize
 from bokeh.client import pull_session
 from bokeh.embed import server_session
@@ -11,10 +16,23 @@ import param
 from bokeh.plotting import figure
 import numpy as np
 import panel as pn
+
+from typing import Any
 from bokeh.embed import server_document
+from bokeh.io import curdoc
+from bokeh.layouts import column
+from bokeh.models import ColumnDataSource, Slider
+from bokeh.plotting import figure
+from os.path import join
+from django.conf import settings
+from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
 
 
-def default(request):
+from bokeh.themes import Theme
+theme = Theme(filename=join(settings.THEMES_DIR, "theme.yaml"))
+
+
+def default(request, symbol, cut_over):
     user_id = request.user.id  # Assuming you have the user_id from the request
 
     # Step 0. Get default portfolio
@@ -22,8 +40,15 @@ def default(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-    # m, result = StrategyOptimize().run(symbol, cut_over)
-    # model = m # Assign the model to the global variable
+
+    # Optimization Browser
+    # bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
+    # browser = OptBrowser(bokeh, result)
+    # model = browser.build_optresult_model()
+
+    # browser.start()
+
+    # result = StrategyOptimize().run(symbol, cut_over)
 
     # sample
     script = server_document(request.get_full_path())
@@ -39,10 +64,49 @@ def default(request):
             'script': script,
         })
 
-def bokeh_optimize(doc: Document) -> None:
-    panel = shape_viewer()
-    panel.server_doc(doc)
+@with_url_args
+def bokeh_optimize(doc: Document, symbol, cut_over) -> None:
+    doc.theme = theme
 
+    # Deserialize the results from the blob file
+    result_file_path = os.path.join(settings.BASE_DIR, 'media', f'{symbol}_{cut_over}.pkl')
+    with open(result_file_path, 'rb') as result_file:
+        results = pickle.load(result_file)
+
+    # get strategy optimize request Assign the model to the global variable
+    bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
+    browser = OptBrowser(bokeh, results)
+    model = browser.build_optresult_model()
+    doc.add_root(model)
+
+    # sample ver 1.
+    # slider, plot = prepare_plot()
+    # doc.add_root(column(slider, plot))
+    # sample ver 2.
+    # panel = shape_viewer()
+    # panel.server_doc(doc)
+
+
+
+def prepare_plot():
+    df = sea_surface_temperature.copy()
+    source = ColumnDataSource(data=df)
+
+    plot = figure(x_axis_type="datetime", y_range=(0, 25), y_axis_label="Temperature (Celsius)",
+                  title="Sea Surface Temperature at 43.18, -70.43")
+    plot.line("time", "temperature", source=source)
+
+    def callback(attr: str, old: Any, new: Any) -> None:
+        if new == 0:
+            data = df
+        else:
+            data = df.rolling(f"{new}D").mean()
+        source.data = dict(ColumnDataSource(data=data).data)
+
+    slider = Slider(start=0, end=30, value=0, step=1, title="Smoothing by N Days")
+    slider.on_change("value", callback)
+
+    return slider, plot
 
 def shape_viewer():
     shapes = [NGon(), Circle()]

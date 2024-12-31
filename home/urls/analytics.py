@@ -10,7 +10,7 @@ urlpatterns = [
 
     ####### analytics.strategy_optimize #######
     # Saved Screeners -> Default
-    path('strategy_optimize/', analytics.strategy_optimize.default, name='strategy_optimize'),
+    path('strategy_optimize/<str:symbol>/<str:cut_over>/', analytics.strategy_optimize.default, name='strategy_optimize'),
 
     ####### analytics.market_comparison #######
     # Screening Result -> Default
