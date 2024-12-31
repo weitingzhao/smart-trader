@@ -1,11 +1,14 @@
 import io
 import contextlib
-
+from bokeh.document import Document
 from cerebro.base import cerebroBase
 from .strategy.test_strategy_1st import TestStrategy
 
 from backtrader_plotting import Bokeh, OptBrowser, OptComponents
 from backtrader_plotting.schemes import Tradimo
+from jinja2 import Environment, PackageLoader
+from backtrader_plotting.bokeh import utils
+
 
 class StrategyOptimize(cerebroBase):
 
@@ -25,6 +28,11 @@ class StrategyOptimize(cerebroBase):
         results = self.cerebro.run(optreturn=True)
 
         # Optimization Browser
-        b = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
-        return b, results
+        bokeh = Bokeh(style='bar', scheme=Tradimo(), output_mode='memory')
 
+        browser = OptBrowser(bokeh, results)
+        model = browser.build_optresult_model()
+
+        # browser.start()
+
+        return model, results
