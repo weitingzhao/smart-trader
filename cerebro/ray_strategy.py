@@ -23,7 +23,6 @@ class RayStrategyProfile(cerebroBase):
         strategyObj = self.strategy
         self.cerebro.addstrategy(strategyObj, map_period=13)
 
-        a = self.get_strategy_source_code()
         # Run cerebro
         self.result = self.cerebro.run(optreturn=True)
         return self.result
@@ -44,7 +43,11 @@ class RayStrategyProfile(cerebroBase):
         # Save the plot as an image
         # Plot the result
         bokeh = Bokeh(
-            style='bar', plot_mode='single', scheme=Tradimo(), output_mode='memory')
+            # kwargs
+            style='bar', plot_mode='single',
+            # params
+            scheme=Tradimo(), output_mode='memory')
+
         self.cerebro.plot(bokeh, iplot=False)
         plot = bokeh.plot_html(bokeh.figurepages[0].model, template="smart_trader.html.j2")
 

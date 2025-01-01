@@ -114,3 +114,6 @@ def get_metadata_div(strategy: bt.Strategy, include_src=True) -> str:
         'html-classes': css_classes
     })
     return html
+
+def get_strategy_souce_code(strategy: bt.Strategy) -> str:
+    return inspect.getsource(strategy.__class__)

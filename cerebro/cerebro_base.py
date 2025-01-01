@@ -35,12 +35,6 @@ class cerebroBase():
     def set_strategy(self, strategy):
         self.strategy = strategy
 
-    def get_strategy_source_code(self):
-        if self.strategy is not None:
-            return inspect.getsource(self.strategy)
-        else:
-            return None
-
     def configure(self):
 
         # Set our desired cash start

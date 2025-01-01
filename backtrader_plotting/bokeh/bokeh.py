@@ -20,7 +20,7 @@ from bokeh.models import Panel, Tabs, TabPanel
 from bokeh.layouts import column, gridplot
 
 from bokeh.embed import file_html
-from bokeh.models.widgets import Div
+from bokeh.models.widgets import *
 from bokeh.resources import CDN
 from bokeh.util.browser import view
 
@@ -66,7 +66,7 @@ class Bokeh(metaclass=bt.MetaParams):
               ('filename', None),
               ('plotconfig', None),
               ('output_mode', 'show'),
-              ('show', True)
+              ('show', True),
               )
 
     def __init__(self, **kwargs):
@@ -371,6 +371,11 @@ class Bokeh(metaclass=bt.MetaParams):
             assert figurepage.strategy is not None
             meta = Div(text=metadata.get_metadata_div(figurepage.strategy, self.p.scheme.strategysrc))
             panels.append(TabPanel(title="Meta", child=meta))
+
+            running_code = TextAreaInput(value=metadata.get_strategy_souce_code(figurepage.strategy), rows=60, title="Strategy code:", width=800)
+            panels.append(TabPanel(title="Strategy", child=running_code))
+
+
 
         model = Tabs(tabs=panels)
 
