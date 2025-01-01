@@ -26,7 +26,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # init ray
-    ray.init()
     # Django
     main()

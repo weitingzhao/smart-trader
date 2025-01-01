@@ -15,6 +15,8 @@ from django.contrib import messages
 from dotenv import load_dotenv
 from str2bool       import str2bool
 import os, random, string
+# import configurations for editor
+from djangoeditorwidgets.config import init_web_editor_config
 
 try:
     from django.utils.translation import ugettext_lazy as _
@@ -94,6 +96,9 @@ INSTALLED_APPS = [
     'daphne',
     'channels',
     'bokeh_django',
+
+    # Online Editor
+    'djangoeditorwidgets',
 
     'django_celery_results',
     'django_quill',
@@ -228,6 +233,14 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 bokeh_settings.resources = 'cdn' #'server'
+
+# Web Editor Configuration
+WEB_EDITOR_DOWNLOAD, WEB_EDITOR_CONFIG = init_web_editor_config(
+    # set the directory where files are downloaded
+    BASE_DIR / "static_cdn",
+    # set static url prefix
+    STATIC_URL
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

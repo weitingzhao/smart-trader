@@ -15,4 +15,8 @@ urlpatterns = [
     ####### analytics.market_comparison #######
     # Screening Result -> Default
     path('market_comparison/', analytics.market_comparison.default, name='market_comparison'),
+    path('strategy_optimize/save_algo_strategy/',
+         analytics.market_comparison.save_algo_strategy, name='save_algo_strategy'),
+    path('strategy_optimize/load_algo_strategy/',
+         analytics.market_comparison.load_algo_strategy, name='load_algo_strategy'),
 ]

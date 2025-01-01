@@ -65,8 +65,18 @@ class StrategyCategorySnapshot(models.Model):
         return f"Strategy Category Snapshot: {self.strategy_category_id} - {self.snapshot_indicator_id}"
 
 
+class StrategyAlgoScript(models.Model):
 
+    # Primary Key
+    strategy_algo_script_id = models.AutoField(primary_key=True)
 
+    title = models.CharField(max_length=50)
+    text = models.TextField(null=True)
 
+    class Meta:
+        db_table = 'strategy_algo_script'
+
+    def __str__(self):
+        return f"Strategy Algo Script:  {self.title}"
 
 

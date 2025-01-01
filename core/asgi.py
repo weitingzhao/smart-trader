@@ -11,13 +11,15 @@ import os
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import threading
-from django.core.asgi import get_asgi_application
-from django.urls import path
+import ray
 from django.apps import apps
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
+
+# init ray
+ray.init()
 
 bokeh_app_config = apps.get_app_config('bokeh_django')
 

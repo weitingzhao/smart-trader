@@ -4,16 +4,36 @@ import pandas as pd
 import ray
 from django.shortcuts import render
 
-from cerebro.ray_actor import StrategyOptimizeRay
+from cerebro.ray_optimize import RayStrategyOptimize
 from cerebro.ray_sample_pi import ProgressActor, sampling_task
 from apps.common.models import *
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.shortcuts import render
+
+from home.forms.strategy_algo_script import StrategyAlgoScriptModelForm
+
 
 def default(request):
-    symbol = 'DAVE'
-    cut_over = '2024-05-01'
 
-    res = ray_strategy_optimize(symbol, cut_over)
+    if request.method == 'POST':
+        form = StrategyAlgoScriptModelForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            print(form.cleaned_data)
+            # Get title and text from form.cleaned_data
+            title = form.cleaned_data['title']
+            text = form.cleaned_data['text']
 
+            # Save to StrategyAlgoScript model
+            strategy_algo_script = StrategyAlgoScript(title=title, text=text)
+            strategy_algo_script.save()
+            # Redirect or show success message
+            return render(request,
+                          'pages/analytics/market_comparison.html',
+                          {'message': 'Form submitted successfully!'})
+    algo_script_form = StrategyAlgoScriptModelForm()
 
     return render(
         request=request,
@@ -21,19 +41,24 @@ def default(request):
         context= {
             'parent': 'analytics',
             'segment': 'market_comparison',
-            'result': res
+            'form': algo_script_form,
         })
 
-def ray_strategy_optimize(symbol, cut_over):
+@csrf_exempt
+def save_algo_strategy(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        content = data.get('content', '')
+        file_content, created = StrategyAlgoScript.objects.get_or_create(name='default_strategy.py')
+        file_content.content = content
+        file_content.save()
+        return JsonResponse({'success': True})
 
-    stock_data = (MarketStockHistoricalBarsByDay.objects
-                  .filter(symbol=symbol, time__gte=cut_over).order_by('time'))
-    stock_data_df = pd.DataFrame(list(stock_data.values()))
+def load_algo_strategy(request):
+    file_content = StrategyAlgoScript.objects.filter(name='default_strategy.py').first()
+    content = file_content.content if file_content else ''
+    return JsonResponse({'content': content})
 
-    # Convert the QuerySet to a DataFrame
-    strategyOptimize = StrategyOptimizeRay.remote()
-    res = ray.get(strategyOptimize.run.remote(symbol, cut_over, stock_data_df))
-    return res
 
 def ray_sample_pi():
     # Change this to match your cluster scale.

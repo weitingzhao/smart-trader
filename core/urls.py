@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -95,7 +96,3 @@ bokeh_apps = [
     autoload("bokeh/shapes/", bokeh_views.shape_viewer_handler),
     autoload(r"bokeh/shapes/(?P<arg1>[\w_\-]+)/(?P<arg2>[\w_\-]+)", bokeh_views.shape_viewer_handler_with_args),
 ]
-
-a = ""
-
-

@@ -50,11 +50,45 @@
         </div>
     </div>
     <div class="container-fluid py-4">
-        {{ result |safe }}
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
     </div>
 {% endblock content %}
 
 <!-- Specific JS goes HERE --> 
 {% block scripts %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs/editor/editor.main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs/loader.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            window.editor = monaco.editor.create(document.getElementById('container'), {
+                value: '',
+                language: 'python'
+            });
+        });
 
+        function saveAlgoStrategy() {
+            const content = window.editor.getValue();
+            fetch('/strategy_optimize/save_algo_strategy/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ content: content })
+            });
+        }
+
+        function loadAlgoStrategy() {
+            fetch('/strategy_optimize/load_algo_strategy/')
+                .then(response => response.json())
+                .then(data => {
+                    window.editor.setValue(data.content);
+                });
+        }
+    </script>
 {% endblock scripts %}

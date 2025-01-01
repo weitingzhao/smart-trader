@@ -1,30 +1,35 @@
-import io
 import contextlib
+import io
+import ray
 
-from cerebro.base import cerebroBase
+from backtrader_plotting import Bokeh
+from backtrader_plotting.schemes import Tradimo
+from cerebro.cerebro_base import cerebroBase
 from .strategy.test_strategy_1st import TestStrategy
 
-from backtrader_plotting import Bokeh, OptBrowser, OptComponents
-from backtrader_plotting.schemes import Tradimo
-
-class StrategyProfile(cerebroBase):
+# @ray.remote
+class RayStrategyProfile(cerebroBase):
 
     def __init__(self, stdstats=False):
         super().__init__(stdstats)
 
-    def run(self, symbol, cut_over):
 
-        self.add_data(symbol, cut_over)
-
+    def run(self):
+        # Prepare data
+        self._prepare_data()
+        # Configure
         self.configure()
-
         # Add Strategy
-        self.cerebro.addstrategy(TestStrategy, map_period=13)
+        strategyObj = self.strategy
+        self.cerebro.addstrategy(strategyObj, map_period=13)
 
-        # Run over everything
-        results = self.cerebro.run(optreturn=True)
+        a = self.get_strategy_source_code()
+        # Run cerebro
+        self.result = self.cerebro.run(optreturn=True)
+        return self.result
 
-        st0 = results[0]
+    def plot(self):
+        st0 = self.result[0]
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
             for alyzer in st0.analyzers:

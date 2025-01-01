@@ -1,36 +1,24 @@
-import os
-import pickle
+import ray
+import param
+import pandas as pd
+import numpy as np
+import panel as pn
+from typing import Any
+from os.path import join
+from django.conf import settings
+from bokeh.plotting import figure
+from bokeh.themes import Theme
 from django.shortcuts import render
-
 from apps.bokeh.views import with_url_args
 from apps.common.models import *
 from django.http import JsonResponse
-
+from bokeh.document import Document
+from bokeh.embed import server_document
 from backtrader_plotting import Bokeh, OptBrowser
 from backtrader_plotting.schemes import Tradimo
-from cerebro.strategy_optimize import StrategyOptimize
-from bokeh.client import pull_session
-from bokeh.embed import server_session
-from bokeh.document import Document
-import param
-from bokeh.plotting import figure
-import numpy as np
-import panel as pn
-
-from typing import Any
-from bokeh.embed import server_document
-from bokeh.io import curdoc
-from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, Slider
-from bokeh.plotting import figure
-from os.path import join
-from django.conf import settings
+from cerebro.ray_optimize import RayStrategyOptimize
 from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
-
-
-from bokeh.themes import Theme
-
-from home.views.analytics.market_comparison import ray_sample_pi, ray_strategy_optimize
 
 theme = Theme(filename=join(settings.THEMES_DIR, "theme.yaml"))
 
@@ -54,6 +42,21 @@ def default(request, symbol, cut_over):
             'segment': 'strategy_optimize',
             'script': script,
         })
+
+def ray_strategy_optimize(symbol, cut_over):
+    # Step 1.  Prepare data as Data Frame
+    stock_data = (MarketStockHistoricalBarsByDay.objects
+                  .filter(symbol=symbol, time__gte=cut_over).order_by('time'))
+    stock_data_df = pd.DataFrame(list(stock_data.values()))
+
+    # Step 2. Use Ray run backtrader  (and must use Ray, otherwise multi-threading will cause error)
+    strategyOptimize = RayStrategyOptimize.remote(stdstats=False)
+    strategyOptimize.set_data.remote(data_name = f'{symbol}-{cut_over}', data_df=stock_data_df)
+    return ray.get(strategyOptimize.run.remote())
+
+
+
+
 
 @with_url_args
 def bokeh_optimize(doc: Document, symbol, cut_over) -> None:
