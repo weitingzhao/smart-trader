@@ -3,14 +3,27 @@ from .celery import app
 from .controller import *
 from celery.contrib.abortable import AbortableTask
 from celery import current_app
+import os
+from celery import Celery
+
+# set the default Django settings module for the 'celery' program.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+app = Celery('apps.tasks')
+
+# use django settings for celery
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+# auto discover tasks
+app.autodiscover_tasks()
+
 
 def get_tasks() -> List:
     return [
-        no_01_fetching,
-        no_02_calculating,
-        no_03_indexing,
-        no_04_screening,
-        no_05_snapshot,
+        {"name": "no_01_fetching", "queue": "fetching_queue"},
+        {"name": "no_02_calculating", "queue": "default_queue"},
+        {"name": "no_03_indexing", "queue": "default_queue"},
+        {"name": "no_04_screening", "queue": "default_queue"},
+        {"name": "no_05_snapshot", "queue": "default_queue"},
     ]
 
 def get_task_scripts(task_name) -> List:

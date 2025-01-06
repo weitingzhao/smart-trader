@@ -1,8 +1,12 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
+from sqlalchemy.dialects.oracle.dictionary import all_tables
+
 from apps.common.models import *
 from home.forms.portfolio import UserStaticSettingForm
-
+from django.db.models import (
+    F,Case, When, Value, IntegerField,
+    Sum, Max,Min, Q, BooleanField,Subquery, OuterRef)
 
 def default(request):
     try:
@@ -11,14 +15,39 @@ def default(request):
     except UserStaticSetting.DoesNotExist:
         form_static_risk = UserStaticSettingForm()
 
-    # Get symbols from Holding model
-    holding_symbols = list(Holding.objects.values_list('symbol', flat=True))
+    index = ['^IXIC', '^DJI', '^GSPC', 'NQ=F']
 
-    # Add additional symbols
-    additional_symbols = ['^IXIC', '^DJI', '^GSPC', 'NQ=F']
-    holding_symbols.extend(additional_symbols)
+    # Get Portfolio Holding Symbols
+    user_id = request.user.id  # Assuming you have the user_id from the request
+    portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+    if portfolio:
+        holdings = Holding.objects.filter(portfolio=portfolio)
+        transaction = (
+            Transaction.objects.filter(holding__in=holdings)
+            .annotate(
+                trade_is_finished=Subquery(
+                    Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
+                )
+            )
+           .filter(Q(trade_is_finished=False) | Q(trade_is_finished__isnull=True))
+           .annotate(amount=F('quantity_final') * F('price_final'))
+           .values('holding_id')
+           .annotate(
+                init_tran_id = Min('transaction_id'),
+                quantity=Sum('quantity_final'),
+                invest=Sum('amount'),
+                price=Sum('amount') / Sum('quantity_final')
+           ))
 
-    symbols = ','.join(holding_symbols)
+        holding_ids = transaction.values_list('holding_id', flat=True)
+        holdings  = list(Holding.objects.filter(holding_id__in=holding_ids).values_list('symbol', flat=True))
+    else:
+        holdings = []
+    holdings.extend(index)
+
+    # Get All symbols
+    all_symbols = list(Holding.objects.values_list('symbol', flat=True))
+    all_symbols.extend(index)
 
     return render(
         request=request,
@@ -28,8 +57,11 @@ def default(request):
             'segment': 'risk_preferences',
             'static_risk_form': form_static_risk,
             'messages': messages.get_messages(request),
-            'holding_symbols': symbols,  # Add symbols to context,
-            'page_title': 'Risk Setting'  # title
+            'page_title': 'Risk Setting', # title
+
+            'index': ','.join(index),
+            'all_symbols': ','.join(all_symbols),
+            'holdings': ','.join(holdings),
         })
 
 

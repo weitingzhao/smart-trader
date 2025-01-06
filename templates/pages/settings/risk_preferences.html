@@ -148,7 +148,7 @@
                       </div>
                   </div>
               </div>
-                  <!--index settings-->
+                  <!--Index-->
                   <div class="card mt-4" id="index">
                       <div class="card-header">
                           <div class="row">
@@ -198,20 +198,20 @@
                                 </div>
                                 <div class="col-8">
                                   <label>Symbols</label>
-                                  <input type="text" class="form-control" id="index_input" placeholder="Enter symbols separated by commas" value="^IXIC,^DJI,^GSPC,NQ=F">
+                                  <input type="text" class="form-control" id="index_input" placeholder="Enter symbols separated by commas" value="{{ index }}">
                                 </div>
                             </div>
                       </div>
                   </div>
-                  <!--portfolio settings-->
+                  <!--Index & Open Position-->
                   <div class="card mt-4" id="portfolio">
                       <div class="card-header">
                           <div class="row">
                               <div class="col-2">
-                                  <h5>Portfolio data refresh</h5>
+                                  <h5>Index & Open</h5>
                               </div>
                               <div class="col-2">
-                                  <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask('portfolio_input','period_select', 'interval_select')">Refresh</button>
+                                  <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask('holding_input','holding_period_select', 'holding_interval_select')">Refresh</button>
                               </div>
                           </div>
                       </div>
@@ -219,7 +219,7 @@
                             <div class="row">
                                 <div class="col-2">
                                     <label>Period</label>
-                                    <select class="form-select" id="period_select">
+                                    <select class="form-select" id="holding_period_select">
                                         <option value="max" >max</option>
                                         <option value="1d">1d</option>
                                         <option value="5d" selected>5d</option>
@@ -235,7 +235,7 @@
                                 </div>
                                 <div class="col-2">
                                     <label>Interval</label>
-                                    <select class="form-select" id="interval_select">
+                                    <select class="form-select" id="holding_interval_select">
                                         <option value="1m">1m</option>
                                         <option value="2m">2m</option>
                                         <option value="5m">5m</option>
@@ -253,7 +253,62 @@
                                 </div>
                                 <div class="col-8">
                                   <label>Symbols</label>
-                                  <input type="text" class="form-control" id="portfolio_input" placeholder="Enter symbols separated by commas" value="{{ holding_symbols }}">
+                                  <input type="text" class="form-control" id="holding_input" placeholder="Enter symbols separated by commas" value="{{ holdings }}">
+                                </div>
+                            </div>
+                      </div>
+                  </div>
+                  <!--All Symbols-->
+                  <div class="card mt-4" id="portfolio">
+                      <div class="card-header">
+                          <div class="row">
+                              <div class="col-2">
+                                  <h5>All Symbols</h5>
+                              </div>
+                              <div class="col-2">
+                                  <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100" type="button" id="refreshButton" onclick="refreshTask('all_input','all_period_select', 'all_interval_select')">Refresh</button>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="card-body pt-0">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label>Period</label>
+                                    <select class="form-select" id="all_period_select">
+                                        <option value="max" >max</option>
+                                        <option value="1d">1d</option>
+                                        <option value="5d" selected>5d</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                        <option value="6mo">6mo</option>
+                                        <option value="1y">1y</option>
+                                        <option value="2y">2y</option>
+                                        <option value="5y">5y</option>
+                                        <option value="10y">10y</option>
+                                        <option value="ytd">ytd</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <label>Interval</label>
+                                    <select class="form-select" id="all_interval_select">
+                                        <option value="1m">1m</option>
+                                        <option value="2m">2m</option>
+                                        <option value="5m">5m</option>
+                                        <option value="15m">15m</option>
+                                        <option value="30m">30m</option>
+                                        <option value="60m">60m</option>
+                                        <option value="90m">90m</option>
+                                        <option value="1h">1h</option>
+                                        <option value="1d" selected>1d</option>
+                                        <option value="5d">5d</option>
+                                        <option value="1wk">1wk</option>
+                                        <option value="1mo">1mo</option>
+                                        <option value="3mo">3mo</option>
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                  <label>Symbols</label>
+                                  <input type="text" class="form-control" id="all_input" placeholder="Enter symbols separated by commas" value="{{ all_symbols }}">
                                 </div>
                             </div>
                       </div>

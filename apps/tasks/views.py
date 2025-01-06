@@ -46,13 +46,24 @@ def run_task(request, task_name):
     _script_name = request.POST.get("script_name")
 
     for task in celery_tasks.get_tasks():
-        if task.__name__ == task_name:
-            task.delay({
+        if task["name"] == task_name:
+            celery_task = getattr(celery_tasks, task_name)
+            data = {
                 "args": _args,
                 "user_id": request.user.id,
                 "script_name": _script_name,
                 "task_name": task_name
-            })
+            }
+            celery_task.apply_async(
+                args=[data],
+                queue=task["queue"],
+            )
+            # task.delay({
+            #     "args": _args,
+            #     "user_id": request.user.id,
+            #     "script_name": _script_name,
+            #     "task_name": task_name
+            # })
     time.sleep(1)  # Waiting for task status to update in db
     return redirect("tasks")
 
