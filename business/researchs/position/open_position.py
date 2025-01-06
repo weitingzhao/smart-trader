@@ -339,3 +339,6 @@ class OpenPosition(PositionBase):
         # # Retrieve the UserStaticSetting record for the given user_id
         # user_static_setting = get_object_or_404(UserStaticSetting, user_id=user_id)
         # expect_gain_risk_ratio = user_static_setting.expect_gain_risk_ratio
+
+
+
