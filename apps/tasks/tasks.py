@@ -3,18 +3,7 @@ from .celery import app
 from .controller import *
 from celery.contrib.abortable import AbortableTask
 from celery import current_app
-import os
-from celery import Celery
 
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-app = Celery('apps.tasks')
-
-# use django settings for celery
-app.config_from_object('django.conf:settings', namespace='CELERY')
-
-# auto discover tasks
-app.autodiscover_tasks()
 
 
 def get_tasks() -> List:

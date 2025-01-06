@@ -105,7 +105,7 @@ class OpenPosition(PositionBase):
         }
 
         # Part 1. holding_symbols
-        symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
+        symbols = self.get_portfolio_holding(portfolio)
         summary['holding_symbols'] = '|'.join(symbols)
 
         # Part 2. market value
@@ -138,6 +138,30 @@ class OpenPosition(PositionBase):
 
 
         return summary
+
+    def get_portfolio_holding(self, portfolio: Portfolio, extend_symbol = []) -> List:
+        holdings = Holding.objects.filter(portfolio=portfolio)
+        transaction = (
+            Transaction.objects.filter(holding__in=holdings)
+            .annotate(
+                trade_is_finished=Subquery(
+                    Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
+                )
+            )
+            .filter(Q(trade_is_finished=False) | Q(trade_is_finished__isnull=True))
+            .annotate(amount=F('quantity_final') * F('price_final'))
+            .values('holding_id')
+            .annotate(
+                init_tran_id=Min('transaction_id'),
+                quantity=Sum('quantity_final'),
+                invest=Sum('amount'),
+                price=Sum('amount') / Sum('quantity_final')
+            ))
+
+        holding_ids = transaction.values_list('holding_id', flat=True)
+        holdings = list(Holding.objects.filter(holding_id__in=holding_ids).values_list('symbol', flat=True))
+        holdings.extend(extend_symbol)
+        return holdings
 
     def get_holding_fundamentals(self, holdings_df: DataFrame) -> pd.DataFrame:
 

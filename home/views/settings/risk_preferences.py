@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from sqlalchemy.dialects.oracle.dictionary import all_tables
-
+import business.logic as Logic
 from apps.common.models import *
 from home.forms.portfolio import UserStaticSettingForm
 from django.db.models import (
@@ -21,29 +20,9 @@ def default(request):
     user_id = request.user.id  # Assuming you have the user_id from the request
     portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
     if portfolio:
-        holdings = Holding.objects.filter(portfolio=portfolio)
-        transaction = (
-            Transaction.objects.filter(holding__in=holdings)
-            .annotate(
-                trade_is_finished=Subquery(
-                    Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
-                )
-            )
-           .filter(Q(trade_is_finished=False) | Q(trade_is_finished__isnull=True))
-           .annotate(amount=F('quantity_final') * F('price_final'))
-           .values('holding_id')
-           .annotate(
-                init_tran_id = Min('transaction_id'),
-                quantity=Sum('quantity_final'),
-                invest=Sum('amount'),
-                price=Sum('amount') / Sum('quantity_final')
-           ))
-
-        holding_ids = transaction.values_list('holding_id', flat=True)
-        holdings  = list(Holding.objects.filter(holding_id__in=holding_ids).values_list('symbol', flat=True))
+        holdings = Logic.research().position().Open().get_portfolio_holding(portfolio, index)
     else:
         holdings = []
-    holdings.extend(index)
 
     # Get All symbols
     all_symbols = list(Holding.objects.values_list('symbol', flat=True))
