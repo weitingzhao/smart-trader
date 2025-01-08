@@ -13,6 +13,7 @@ def get_tasks() -> List:
         {"name": "no_03_indexing", "queue": "default_queue"},
         {"name": "no_04_screening", "queue": "default_queue"},
         {"name": "no_05_snapshot", "queue": "default_queue"},
+        {"name": "no_06_strategy_test", "queue": "strategy_test_queue"},
     ]
 
 def get_task_scripts(task_name) -> List:
@@ -26,6 +27,8 @@ def get_task_scripts(task_name) -> List:
         return ScreeningTask(None, None).job_scripts()
     elif task_name == "no_05_snapshot":
         return SnapshotTask(None, None).job_scripts()
+    elif task_name == "no_06_strategy_test":
+        return StrategyTestTask(None, None).job_scripts()
 
 @app.task(bind=True, base=AbortableTask)
 def no_01_fetching(self, data):
@@ -51,6 +54,13 @@ def no_04_screening(self, data):
 def no_05_snapshot(self, data):
     task = SnapshotTask(self, data)
     task.run()
+
+@app.task(bind=True, base=AbortableTask)
+def no_06_strategy_test(self, data):
+    task = StrategyTestTask(self, data)
+    task.run()
+
+
 
 # Unregister the task
 current_app.tasks.unregister('import_export_celery.tasks.run_export_job')

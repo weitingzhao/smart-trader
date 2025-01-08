@@ -313,10 +313,22 @@ class OpenPosition(PositionBase):
         max_date = final_df['date'].max()
         max_date = datetime.combine(max_date, datetime.min.time())
         max_date = timezone.make_aware(max_date, timezone.get_current_timezone())
-        today_transactions = Transaction.objects.filter(date=max_date, transaction_type=1)
+
+        # Filter today_transactions by max_date, transaction_type=1, and trade.is_finished=False
+        today_transactions = (
+            Transaction.objects.filter(
+                date=max_date,
+                transaction_type=1,
+                trade__is_finished=False
+            )
+            .values('holding_id')
+            .annotate(
+                today_quantity=Sum('quantity_final'),
+                today_price=Sum(F('quantity_final') * F('price_final')) / Sum('quantity_final')
+            )
+        )
         if today_transactions.exists():
-            today_transactions_df = pd.DataFrame(list(today_transactions.values('holding_id', 'quantity_final', 'price_final')))
-            today_transactions_df.rename(columns={'price_final': 'today_price', 'quantity_final': 'today_quantity'}, inplace=True)
+            today_transactions_df = pd.DataFrame(list(today_transactions))
             final_df = pd.merge(final_df, today_transactions_df, on='holding_id', how='left').fillna(0)
             final_df['delta'] = final_df['today_quantity'] * (final_df['bk_close'].astype(float) - final_df['today_price'].astype(float))
         else:

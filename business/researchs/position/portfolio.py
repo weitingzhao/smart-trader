@@ -251,6 +251,13 @@ class Portfolio(PositionBase):
         # Append filled records back to sell_order_df
         sell_order_df = pd.concat([sell_order_df, filled_records])
 
+        # Group by date and symbol, use max order_id row's status and fill_date, and sum baseline
+        sell_order_df = sell_order_df.sort_values('order_id').groupby(['date', 'symbol']).agg(
+            status=('status', 'last'),
+            fill_date=('fill_date', 'last'),
+            baseline=('baseline', 'last')
+        ).reset_index()
+
         return sell_order_df
 
 
