@@ -8,6 +8,7 @@ from django_celery_results.models import TaskResult
 from cerebro.ray_strategy import RayStrategyProfile
 from ...common.models import MarketStockHistoricalBarsByDay
 from cerebro.strategy.test_strategy_1st import TestStrategy
+import redis
 
 class StrategyTestTask(BaseTask):
 
@@ -22,8 +23,13 @@ class StrategyTestTask(BaseTask):
 
     def _worker_run(self, script_name: str, instance : Instance, task_result: TaskResult, meta: dict, args: str = None):
         # Step 1.  Get the screening operations
-        self.ray_strategy_optimize('DAVE', '2024-05-01')
-        a  = ""
+        # self.ray_strategy_optimize('DAVE', '2024-05-01')
+
+        # Push result to Redis
+        result = {"x": [1, 2, 3], "y": [4, 5, 6]}  # Example result
+        redis_client = redis.StrictRedis(host='localhost', port=6379, db=1)
+        redis_client.publish("bokeh_plot_channel", str(result))
+
 
 
     def ray_strategy_optimize(self, symbol, cut_over):

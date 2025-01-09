@@ -11,11 +11,30 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render
-
+from bokeh.embed import server_document
 from home.forms.strategy_algo_script import StrategyAlgoScriptModelForm
+import redis
+import json
+import threading
 
+def listen_to_redis():
+    redis_client = redis.StrictRedis(host='localhost', port=6379, db=1)
+    pubsub = redis_client.pubsub()
+    pubsub.subscribe("bokeh_plot_channel")
+
+    for message in pubsub.listen():
+        if message['type'] == 'message':
+            data = json.loads(message['data'])
+        print("Received message:", message)
 
 def default(request):
+
+    # Start the Redis listener in a separate thread
+    listener_thread = threading.Thread(target=listen_to_redis)
+    listener_thread.daemon = True
+    listener_thread.start()
+
+    # bokeh_script = server_document("http://localhost:5006/my_bokeh_app")
 
     if request.method == 'POST':
         form = StrategyAlgoScriptModelForm(request.POST)
@@ -42,6 +61,7 @@ def default(request):
             'parent': 'analytics',
             'segment': 'market_comparison',
             'form': algo_script_form,
+            'bokeh_script': 'test'
         })
 
 @csrf_exempt
