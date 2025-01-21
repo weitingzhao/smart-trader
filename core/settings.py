@@ -232,7 +232,8 @@ THEMES_DIR = BASE_DIR / "themes"
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-bokeh_settings.resources = 'cdn' #'server'
+bokeh_settings.resources = 'cdn'
+# bokeh_settings.resources = 'server'
 
 # Web Editor Configuration
 WEB_EDITOR_DOWNLOAD, WEB_EDITOR_CONFIG = init_web_editor_config(

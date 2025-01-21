@@ -21,7 +21,7 @@ from bokeh.layouts import column, gridplot
 
 from bokeh.embed import file_html
 from bokeh.models.widgets import *
-from bokeh.resources import CDN
+from bokeh.resources import CDN, Resources
 from bokeh.util.browser import view
 
 from jinja2 import Environment, PackageLoader

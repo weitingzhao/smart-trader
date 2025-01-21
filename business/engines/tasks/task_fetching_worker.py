@@ -33,6 +33,11 @@ class TaskFetchingWorker(ABC):
         """Abstract method that must be implemented in any subclass"""
         pass
 
+    def dry_run(self, meta: dict):
+        if not isinstance(meta, dict):
+            raise ValueError("task_kwargs must be a dictionary or a JSON string")
+        pass
+
     # Builder pattern
     def run(self, meta: dict, task_result:TaskResult, args: str = None, is_test : bool = False):
 

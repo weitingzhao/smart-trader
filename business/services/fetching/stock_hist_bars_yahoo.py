@@ -2,6 +2,7 @@ import logging, re
 import yfinance as yf
 from typing import List
 from apps.common.models import *
+from bokeh_django.routing import is_bokeh_app
 from ...engine import Engine
 from ..base_service import BaseService
 from ...engines.tasks.task_fetching_worker import TaskFetchingWorker
@@ -12,6 +13,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
     def __init__(self, engine: Engine):
         super().__init__(engine)
         self.symbol_data = None
+        self.snapshot = None
 
         # Get configure logger
         logger = logging.getLogger('yfinance')
@@ -118,6 +120,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
 
         # Step 1. prepare parameters
         #method for append
+        is_snapshot = self.args.get("snapshot", False)
         is_append = self.args.get("append",False)
         delta= int(self.args.get("delta", 1))
         # “1d”, “5d”, “1mo”, “3mo”, “6mo”, “1y”, “2y”, “5y”, “10y”, “ytd”, “max”
@@ -202,9 +205,15 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
         try:
             if start:
                 history = ticker.history(start=start, end=end, interval=interval)
+                if is_snapshot:
+                    self.snapshot = history
+                    return
                 save_to_timeseries_db(history)
             else:
                 history = ticker.history(period=period, interval=interval)
+                if is_snapshot:
+                    self.snapshot = history
+                    return
                 # If the history is empty and is appended mode,try to get the history with the max period for lucky
                 if is_append and len(history) <= 0:
                     history = ticker.history(period='max', interval=interval)

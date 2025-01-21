@@ -7,6 +7,7 @@ from pandas.core.interchange.dataframe_protocol import DataFrame
 from apps.common.models import *
 from decimal import Decimal
 from ...service import Service
+from .portfolio import Portfolio as PO
 from .position_base import PositionBase
 from django.db.models import (
     F,Case, When, Value, IntegerField,
@@ -101,6 +102,8 @@ class OpenPosition(PositionBase):
                 'breaking_out_pct': 0,
                 'after_breakout': 0,
                 'after_breakout_pct': 0,
+                'cash': 0,
+                'cash_pct': 0,
             }
         }
 
@@ -124,13 +127,20 @@ class OpenPosition(PositionBase):
         summary['water']['below'] = final_df[final_df['risk'] < 0]['risk'].sum()
         summary['water']['dist'] = summary['water']['above']  + summary['water']['below']
 
+        # Part 6. Cash
+        cash_balance_df = PO(self.service).get_cash_balance(portfolio)
+        cash_balance = float(cash_balance_df.loc[cash_balance_df['date'].idxmax()]['cash_mm'])
+
         # Part 6. category
+        summary['category']['total'] = final_df['market'].sum() + float(cash_balance)
+        summary['category']['cash'] = cash_balance
+        summary['category']['cash_pct'] = cash_balance / summary['category']['total'] * 100
+
         summary['category']['earning'] =  round(final_df[final_df['trade_phase'] == '4']['market'].sum(),0)
         summary['category']['before_breakout'] =  round(final_df[final_df['trade_phase'] == '1']['market'].sum(),0)
         summary['category']['breaking_out'] =  round(final_df[final_df['trade_phase'] == '2']['market'].sum(),0)
         summary['category']['after_breakout'] =  round(final_df[final_df['trade_phase'] == '3']['market'].sum(),0)
 
-        summary['category']['total'] = final_df['market'].sum()
         summary['category']['earning_pct'] = summary['category']['earning'] / summary['category']['total'] * 100
         summary['category']['before_breakout_pct'] = summary['category']['before_breakout'] / summary['category']['total'] * 100
         summary['category']['breaking_out_pct'] = summary['category']['breaking_out'] / summary['category']['total'] * 100

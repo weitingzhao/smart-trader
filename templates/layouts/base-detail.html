@@ -1,0 +1,99 @@
+<!--
+=========================================================
+* Soft UI Dashboard PRO - v1.1.1
+=========================================================
+
+* Product Page:  https://www.creative-tim.com/product/soft-ui-dashboard-pro 
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+{% load i18n static admin_soft %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_direction as direction %}
+{% get_admin_setting as admin_setting %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% include 'includes/head.html' %}
+  {% block extrahead %}{% endblock extrahead %}
+  {% block extrastyle %}{% endblock extrastyle %}
+</head>
+
+<body class="g-sidenav-show bg-gray-100 {% block body %}{% endblock body %}">
+
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    {% block content %}{% endblock content %}
+  </main>
+
+  {% block fixed_plugin %}
+  {% include 'includes/fixed-plugin.html' %}
+  {% endblock fixed_plugin %}
+
+  {% include 'includes/scripts.html' %}
+  {% block extra_js %}{% endblock extra_js %}
+
+  <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center"
+    style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
+    <!-- Toast 容器 -->
+    <div id="toastContainer"></div>
+  </div>
+
+  <script src="{% static "assets/js/dark-theme.js" %}"></script>
+  <script>
+    if ('{{ request.user.profile.dark_mode }}' === 'True') {
+      document.addEventListener('DOMContentLoaded', function () {
+        initialDarkMode();
+      });
+    }
+
+    //tpyp : success \ danger \warning
+    function showMessage(message, type) {
+      // 设置类型对应的背景颜色
+      const bgClass = {
+        success: 'bg-success text-white', // 成功：绿色背景
+        danger: 'bg-danger text-white',   // 失败：红色背景
+        warning: 'bg-warning text-dark'  // 警告：黄色背景
+      };
+
+      // 动态生成 Toast 的 HTML
+      const toastHTML = `
+        <div class="toast ${bgClass[type]}" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000">
+            <div class="toast-header">
+                <strong class="mr-auto">${type.charAt(0).toUpperCase() + type.slice(1)} Message</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+
+      // 将 Toast 插入到容器中
+      const toastContainer = document.getElementById('toastContainer');
+      toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+
+      // 初始化并显示 Toast
+      const toastElement = toastContainer.lastElementChild;
+      $(toastElement).toast('show');
+
+      // 自动移除 Toast 元素
+      toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+      });
+    }
+
+  </script>
+
+
+</body>
+
+</html>

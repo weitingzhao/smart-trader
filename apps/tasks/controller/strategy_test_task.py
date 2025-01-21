@@ -42,7 +42,7 @@ class StrategyTestTask(BaseTask):
 
     def run_by_normal(self, symbol, cut_over, stock_data_df):
         # Step 2. Convert the QuerySet to a DataFrame
-        strategyProfile = RayStrategyProfile(stdstats=False)
+        strategyProfile = RayStrategyProfile(stdstats=True)
         strategyProfile.set_data(data_name=f'{symbol}-{cut_over}', data_df=stock_data_df)
 
         # Step 3. Load Startegy

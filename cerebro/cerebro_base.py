@@ -1,7 +1,8 @@
 import pandas as pd
 import backtrader as bt
-from pandas.core.interchange.dataframe_protocol import DataFrame
-import inspect
+from apps.tasks.controller.instance import Instance
+
+
 
 class cerebroBase():
 
@@ -13,18 +14,59 @@ class cerebroBase():
         self.data_df = None
         self.result = None
         self.strategy  = None
+        self.instance = Instance()
 
 
-    def set_data(self, data_name:str, data_df: DataFrame):
+    def set_data(self, data_json : object):
+
+        # Extract symbols from JSON
+        symbols = data_json.get('symbols')
+        # Continue with the rest of your logic
+        period = data_json.get('period')
+        interval = data_json.get('interval')
+        since = data_json.get('since')
+
+        # Build the meta dictionary based on input
+        meta = {
+            'error': 'false',
+            'output': '',
+            'status': 'STARTED',
+            'initial': 'false',
+            'leftover': symbols.split('|'),
+            'done': []
+        }
+
+        # Prepare args dictionary
+        args = f"snapshot=True,period='{period}',interval='{interval}',symbols={symbols},since={since}"
+
+        # Call the function to get Yahoo data
+        worker = self.instance.service().fetching().stock_hist_bars_yahoo()
+        error_list, meta = worker.run(meta=meta, task_result=None, args=args, is_test=False)
+        if len(error_list) > 0:
+            return
+        yahoo_data = worker.snapshot
+        # Convert yahoo_data to a DataFrame
+        yahoo_data_df = pd.DataFrame(yahoo_data)
+
+        # # Step 1.  Prepare data as Data Frame
+        # Filter the DataFrame by the 'since' date
+        stock_data_df = yahoo_data_df[yahoo_data_df.index >= since]
+        stock_data_df.rename(columns={
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume',
+        }, inplace=True)
+        # Remove the 'dividends' and 'stocksplits' columns
+        stock_data_df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+        stock_data_df.rename_axis('datetime', inplace=True)
+        # Add the openinterest column and set it to 0
+        stock_data_df['openinterest'] = 0
+
         # Set Data Name
-        self.data_name = data_name
-
-        # Set Data Frane
-        # Ensure the DataFrame has the required columns for Backtrader
-        data_df['datetime'] = pd.to_datetime(data_df['time'])
-        data_df.set_index('datetime', inplace=True)
-        data_df = data_df[['open', 'high', 'low', 'close', 'volume']]
-        self.data_df = data_df
+        self.data_name = f'{symbols}-{since}'
+        self.data_df = stock_data_df
 
     def _prepare_data(self):
         # Add the Data Feed to Cerebro

@@ -9,7 +9,6 @@ from bokeh.embed import server_document
 from bokeh.themes import Theme
 import panel as pn
 import inspect
-
 from .shape_viewer import shape_viewer
 
 from bokeh.io import curdoc
@@ -67,7 +66,6 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 def shape_viewer_handler(doc: Document) -> None:
-
     def get_doc():
         df = sea_surface_temperature.copy()
         source = ColumnDataSource(data=df)

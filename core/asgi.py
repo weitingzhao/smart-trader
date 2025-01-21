@@ -21,6 +21,8 @@ django.setup()
 # init ray
 ray.init()
 
+
+
 bokeh_app_config = apps.get_app_config('bokeh_django')
 
 application = ProtocolTypeRouter({

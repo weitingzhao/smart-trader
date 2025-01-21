@@ -243,7 +243,7 @@
         <div class="collapse {% if 'analytics' in parent %}show{% endif %} " id="analyticsPanel">
           <ul class="nav ms-4 ps-3">
               <li class="nav-item {% if 'strategy_analysis' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'strategy_analysis' in segment %}active{% endif %}" href="{% url 'strategy_analysis' symbol='DAVE' cut_over='2024-05-01' %}" target="_self">
+                  <a class="nav-link {% if 'strategy_analysis' in segment %}active{% endif %}" href="{% url 'strategy_analysis'%}" target="_self">
                       <span class="sidenav-mini-icon"> RA </span>
                       <span class="sidenav-normal"> Strategy Analysis </span>
                   </a>

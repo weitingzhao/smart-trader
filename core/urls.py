@@ -71,10 +71,13 @@ urlpatterns +=([
 ])
 
 bokeh_apps = [
+    autoload(r"analytics/strategy/test/(?P<data>[\w_\-=%]+)", views.analytics.strategy_analysis.test_result),
     autoload(r"analytics/strategy_optimize/(?P<symbol>[\w_\-]+)/(?P<cut_over>[\w_\-]+)",
              views.analytics.strategy_optimize.bokeh_optimize),
+
     #below all sample
     *directory(apps_path),
+
     document("bokeh/sea_surface_direct", bokeh_views.sea_surface_handler),
     document("bokeh/sea_surface_with_template", bokeh_views.sea_surface_handler_with_template),
     document("bokeh/sea_surface_bokeh", apps_path / "sea_surface.py"),

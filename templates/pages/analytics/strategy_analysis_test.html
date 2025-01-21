@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends 'layouts/base-detail.html' %}
 {% load static %}
 
 {% block content %}
@@ -16,13 +16,8 @@
                 <div class="col-auto my-auto">
                   <div class="h-100">
                       <h5 class="mb-1">
-                          Strategy Analysis
+                          Strategy Test Result
                       </h5>
-                      <p class="mb-0 font-weight-bold text-sm">
-                          <a href="javascript:void(0);" onclick="refreshSymbol('{{ summary.holding_symbols }}','5d', '1d','{{ csrf_token }}');">
-                              {{ portfolio.name }}
-                          </a>
-                      </p>
                   </div>
               </div>
                 <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
@@ -58,13 +53,6 @@
                             <div class="col-8">
                                 <h5>Data Source</h5>
                             </div>
-                            <div class="col-4">
-                                <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100"
-                                        type="button" id="refreshButton"
-                                        onclick="refreshTask('index_input','index_period_select', 'index_interval_select', 'index_since_date')">
-                                    Test
-                                </button>
-                            </div>
                         </div>
                     </div>
                     <div class="card-body pt-0">
@@ -77,47 +65,21 @@
                         </div>
                             <div class="col-4">
                                 <label>Since</label>
-                                <input type="date" class="form-control" id="index_since_date" value="2024-05-01">
+                                {{ data_json.since }}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-4">
-                            <label>Period</label>
-                            <select class="form-select" id="index_period_select">
-                                <option value="max">max</option>
-                                <option value="1d">1d</option>
-                                <option value="5d">5d</option>
-                                <option value="1mo">1mo</option>
-                                <option value="3mo" selected>3mo</option>
-                                <option value="6mo" >6mo</option>
-                                <option value="1y">1y</option>
-                                <option value="2y">2y</option>
-                                <option value="5y">5y</option>
-                                <option value="10y">10y</option>
-                                <option value="ytd">ytd</option>
-                            </select>
-                        </div>
+                                <label>Period</label>
+                                {{ data_json.period }}
+                            </div>
                             <div class="col-4">
-                            <label>Interval</label>
-                            <select class="form-select" id="index_interval_select">
-                                <option value="1m">1m</option>
-                                <option value="2m">2m</option>
-                                <option value="5m">5m</option>
-                                <option value="15m">15m</option>
-                                <option value="30m">30m</option>
-                                <option value="60m" selected>60m</option>
-                                <option value="90m">90m</option>
-                                <option value="1h">1h</option>
-                                <option value="1d">1d</option>
-                                <option value="5d">5d</option>
-                                <option value="1wk">1wk</option>
-                                <option value="1mo">1mo</option>
-                                <option value="3mo">3mo</option>
-                            </select>
+                                <label>Interval</label>
+                                {{ data_json.interval }}
                         </div>
                             <div class="col-4">
                                 <label>Symbols</label>
-                                <input type="text" class="form-control" id="index_input" placeholder="Enter symbols separated by commas" value="DAVE">
+                                {{ data_json.symbols }}
                             </div>
                         </div>
                     </div>

@@ -6,7 +6,10 @@ urlpatterns = [
 
     ####### analytics.strategy_analysis #######
     # Wishlist Overview -> Default
-    path('strategy_analysis/<str:symbol>/<str:cut_over>/',analytics.strategy_analysis.default, name='strategy_analysis'),
+    path('strategy/',
+         analytics.strategy_analysis.default, name='strategy_analysis'),
+    path('strategy/test/<str:data>/',
+         analytics.strategy_analysis.test, name='strategy_analysis_test'),
 
     ####### analytics.strategy_optimize #######
     # Saved Screeners -> Default

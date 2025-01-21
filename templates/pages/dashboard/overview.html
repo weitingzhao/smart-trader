@@ -457,6 +457,22 @@
                               </span>
                             </td>
                           </tr>
+                          <tr>
+                            <td>
+                              <div class="d-flex px-2 py-0">
+                                <span class="badge bg-gradient-light me-3"> </span>
+                                <div class="d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm">Cash</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                              <span class="text-xs font-weight-bold">
+                                  {% round_by_digits open_summary.category.cash 0 '${0}' False %} -
+                                  {% round_by_digits open_summary.category.cash_pct 0 '{0}%' False %}
+                              </span>
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -1265,6 +1281,7 @@
     gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
     gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
 
+
     new Chart(ctx1, {
       type: "doughnut",
       data: {
@@ -1276,12 +1293,13 @@
           tension: 0.9,
           pointRadius: 2,
           borderWidth: 2,
-          backgroundColor: ['#ff667c', '#A8B8D8', '#21d4fd', '#98ec2d'],
+          backgroundColor: ['#ff667c', '#A8B8D8', '#21d4fd', '#98ec2d','#dfe3e8'],
           data: [
               {{ open_summary.category.earning }},
               {{ open_summary.category.before_breakout }},
               {{ open_summary.category.breaking_out }},
               {{ open_summary.category.after_breakout }},
+              {{ open_summary.category.cash }},
           ],
           fill: false
         }],
