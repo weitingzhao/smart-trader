@@ -1,5 +1,9 @@
-from django.urls import path
+from django.urls import path, register_converter
 from home.views import position
+from home.converters import NegativeIntConverter
+
+# Register the custom converter
+register_converter(NegativeIntConverter, 'negint')
 
 #all below path with [position]
 urlpatterns = [
@@ -8,7 +12,7 @@ urlpatterns = [
     # Open Positions -> Default
     path('open_positions/', position.open_positions.default,  name='open_positions'),
     # Close Position  -> Default
-    path('close_positions/', position.close_positions.default,  name='close_positions'),
+    path('close_positions/<negint:strategy_id>/', position.close_positions.default,  name='close_positions'),
 
     ####### holding. trade #######
     path('holding/trade/<int:trade_id>/', position.trade.update_phase,  name='update_trade_phase'),

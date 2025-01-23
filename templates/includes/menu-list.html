@@ -147,7 +147,7 @@
                   </a>
               </li>
               <li class="nav-item {% if 'close_positions' in segment %}active{% endif %}">
-                  <a class="nav-link {% if 'close_positions' in segment %}active{% endif %}" href="{% url 'close_positions' %}" target="_self">
+                  <a class="nav-link {% if 'close_positions' in segment %}active{% endif %}" href="{% url 'close_positions' -1 %}" target="_self">
                       <span class="sidenav-mini-icon"> CP </span>
                       <span class="sidenav-normal"> Close Position </span>
                   </a>

@@ -21,8 +21,10 @@ class Strategy(models.Model):
     owner_user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
     # Data
     name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=50, null=True, blank=True)  # New field
     description = models.TextField()
     as_of_date = models.DateField()
+    custom_order = models.IntegerField(default=0)  # New field
 
     class Meta:
         db_table = 'strategy'

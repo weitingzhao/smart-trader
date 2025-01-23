@@ -1010,3 +1010,64 @@ function drawFilter_NavLink(container, aNavLink, filer_group_name, filter, key, 
      // console.log(filer_group_name +"=>filter:"+filter+" key:"+key+" value:"+value);
 }
 
+/////////////////////// Trade Phase ////////////////////////////
+function showTradePhasePopup(tradeId, phase, phase_rating, source, strategy) {
+
+    const sourceSelect = document.getElementById('tradeSourceSelect');
+    sourceSelect.value = source;
+
+    const phaseSelect = document.getElementById('tradePhaseSelect');
+    phaseSelect.value = phase;
+    phaseSelect.setAttribute('data-trade-id', tradeId);
+
+    const phaseRatingSelect = document.getElementById('tradeRatingSelect');
+    phaseRatingSelect.value = phase_rating;
+
+    const tradeStrategySelect = document.getElementById('tradeStrategySelect');
+    tradeStrategySelect.value = strategy;
+
+    $('#tradePhaseModal').modal('show');
+}
+
+function closeTradePhaseModal() {
+    $('#tradePhaseModal').modal('hide');
+}
+
+function updateTradePhase() {
+    const phaseSelect = document.getElementById('tradePhaseSelect');
+    const phase = phaseSelect.value;
+    const tradeId = phaseSelect.getAttribute('data-trade-id');
+
+    const sourceSelect = document.getElementById('tradeSourceSelect');
+    const source = sourceSelect.value;
+
+    const ratingSelect = document.getElementById('tradeRatingSelect');
+    const rating = ratingSelect.value;
+
+    const strategySelect = document.getElementById('tradeStrategySelect');
+    const strategy = strategySelect.value;
+
+    fetch(`/position/holding/trade/${tradeId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ trade_phase: phase, trade_rating: rating, trade_source: source, strategy: strategy })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showNotification('success', 'Phase updated', 'Phase updated successfully', new Date().toLocaleTimeString());
+            location.reload();
+        } else {
+            showNotification('error', 'Phase updated', 'Failed to update trade phase', new Date().toLocaleTimeString());
+        }
+        $('#tradePhaseModal').modal('hide');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('error', 'Phase updated', error, new Date().toLocaleTimeString());
+        $('#tradePhaseModal').modal('hide');
+    });
+}

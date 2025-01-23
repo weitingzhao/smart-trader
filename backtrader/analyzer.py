@@ -41,7 +41,7 @@ class MetaAnalyzer(bt.MetaParams):
 
         _obj._children = list()
 
-        _obj.strategy = strategy = bt.metabase.findowner(_obj, bt.Strategy)
+        _obj.trade_strategy = strategy = bt.metabase.findowner(_obj, bt.Strategy)
         _obj._parent = bt.metabase.findowner(_obj, Analyzer)
 
         # Register with a master observer if created inside one

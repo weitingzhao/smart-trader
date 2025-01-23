@@ -66,3 +66,57 @@
     </div>
   </div>
 </div>
+
+<!-- Trade Phase  Modal -->
+<div class="modal fade" id="tradePhaseModal" tabindex="-1" role="dialog" aria-labelledby="tradePhaseModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tradePhaseModalLabel">Select Trade Phase</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <label for="tradePhaseSelect" class="form-label">Phase</label>
+                        <select id="tradePhaseSelect" class="form-control">
+                            {% for value, label in trade_phase_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="tradeRatingSelect" class="form-label">Phase Rating</label>
+                        <select id="tradeRatingSelect" class="form-control">
+                            {% for value, label in trade_phase_rating_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="tradeSourceSelect" class="form-label">Source</label>
+                        <select id="tradeSourceSelect" class="form-control">
+                            {% for value, label in trade_source_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="tradeStrategySelect" class="form-label">Source</label>
+                        <select id="tradeStrategySelect" class="form-control">
+                            {% for value, label in trade_strategy.items %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeTradePhaseModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateTradePhase()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

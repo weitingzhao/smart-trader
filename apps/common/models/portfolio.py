@@ -1,5 +1,5 @@
 from django.db import models
-from . import Wishlist
+from . import Wishlist, Strategy
 from .market import MarketSymbol
 
 
@@ -123,11 +123,14 @@ class Holding(models.Model):
     def __str__(self):
         return f"Holding: {self.portfolio} - {self.symbol}"
 
+
+
 class Trade(models.Model):
     """
     This model is used to store trade information
     """
     trade_id = models.AutoField(primary_key=True)
+    strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE, null=True, blank=True)
     profit_actual = models.DecimalField(max_digits=15, decimal_places=2)
     profit_actual_ratio = models.DecimalField(max_digits=5, decimal_places=2)
     is_finished = models.BooleanField(null=True, blank=True)

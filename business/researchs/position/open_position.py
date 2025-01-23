@@ -256,14 +256,6 @@ class OpenPosition(PositionBase):
 
         return last_sell_orders_df
 
-    def get_trading_info(self, holdings_df: DataFrame) -> pd.DataFrame:
-        # Step 2. attach Trade info
-        trade_phases = Trade.objects.filter(trade_id__in=holdings_df['trade_id'].tolist()
-        ).values('trade_id', 'trade_phase', 'trade_phase_rating','trade_source')
-        # Convert the query result to a DataFrame
-        trade_phases_df = pd.DataFrame(list(trade_phases))
-        return trade_phases_df
-
     def get_market_benchmark(self, symbols) -> pd.DataFrame:
 
         # get current stock & previous day stock as benchmark

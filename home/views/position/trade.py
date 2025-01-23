@@ -19,12 +19,18 @@ def update_phase(request, trade_id):
         trade_phase = data.get('trade_phase')
         trade_rating = data.get('trade_rating')
         trade_source = data.get('trade_source')
+        strategy_id = data.get('strategy')
 
         try:
             trade = Trade.objects.get(trade_id=trade_id)
             trade.trade_phase = trade_phase
             trade.trade_phase_rating = trade_rating
             trade.trade_source = trade_source
+
+            if strategy_id:
+                strategy = Strategy.objects.get(strategy_id=strategy_id)
+                trade.strategy = strategy
+
             trade.save()
             return JsonResponse({'status': 'success', 'action': 'updated'})
         except Trade.DoesNotExist:

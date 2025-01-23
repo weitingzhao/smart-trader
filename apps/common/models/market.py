@@ -31,8 +31,6 @@ class MarketStockHistoricalBarsByMin(TimescaleModel):
     volume = models.FloatField()
     dividend = models.FloatField()
     stock_splits = models.FloatField()
-    # trade_count = models.FloatField()
-    # volume_weighted_average_price = models.FloatField()
 
     class Meta:
         db_table = 'market_stock_hist_bars_min_ts'
@@ -56,8 +54,6 @@ class MarketStockHistoricalBarsByDay(TimescaleModel):
     volume = models.FloatField()
     dividend = models.FloatField()
     stock_splits = models.FloatField()
-    # trade_count = models.FloatField()
-    # volume_weighted_average_price = models.FloatField()
 
     class Meta:
         db_table = 'market_stock_hist_bars_day_ts'
@@ -72,3 +68,26 @@ class MarketStockHistoricalBarsByDay(TimescaleModel):
     def __str__(self):
         return f"{self.symbol} - {self.time}"
 
+
+class MarketStockHistoricalBarsByHour(TimescaleModel):
+    symbol = models.CharField(max_length=10, null=False, blank=False, default="NaN")
+    open = models.FloatField()
+    high = models.FloatField()
+    low = models.FloatField()
+    close = models.FloatField()
+    volume = models.FloatField()
+    # dividend = models.FloatField()
+    # stock_splits = models.FloatField()
+
+    class Meta:
+        db_table = 'market_stock_hist_bars_hour_ts'
+        indexes = [
+            models.Index(fields=['symbol', 'time']),
+        ]
+        # Setting a composite primary key
+        constraints = [
+            models.UniqueConstraint(fields=['symbol', 'time'], name='symbol_timestamp_hour_pk'),
+        ]
+
+    def __str__(self):
+        return f"{self.symbol} - {self.time}"

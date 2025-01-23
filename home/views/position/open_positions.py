@@ -6,7 +6,7 @@ from home.templatetags.home_filter import order_price
 from django.db.models import (Sum)
 from apps.common.models import *
 from django.shortcuts import render, get_object_or_404
-
+from collections import OrderedDict
 
 def default(request):
 
@@ -32,19 +32,25 @@ def default(request):
         portfolio.investment = summary['mv']['value']
         portfolio.save()
 
+        # Query all records from the Strategy model
+        trade_strategy = Logic.research().category().strategy().get_simple_dic()
+
     return render(
         request = request,
         template_name='pages/position/open_positions.html',
         context= {
             'parent': 'position',
             'segment': 'open_positions',
+            'page_title': 'Open Position',  # title
             'portfolio': portfolio,
             'portfolio_items': final_json,
             'summary': summary,
+
+            # Trade
             'trade_source_choices': TradeSourceChoices.choices,
             'trade_phase_choices': TradePhaseChoices.choices,
             'trade_phase_rating_choices': TradePhaseRatingChoices.choices,
-            'page_title': 'Open Position'  # title
+            'trade_strategy': trade_strategy  # Add trade_strategy to context
         })
 
 def get_order(request, order_id):

@@ -53,6 +53,12 @@ class SnapshotIndicatorAdmin(admin.ModelAdmin):
         'snapshot_column_group', 'snapshot_column')
     search_fields = ('snapshot_category','snapshot_column_group', 'snapshot_column')
 
+@admin.register(Strategy)
+class StrategyAdmin(admin.ModelAdmin):
+    list_display = ('strategy_id', 'short_name', 'name', 'custom_order', 'owner_user', 'as_of_date')
+    search_fields = ('name', 'owner_user__username')
+    list_filter = ('as_of_date',)
+    ordering = ('-as_of_date',)
 
 # Snapshots detail tables
 # @admin.register(SnapshotScreening)

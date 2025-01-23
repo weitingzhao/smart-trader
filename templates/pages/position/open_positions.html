@@ -23,28 +23,28 @@
                           </a>
                       </p>
                   </div>
-              </div>
-                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-                <div class="nav-wrapper position-relative end-0">
-                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-                        <li class="nav-item">
-                            <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
-                                <span class="ms-1">Summary</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
-                                <span class="ms-1">My Holdings</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
-                                <span class="ms-1">Fundamentals</span>
-                            </a>
-                        </li>
-                    </ul>
                 </div>
-            </div>
+                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                    <div class="nav-wrapper position-relative end-0">
+                        <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                            <li class="nav-item">
+                                <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
+                                    <span class="ms-1">Summary</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                    <span class="ms-1">My Holdings</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                    <span class="ms-1">Fundamentals</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -218,12 +218,14 @@
                                             <i class="{% trade_phase_fa_icon item.trade_phase True%}"
                                                 style="{% trade_phase_fa_icon item.trade_phase %}; cursor: pointer;"
                                                 data-phase="{{ item.trade_phase }}"
-                                                onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}', '{{ item.trade_phase_rating }}','{{ item.trade_source }}')">
+                                                onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}', '{{ item.trade_phase_rating }}','{{ item.trade_source }}','{{ item.strategy_id }}')">
                                                 {{ item.trade_phase_rating }}
                                             </i>
                                             <span style="color: {% if item.trade_source == 'A' %}dodgerblue{% elif item.trade_source == 'B' %}saddlebrown{% elif item.trade_source == 'C' %}black{% endif %};">
                                                 <b>{{ item.trade_source }}</b>
                                             </span>
+                                            <br>
+                                            <span style="font-size: smaller;">{{ item.strategy__short_name }}</span>
                                         </td>
                                         <td class="text-start">
                                             <a href="{% url 'stock_quote' item.symbol %}"
@@ -536,50 +538,6 @@
         {% include 'includes/footer.html' %}
     </div>
 
-    <!-- Trade Phase  Modal -->
-    <div class="modal fade" id="tradePhaseModal" tabindex="-1" role="dialog" aria-labelledby="tradePhaseModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tradePhaseModalLabel">Select Trade Phase</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col">
-                            <label for="tradePhaseSelect" class="form-label">Phase</label>
-                            <select id="tradePhaseSelect" class="form-control">
-                                {% for value, label in trade_phase_choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="tradeRatingSelect" class="form-label">Phase Rating</label>
-                            <select id="tradeRatingSelect" class="form-control">
-                                {% for value, label in trade_phase_rating_choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="tradeSourceSelect" class="form-label">Source</label>
-                            <select id="tradeSourceSelect" class="form-control">
-                                {% for value, label in trade_source_choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeTradePhaseModal()">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="updateTradePhase()">Update</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
@@ -702,62 +660,6 @@
         const period = document.getElementById(period_select).value; // Get the selected period
         const interval = document.getElementById(interval_select).value; // Get the selected interval
         refreshSymbol(symbolInput,period,interval, '{{ csrf_token }}')
-    }
-
-    /////////////////////// Trade Phase ////////////////////////////
-    function showTradePhasePopup(tradeId, phase, phase_rating, source) {
-
-        const sourceSelect = document.getElementById('tradeSourceSelect');
-        sourceSelect.value = source;
-
-        const phaseSelect = document.getElementById('tradePhaseSelect');
-        phaseSelect.value = phase;
-        phaseSelect.setAttribute('data-trade-id', tradeId);
-
-        const phaseRatingSelect = document.getElementById('tradeRatingSelect');
-        phaseRatingSelect.value = phase_rating;
-
-        $('#tradePhaseModal').modal('show');
-    }
-
-    function closeTradePhaseModal() {
-        $('#tradePhaseModal').modal('hide');
-    }
-
-    function updateTradePhase() {
-        const phaseSelect = document.getElementById('tradePhaseSelect');
-        const phase = phaseSelect.value;
-        const tradeId = phaseSelect.getAttribute('data-trade-id');
-
-        const sourceSelect = document.getElementById('tradeSourceSelect');
-        const source = sourceSelect.value;
-
-        const ratingSelect = document.getElementById('tradeRatingSelect');
-        const rating = ratingSelect.value;
-
-        fetch(`/position/holding/trade/${tradeId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ trade_phase: phase, trade_rating: rating, trade_source: source })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showNotification('success', 'Phase updated', 'Phase updated successfully', new Date().toLocaleTimeString());
-                location.reload();
-            } else {
-                showNotification('error', 'Phase updated', 'Failed to update trade phase', new Date().toLocaleTimeString());
-            }
-            $('#tradePhaseModal').modal('hide');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('error', 'Phase updated', error, new Date().toLocaleTimeString());
-            $('#tradePhaseModal').modal('hide');
-        });
     }
 
 

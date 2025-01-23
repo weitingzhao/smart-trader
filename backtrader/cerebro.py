@@ -1324,7 +1324,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
             results = list()
             for strat in runstrats:
                 for a in strat.analyzers:
-                    a.strategy = None
+                    a.trade_strategy = None
                     a._parent = None
                     for attrname in dir(a):
                         if attrname.startswith('data'):

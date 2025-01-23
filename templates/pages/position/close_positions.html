@@ -6,20 +6,48 @@
           <span class="mask bg-gradient-primary opacity-6"></span>
         </div>
         <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
-          <div class="row gx-4">
-            <div class="col-auto">
-              <div class="avatar avatar-xl position-relative">
-                <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
-              </div>
-            </div>
-            <div class="col-auto my-auto">
-              <div class="h-100">
-                <h5 class="mb-1">
-                    Close Positions
-                </h5>
-                <p  class="mb-0 font-weight-bold text-sm text-primary">{{ portfolio.name }}</p>
-              </div>
-            </div>
+            <div class="row gx-4">
+                <div class="col-auto">
+                  <div class="avatar avatar-xl position-relative">
+                    <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                  </div>
+                </div>
+                <div class="col-auto my-auto">
+                  <div class="h-100">
+                    <h5 class="mb-1">
+                        Close Positions
+                    </h5>
+                      <p  class="mb-0 font-weight-bold text-sm text-primary">{{ portfolio.name }} - total <b>{{ summary.total_amt }}</b> trade</p>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                    <div class="nav-wrapper position-relative end-0">
+                        <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                            <li class="nav-item">
+                                <a id="strategy_0_btn"
+                                   class="nav-link mb-0 px-0 py-1 {% if -1 == strategy_id %}active{% endif %}"
+                                   aria-selected="true"
+                                   href="javascript:switchStrategy(-1)">
+                                    <span class="ms-1">
+                                        {% if -1 == strategy_id  %}<b>ALL</b>{% else %}ALL{% endif %}
+                                    </span>
+                                </a>
+                                </li>
+                            {% for key, value in trade_strategy.items %}
+                                <li class="nav-item">
+                                    <a id="strategy_{{ key }}_btn"
+                                       class="nav-link mb-0 px-0 py-1 {% if key == strategy_id %}active{% endif %}"
+                                       aria-selected="{% if key == strategy_id  %}true{% else %}false{% endif %}"
+                                       href="javascript:switchStrategy({{ key }})">
+                                        <span class="ms-1">
+                                             {% if key == strategy_id  %}<b>{{ value }}</b>{% else %}{{ value }}{% endif %}
+                                        </span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
           </div>
         </div>
     </div>
@@ -117,30 +145,15 @@
             </div>
         </div>
         <div class="row">
-            <div id="detail_panel" class="col-lg-6 col-md-10 col-12">
-                <div class="nav-wrapper position-relative end-0">
-                    <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-                        <li class="nav-item">
-                            <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
-                                <span class="ms-1">Summary</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="detail_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
-                                <span class="ms-1">Detail</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div id="summary_panel" class="col-12">
+            <div id="close_position" class="col-12">
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-body px-0 pb-0">
                         <div class="table-responsive">
-                            <table class="table table-flush table-hover text-end" id="summary-list">
+                            <table class="table table-flush table-hover text-end" id="trade_list">
                                 <thead class="thead-light">
                                 <tr class="main-header">
+                                    <th title="trading strategy">STRATEGY</th>
                                     <th>SYMBOL</th>
                                     <th>TRADE<br/>ID</th>
                                     <th># OF<br/>SHARE</th>
@@ -170,7 +183,7 @@
                                     <th class="bg-dark text-white">% INIT<br/>RISK</th>
                                 </tr>
                                 <tr class="subheader">
-                                    <th colspan="3">Market</th>
+                                    <th colspan="4">Market</th>
                                     <th colspan="2" class="bg-gray-200  text-dark">INITIAL ENTRY</th>
                                     <th colspan="2" class="bg-primary text-white">EXIT</th>
                                     <th colspan="5" class="bg-info text-white">STOP LIMIT ORDER</th>
@@ -181,6 +194,20 @@
                                 <tbody>
                                 {% for item in portfolio_items|to_json%}
                                 <tr>
+                                    <td class="text-start">
+                                        <span style="display: none;">{{ item.sort_order}}</span>
+                                        <i class="{% trade_phase_fa_icon item.trade_phase True%}"
+                                            style="{% trade_phase_fa_icon item.trade_phase %}; cursor: pointer;"
+                                            data-phase="{{ item.trade_phase }}"
+                                            onclick="showTradePhasePopup('{{ item.trade_id }}', '{{ item.trade_phase }}', '{{ item.trade_phase_rating }}','{{ item.trade_source }}','{{ item.strategy_id }}')">
+                                            {{ item.trade_phase_rating }}
+                                        </i>
+                                        <span style="color: {% if item.trade_source == 'A' %}dodgerblue{% elif item.trade_source == 'B' %}saddlebrown{% elif item.trade_source == 'C' %}black{% endif %};">
+                                            <b>{{ item.trade_source }}</b>
+                                        </span>
+                                        <br>
+                                        <span style="font-size: smaller;">{{ item.strategy__short_name }}</span>
+                                    </td>
                                     <td class="text-start">
                                         <a href="{% url 'stock_quote' item.symbol %}" class="text-info text-decoration-none fw-bold">
                                             <b>{{ item.symbol }}</b>
@@ -224,42 +251,25 @@
                     </div>
                 </div>
             </div>
-            <div id="detail_panel" class="col-12">
-                Detail
-            </div>
         </div>
         {% include 'includes/footer.html' %}
     </div>
+
 {% endblock content %}
 {% block extra_js %}
   <script src="{% static 'assets/js/plugins/datatables.js' %}"></script>
   <script src="{% static 'assets/js/plugins/nouislider.min.js' %}"></script>
   <script>
-    pagination('summary-list');
-    pagination('detail-list',20);
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const summary_btn = document.getElementById('summary_btn');
-        const detail_btn = document.getElementById('detail_btn');
-
-        const summaryPanel = document.getElementById('summary_panel');
-        const detailPanel = document.getElementById('detail_panel');
-
-        function showPanel(panelToShow) {
-            summaryPanel.style.display = 'none';
-            detailPanel.style.display = 'none';
-            
-            panelToShow.style.display = 'block';
-        }
-
-        summary_btn.addEventListener('click', function () {showPanel(summaryPanel);});
-        detail_btn.addEventListener('click', function () {showPanel(detailPanel);});
-
-        // Initialize by showing the summary panel
-        showPanel(summaryPanel);
-    });
-    
-
+      if (document.getElementById('trade_list')) {
+          new simpleDatatables.DataTable("#trade_list", {
+            searchable: true,
+            fixedHeight: false,
+            perPage: 10
+          });
+      }
+      function switchStrategy(strategy_id) {
+          window.location.href = `/position/close_positions/${strategy_id}/`;
+      }
 
   </script>
 

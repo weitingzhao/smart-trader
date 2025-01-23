@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from apps.common.models import *
 from datetime import datetime, timedelta, date
+from pandas.core.interchange.dataframe_protocol import DataFrame
 
 class PositionBase(BaseResearch):
 
@@ -30,3 +31,12 @@ class PositionBase(BaseResearch):
         cash_balance_df['cash_mm'] = cash_balance_df['cash_mm'].replace(0, np.nan).ffill().fillna(0)
 
         return cash_balance_df
+
+    def get_trading_info(self, holdings_df: DataFrame) -> pd.DataFrame:
+        # Step 2. attach Trade info
+        trade_phases = Trade.objects.filter(trade_id__in=holdings_df['trade_id'].tolist()
+        ).values('trade_id', 'trade_phase', 'trade_phase_rating','trade_source', 'strategy_id', 'strategy__short_name')
+        # Convert the query result to a DataFrame
+        trade_phases_df = pd.DataFrame(list(trade_phases))
+        trade_phases_df['strategy_id'] = trade_phases_df['strategy_id'].fillna(0).astype(int)
+        return trade_phases_df

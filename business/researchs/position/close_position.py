@@ -13,11 +13,11 @@ class ClosePosition(PositionBase):
     def __init__(self, service: Service):
         super().__init__(service)
 
-    def Position(self, portfolio: Portfolio) -> pd.DataFrame or None:
+    def Position(self, portfolio: Portfolio, strategy_id: int ) -> pd.DataFrame or None:
 
         holdings = Holding.objects.filter(portfolio=portfolio)
         if len(holdings) <= 0:
-            return None,None
+            return None
 
         # Step 0. Convert holdings to DataFrame
         final_df = pd.DataFrame(list(holdings.values()))
@@ -28,6 +28,16 @@ class ClosePosition(PositionBase):
         final_df = pd.merge(final_df, self.get_holding_symbol(final_df), on='symbol', how='left')
         # Step 1.b Attach Trades
         trade_df = self.get_trades(holdings)
+        # Step 1.c Attach Trade info
+        trade_df = pd.merge(trade_df, self.get_trading_info(trade_df), on='trade_id', how='left')
+
+        # Filter trade_df based on strategy_id if strategy_id >= 0
+        if strategy_id >= 0:
+            trade_df = trade_df[trade_df['strategy_id'] == strategy_id]
+            if len(trade_df) <= 0:
+                return None
+
+        # Step 1.d Merge to final df
         final_df = pd.merge(final_df, trade_df, on='holding_id', how='inner').fillna(0)
         # Step 1.c Attach stock prices
         final_df = pd.merge(final_df, self.get_stock_prices(final_df), left_on=['symbol', 'exit_date'], right_on=['symbol', 'date'], how='left')
@@ -48,6 +58,7 @@ class ClosePosition(PositionBase):
     def summary(self, final_df: pd.DataFrame) -> dict:
         ##### Calculate the summary tab ##############
         summary = {
+            'total_amt': 0,
             'realized': {
                 'net': 0,
                 'gain': 0,
@@ -65,7 +76,7 @@ class ClosePosition(PositionBase):
                 'lose_avg_days': 0,
             }
         }
-
+        summary['total_amt'] = final_df['trade_margin'].count()
         # Part 1. realized G/L gain / loss
         # Calculate realized gain and loss
         summary['realized']['gain'] = final_df[final_df['trade_margin'] > 0]['trade_margin'].sum()
@@ -105,13 +116,10 @@ class ClosePosition(PositionBase):
             trade_is_finished=Subquery(
                 Trade.objects.filter(trade_id=OuterRef('trade_id')).values('is_finished')[:1]
             ),
-            trade_source=Subquery(
-                Trade.objects.filter(trade_id=OuterRef('trade_id')).values('trade_source')[:1]
-            )
         )
         .filter(Q(trade_is_finished=True))
         .annotate(amount=F('quantity_final') * F('price_final'))
-        .values('trade_id', 'holding_id', 'trade_source')
+        .values('trade_id', 'holding_id')
         .annotate(
             init_quantity=Sum(Case(When(transaction_type=1, then=F('quantity_final')))),
             quantity=Sum(Case(When(transaction_type=2, then=F('quantity_final')))),
@@ -126,7 +134,7 @@ class ClosePosition(PositionBase):
             exit_date=Max('date'),
         ))
         trade_df = pd.DataFrame(list(trades), columns=[
-            'trade_id', 'holding_id', 'trade_source', 'init_quantity', 'quantity',
+            'trade_id', 'holding_id', 'init_quantity', 'quantity',
             'buy_total_value', 'buy_average_price',
             'sell_total_value', 'sell_average_price', 'sell_commission',
             'entry_date', 'exit_date'])
