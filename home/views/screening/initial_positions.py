@@ -23,11 +23,11 @@ def default(request):
         return redirect('initial_positions')  # Replace with your success URL
 
     return render(request,
-        template_name='pages/wishlist/initial_positions.html',
-        context={
+                  template_name='pages/screening/initial_positions.html',
+                  context={
             'portfolio': portfolio,
             'holdings': holdings,
-            'parent': 'wishlist',
+            'parent': 'screening',
             'segment': 'initial_positions',
             'page_title': 'Initial Holding'  # title
         })

@@ -33,7 +33,7 @@ def default(request):
     # Step 3. Get widget data
     ##### Calculate Open Position ##############
     open_final_df, max_date = Logic.research().position().Open().Position(portfolio)
-    close_final_df = Logic.research().position().Close().Position(portfolio)
+    close_final_df = Logic.research().position().Close().Position(portfolio, -1)
 
     open_summary = Logic.research().position().Open().summary(portfolio, open_final_df)
     close_summary = Logic.research().position().Close().summary(close_final_df)

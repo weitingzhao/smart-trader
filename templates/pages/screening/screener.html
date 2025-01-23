@@ -2,6 +2,54 @@
 {% load static %}
 
 {% block content %}
+    <div class="container-fluid">
+        <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('{% static 'assets/img/curved-images/curved0.jpg' %}'); background-position-y: 50%;">
+          <span class="mask bg-gradient-primary opacity-6"></span>
+        </div>
+        <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+            <div class="row gx-4">
+                <div class="col-auto">
+                  <div class="avatar avatar-xl position-relative">
+                      <img src="{% static 'assets/img/bruce-mars.jpg' %}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                  </div>
+              </div>
+                <div class="col-auto my-auto">
+                  <div class="h-100">
+                      <h5 class="mb-1">
+                          Screening Criteria
+                      </h5>
+                      <p class="mb-0 font-weight-bold text-sm">
+                          <a href="javascript:void(0);" onclick="refreshSymbol('{{ summary.holding_symbols }}','5d', '1d','{{ csrf_token }}');">
+                              {{ portfolio.name }}
+                          </a>
+                          Define screening parameters based on stock attributes (e.g., P/E ratio, volume, sector, etc.).
+                      </p>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                    <div class="nav-wrapper position-relative end-0">
+                        <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+                            <li class="nav-item">
+                                <a id="summary_btn" class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
+                                    <span class="ms-1">xxx</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="holding_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                    <span class="ms-1">yyy</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="fundamental_btn" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
+                                    <span class="ms-1">zzz</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container-fluid mt-4">
         <div class="row mt-2 align-items-center">
             <div class="col-lg-8 col-sm-4 nav-wrapper position-relative end-0">
@@ -18,72 +66,6 @@
                             Performance
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a id="ta-indicators-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href="#"
-                           role="tab" aria-selected="false">
-                            TA Indicators
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="support-resistance-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab"
-                           href="#" role="tab" aria-selected="false">
-                            Support/Resistance
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="dividend-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Dividend
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="valuation-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Valuation
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="growth-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Growth
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="profitability-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Profitability
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="health-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Health
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="analysts-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Analysts
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="other-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Other
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="custom-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Custom
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="chart-settings-tab" class="nav-link mb-0 px-0 py-1 text-xs" data-bs-toggle="tab" href=""
-                           role="tab" aria-selected="false">
-                            Chart Settings
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -94,8 +76,10 @@
                     <div class="card-body p-3" id="general-panel">
                         <div class="row mb-0">
                             <div class="col-lg-2 col-md-4">
+                                <div class="dropdown" id="dropdown_General_Timeframe"></div>
                             </div>
                             <div class="col-lg-2 col-md-4">
+                                <div class="dropdown" id="dropdown_General_Type"></div>
                             </div>
                             <div class="col-lg-2 col-md-4">
                                 <div class="dropdown" id="dropdown_General_Exchange"></div>
@@ -115,14 +99,18 @@
                                 <div class="dropdown" id="dropdown_General_Outstanding%20Shares%20and%20Float"></div>
                             </div>
                             <div class="col-lg-2 col-md-4">
-                                <div class="dropdown" id="dropdown_General_Type"></div>
-                            </div>
-                            <div class="col-lg-2 col-md-4">
                                 <div class="dropdown" id="dropdown_General_Index"></div>
                             </div>
                             <div class="col-lg-2 col-md-4">
                                 <div class="dropdown" id="dropdown_General_GICS%20Sector"></div>
                             </div>
+                            <div class="col-lg-2 col-md-4">
+                                <div class="dropdown" id="dropdown_General_Period"></div>
+                            </div>
+                            <div class="col-lg-2 col-md-4">
+                                <div class="dropdown" id="dropdown_General_Lines"></div>
+                            </div>
+                            <div class="col-lg-2 col-md-4"></div>
                         </div>
                     </div>
                     <!-- Performance panel content -->
@@ -212,56 +200,16 @@
                             </div>
                         </div>
                     </div>
-                    <!-- TA Indicators panel content -->
-                    <div class="card-body p-3 d-none" id="ta-indicators-panel">
-                        Ta Indicators
-                    </div>
-                    <!-- Support/Resistance panel content -->
-                    <div class="card-body p-3 d-none" id="support-resistance-panel">
-                        Support/Resistance
-                    </div>
-                    <!--  Dividend panel content -->
-                    <div class="card-body p-3 d-none" id="dividend-panel">
-                        Dividend
-                    </div>
-                    <!--  Valuation panel content -->
-                    <div class="card-body p-3 d-none" id="valuation-panel">
-                        Valuation
-                    </div>
-                    <!--  Growth panel content -->
-                    <div class="card-body p-3 d-none" id="growth-panel">
-                        Growth
-                    </div>
-                    <!--  Profitability panel content -->
-                    <div class="card-body p-3 d-none" id="profitability-panel">
-                        Profitability
-                    </div>
-                    <!-- Health panel content -->
-                    <div class="card-body p-3 d-none" id="health-panel">
-                        Health
-                    </div>
-                    <!-- Analysts panel content -->
-                    <div class="card-body p-3 d-none" id="analysts-panel">
-                        Analysts
-                    </div>
-                    <!-- Other panel content -->
-                    <div class="card-body p-3 d-none" id="other-panel">
-                        Other
-                    </div>
-                    <!-- Custom panel content -->
-                    <div class="card-body p-3 d-none" id="custom-panel">
-                        Custom
-                    </div>
-                    <!-- Chart Settings panel content -->
-                    <div class="card-body p-3 d-none" id="chart-settings-panel">
-                        Chart Settings
-                    </div>
-
                 </div>
             </div>
             <div class="col-lg-2 mt-lg-0 mt-4">
                 <div class="card">
                     <div class="card-body p-3">
+                        <div id="action" class="col-lg-2 col-md-4 mb-4 d-flex align-items-center justify-content-start gap-2">
+                                <i class="fas fa-gear fa-2x cursor-pointer"></i>
+                                <i class="fas fa-folder fa-2x cursor-pointer"></i>
+                                <i class="fas fa-floppy-disk fa-2x cursor-pointer"></i>
+                            </div>
                         <select id="search-option" class="form-control" data-trigger name="search-option" multiple>
                         </select>
                     </div>
@@ -477,7 +425,7 @@
                     addOptionToSearchOption(dropdown.id, dropdown.selectedKey, dropdown.selectedValue);
                 }
                 removeUnselectedOptions(dropdown.id, selectedKeys);
-                
+
                 SearchResult(page=1, searching=true); // Call SearchResult after adding the option
             });
         });
@@ -488,7 +436,7 @@
             slider.addEventListener('change', function() {
                 {#console.log("sliders=" + slider.id + "]type:["+slider.type+"]=> key:[" + slider.values[0] + "] end:"+slider.values[1]+"]");#}
                 addOptionToSearchOption(slider, slider.values[0]+"-"+slider.values[1], slider.valueContent, unique_as_source=true);
-                
+
                 SearchResult(page=1, searching=true); // Call SearchResult after adding the option
             });
         });
@@ -501,6 +449,8 @@
         isSearching = searching
         if(!isSearching) return;
 
+        // Get Parameters
+        // 1. Search options
         const searchOption = document.getElementById('search-option');
         const options = Array.from(searchOption.options);
         const selectedOptions = options.map(option => ({
@@ -508,13 +458,14 @@
             key: option.value,
             value: option.text
         }));
-
+        // 2. Views
         const views = document.getElementById('filter_group_views');
         const viewsFilter = views.filter;
         const viewsValue = views.value;
-
+        // 3. Sorted By
         const sortedBy = document.getElementById('filter_group_sorted_by');
 
+        // Build payload
         const payload = {
             selectedOptions,
             "views-filter": viewsFilter,
@@ -523,7 +474,10 @@
             page
         };
         {#console.log("payload=>", payload);#}
+
+
         try {
+            {#const response = await fetch(`/screening/rating/output/`, {#}
             const response = await fetch(`/screening/stock/search/`, {
                 method: 'POST',
                 headers: {
@@ -658,15 +612,18 @@
 
 
     // General
+    renderDropdown(category='General', type='Timeframe', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Daily');
+    renderDropdown(category='General', type='Type', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Exchange', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Price', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
     renderDropdown(category='General', type='Average%20Volume', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Market%20Cap', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
 
     renderDropdown(category='General', type='Outstanding%20Shares%20and%20Float', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
-    renderDropdown(category='General', type='Type', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='Index', allow_multiple=false, need_all=true, need_none=false, value='', default_value='All');
     renderDropdown(category='General', type='GICS%20Sector', allow_multiple=true, need_all=false, need_none=false, value='', default_value='');
+    renderDropdown(category='General', type='Period', allow_multiple=false, need_all=false, need_none=false, value='', default_value='4 Months');
+    renderDropdown(category='General', type='Lines', allow_multiple=false, need_all=false, need_none=false, value='', default_value='Full');
 
     // Performance
     renderDropdown(category='Performance', type='Signal', allow_multiple=true, need_all=false, need_none=false, value='', default_value='', data_style='separate');

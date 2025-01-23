@@ -39,10 +39,16 @@ class OpenPosition(PositionBase):
         final_df = pd.merge(final_df, self.get_trading_info(final_df), on='trade_id', how='left')
         # Step 1.c Attach Market Benchmark
         final_df = pd.merge(final_df, self.get_market_benchmark(final_df['symbol'].unique()), on='symbol', how='left')
-        # Step 1.d Attach Open Position & Initial Position
+        # Step 1.d Attach Open Position
         final_df = pd.merge(final_df, self.get_current_position(holdings), left_on='holding_id', right_on='holding_id', how='inner').fillna(0)
+
+        # Stop. before move forward, Check there are still have open position
+        if len(final_df) <= 0:
+            return None, None
+
+        # Step 1.e Attach Initial Position only if there still have Open Position
         final_df = pd.merge(final_df, self.get_init_position(final_df['init_tran_id'].tolist()), on='holding_id', how='left')
-        # Step 1.e Attach today_delta
+        # Step 1.f Attach today_delta
         final_df, max_date = self.attach_today_delta(final_df)
 
         # Step 2. Calculate
@@ -111,6 +117,20 @@ class OpenPosition(PositionBase):
         symbols = self.get_portfolio_holding(portfolio)
         summary['holding_symbols'] = '|'.join(symbols)
 
+        # Part 2. Get Cash first, since there are may not have any position
+        cash_balance_df = PO(self.service).get_cash_balance(portfolio)
+        cash_balance = float(cash_balance_df.loc[cash_balance_df['date'].idxmax()]['cash_mm'])
+        summary['category']['cash'] = cash_balance
+
+        if final_df is None or len(final_df) <= 0:
+            # Part 6. category
+            summary['category']['total'] = float(cash_balance)
+            summary['category']['cash_pct'] = cash_balance / summary['category']['total'] * 100
+            return summary
+        else:
+            summary['category']['total'] = final_df['market'].sum() + float(cash_balance)
+            summary['category']['cash_pct'] = cash_balance / summary['category']['total'] * 100
+
         # Part 2. market value
         summary['mv']['value'] = final_df['market'].sum()
         mv_bk = final_df['bk_market'].sum() - final_df['delta'].sum()
@@ -127,14 +147,6 @@ class OpenPosition(PositionBase):
         summary['water']['below'] = final_df[final_df['risk'] < 0]['risk'].sum()
         summary['water']['dist'] = summary['water']['above']  + summary['water']['below']
 
-        # Part 6. Cash
-        cash_balance_df = PO(self.service).get_cash_balance(portfolio)
-        cash_balance = float(cash_balance_df.loc[cash_balance_df['date'].idxmax()]['cash_mm'])
-
-        # Part 6. category
-        summary['category']['total'] = final_df['market'].sum() + float(cash_balance)
-        summary['category']['cash'] = cash_balance
-        summary['category']['cash_pct'] = cash_balance / summary['category']['total'] * 100
 
         summary['category']['earning'] =  round(final_df[final_df['trade_phase'] == '4']['market'].sum(),0)
         summary['category']['before_breakout'] =  round(final_df[final_df['trade_phase'] == '1']['market'].sum(),0)

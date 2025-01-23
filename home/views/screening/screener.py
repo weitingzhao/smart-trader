@@ -10,13 +10,33 @@ from business.utilities.dates import Dates
 
 
 def default(request):
+    query = request.GET.get('q')
+    if query:
+        market_data = MarketStockHistoricalBarsByMin.objects.filter(symbol__icontains=query)
+    else:
+        market_data = MarketStockHistoricalBarsByMin.objects.all()
+
+    paginator = Paginator(market_data, 10)  # Show 10 items per page
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Format the time field to display only the date
+    for item in page_obj:
+        item.time = item.time.strftime('%Y-%m-%d')
+
+    status_message = request.GET.get('status_message', '')
+
     return render(
         request=request,
-        template_name='pages/screening/screening_criteria.html',
+        template_name='pages/screening/screener.html',
         context= {
             'parent': 'screening',
-            'segment': 'screening_criteria',
+            'segment': 'screener',
+            'page_obj': page_obj,
+            'status_message': status_message
         })
+
 
 
 @csrf_exempt
@@ -90,36 +110,6 @@ def stock_search(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
-def stock_screener(request):
-    query = request.GET.get('q')
-    if query:
-        market_data = MarketStockHistoricalBarsByMin.objects.filter(symbol__icontains=query)
-    else:
-        market_data = MarketStockHistoricalBarsByMin.objects.all()
-
-    paginator = Paginator(market_data, 10)  # Show 10 items per page
-
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    # Format the time field to display only the date
-    for item in page_obj:
-        item.time = item.time.strftime('%Y-%m-%d')
-
-    status_message = request.GET.get('status_message', '')
-
-    return render(
-        request=request,
-        template_name='pages/screening/stock_screener.html',
-        context= {
-            'parent': 'research',
-            'segment': 'stock screener',
-            'page_obj': page_obj,
-            'status_message': status_message}
-    )
-
-
 def get_stock_data(request):
     symbol = request.GET.get('symbol')
     interval = request.GET.get('interval', 'daily')
@@ -173,14 +163,66 @@ def get_stock_data(request):
 
     return JsonResponse(data)
 
-def stock_charts(request):
-    return render(
-        request=request,
-        template_name='pages/screening/stock_charts.html',
-        context= {
-            'parent': 'research',
-            'segment': 'stock charts',
-        })
+@csrf_exempt
+def output(request):
+    if request.method == 'POST':
+        try:
+            user_id = request.user.id  # Assuming you have the user_id from the request
+            portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
+            if not portfolio:
+                return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+
+
+            data = json.loads(request.body)
+            views_filter = data.get('views-filter', 'Tables')
+            views_value = data.get('views-value', 'overview')
+            sorted_by = data.get('sortedBy', '')
+            desc = data.get('desc', '')
+            chart_per_line = data.get('chartPerLine', '')
+            page = data.get('page', 1)  # Get the page number from the request, default to 1
+
+            # Initialize the queryset
+            # Part 1. holding_symbols
+            symbols = [item.symbol.symbol for item in Holding.objects.filter(portfolio=portfolio)]
+
+            # Get the total count of the filtered queryset
+            total_count = len(symbols)
+
+            if views_filter == 'Charts':
+                # Construct the URL for the chart image
+                chart_data = []
+                for symbol in symbols:
+                    chart_data.append({
+                        'symbol': symbol,
+                        'period': 'daily',
+                        'type': 'Candles-Full',
+                        'elements': 80
+                    })
+
+                # Paginate the chart URLs
+                paginator = Paginator(chart_data, 40)  # Show 20 items per page
+                page_obj = paginator.get_page(page)
+
+                return JsonResponse({
+                    'results': list(page_obj),
+                    'total_count': total_count
+                }, safe=False, status=200)
+            else:
+                # Convert queryset to a list of dictionaries
+                queryset = MarketSymbol.objects.filter(symbol__in=symbols).values('symbol', 'name', 'market', 'asset_type')
+
+                # Paginate the results
+                paginator = Paginator(queryset, 40)  # Show 10 items per page
+                page_obj = paginator.get_page(page)
+
+                return JsonResponse({
+                    'results': list(page_obj),
+                    'total_count': total_count
+                }, safe=False, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 

@@ -235,9 +235,9 @@ def default(request):
 
         return render(
             request=request,
-            template_name='pages/screening/snapshot_research.html',
+            template_name='pages/screening/snapshot.html',
             context= {
                 'parent': 'screening',
-                'segment': 'snapshot_research'})
+                'segment': 'snapshot'})
     except Exception as e:
         print(e.args)

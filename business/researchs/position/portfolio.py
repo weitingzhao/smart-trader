@@ -85,6 +85,7 @@ class Portfolio(PositionBase):
         # Calculate asset growth percentage
         balance_df['asset_growth_pct'] = (balance_df['margin_diff'] / balance_df['total_asset']) * 100
         # Calculate invest growth percentage
+        balance_df['total_invest'] = balance_df['total_invest'].replace(0, Decimal('1'))
         balance_df['invest_growth_pct'] = (balance_df['margin_diff'] / balance_df['total_invest']) * 100
 
         # Step 2.

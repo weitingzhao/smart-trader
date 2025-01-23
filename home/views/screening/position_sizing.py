@@ -142,9 +142,9 @@ def default(request):
 
     return render(
         request=request,
-        template_name='pages/wishlist/position_sizing.html',
+        template_name='pages/screening/position_sizing.html',
         context= {
-            'parent': 'wishlist',
+            'parent': 'screening',
             'segment': 'position_sizing',
             'watchlist_items': final_df.to_dict(orient='records'),
         })

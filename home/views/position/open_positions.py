@@ -32,8 +32,8 @@ def default(request):
         portfolio.investment = summary['mv']['value']
         portfolio.save()
 
-        # Query all records from the Strategy model
-        trade_strategy = Logic.research().category().strategy().get_simple_dic()
+    # Query all records from the Strategy model
+    trade_strategy = Logic.research().category().strategy().get_simple_dic()
 
     return render(
         request = request,

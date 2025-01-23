@@ -15,12 +15,15 @@ def default(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
+
+
+
     return render(
         request=request,
-        template_name='pages/wishlist/wishlist_overview.html',
+        template_name='pages//screening/wishlist.html',
         context={
-            'parent': 'wishlist',
-            'segment': 'wishlist_overview',
+            'parent': 'screening',
+            'segment': 'wishlist',
         })
 
 
