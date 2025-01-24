@@ -44,7 +44,7 @@
         <a data-bs-toggle="collapse" href="#screeningPanel"
            class="nav-link {% if 'screening' in parent %}active{% endif %}" aria-controls="screeningPanel" role="button" aria-expanded="false">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-              <i class="fas fa-flask-vial fs-7 {% if 'screener' in segment or 'snapshot' in segment or 'wishlist' in segment or 'position_sizing' in segment or 'initial_positions' in segment %}text-white{% else %}text-dark{% endif %}"></i>
+              <i class="fas fa-flask-vial fs-7 {% if 'screener' in segment or 'snapshot' in segment or 'wishlist' in segment or 'monitor' in segment or 'position_sizing' in segment or 'initial_positions' in segment %}text-white{% else %}text-dark{% endif %}"></i>
           </div>
           <span class="nav-link-text ms-1">Screening</span>
         </a>
@@ -66,6 +66,12 @@
                   <a class="nav-link {% if 'wishlist' in segment %}active{% endif %}" href="{% url 'wishlist' %}" target="_self">
                       <span class="sidenav-mini-icon"> WO </span>
                       <span class="sidenav-normal"> Wishlist </span>
+                  </a>
+              </li>
+              <li class="nav-item {% if 'monitor' in segment %}active{% endif %}">
+                  <a class="nav-link {% if 'monitor' in segment %}active{% endif %}" href="{% url 'monitor' %}" target="_self">
+                      <span class="sidenav-mini-icon"> MO </span>
+                      <span class="sidenav-normal"> monitor </span>
                   </a>
               </li>
               <li class="nav-item {% if 'position_sizing' in segment %}active{% endif %}">

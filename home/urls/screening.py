@@ -28,6 +28,10 @@ urlpatterns = [
     path('wishlist/fetching/data', screening.wishlist_overview.fetching, name='wishlist_fetching'),
     path('wishlist/<str:symbol>/delete/', screening.wishlist_overview.delete_wishlist, name='delete_wishlist'),
 
+    ####### Monitor #######
+    # wishlist -> Default (web socket)
+    path('Monitor/', screening.monitor.default, name='monitor'),
+
 
     # wishlist -> position_sizing
     path('position_sizing/', screening.position_sizing.default, name='position_sizing'),
