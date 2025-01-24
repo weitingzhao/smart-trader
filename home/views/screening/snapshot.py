@@ -165,12 +165,17 @@ def default(request):
         if not portfolio:
             return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
+        # Query all records from the Strategy model
+        trade_strategy = Logic.research().category().strategy().get_simple_dic(need_uncategorized=False)
 
         return render(
             request=request,
             template_name='pages/screening/snapshot.html',
             context= {
                 'parent': 'screening',
-                'segment': 'snapshot'})
+                'segment': 'snapshot',
+                'trade_strategy': trade_strategy  # Add trade_strategy to context
+            })
+
     except Exception as e:
         print(e.args)

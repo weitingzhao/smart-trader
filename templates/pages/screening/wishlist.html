@@ -69,16 +69,8 @@
                                     <tr>
                                         <th>No.</th>
                                         <th>Symbol</th>
-                                        <th>Name</th>
-                                        <th>Setup Rating</th>
-                                        <th>Technical Rating</th>
-                                        <th>Fundamental<br />Rating</th>
-                                        <th>Base</th>
-                                        <th>Relative Strength</th>
-                                        <th>Percent Change</th>
-                                        <th>1Mon performance</th>
-                                        <th>3Mon performance</th>
-                                        <th>6Mon performance</th>
+                                        <th>Strategy Name</th>
+                                        <th>Strategy Description</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -203,21 +195,13 @@
             "columns": [{ "data": "row_num" },
             { "data": "symbol_id" },
             { "data": "name" },
-            { "data": "setup_rating" },
-            { "data": "technical_rating" },
-            { "data": "fundamental_rating" },
-            { "data": "base" },
-            { "data": "relative_strength" },
-            { "data": "percent_change" },
-            { "data": "one_month_performance" },
-            { "data": "three_month_performance" },
-            { "data": "six_month_performance" },
+            { "data": "description" },
             {
                 "data": "symbol_id",
                 "title": "Action",
                 "className": "text-center",
                 "render": function (data, type, row) {
-                    return '<a href="javascript:void(0)" title="Add to wishlist" sid="' + data + '" s_name="' + row.name + '" onclick="javascript:addwishlist(this)"><i class="fa fa-add me-sm-2" aria-hidden="true"></i</a> '
+                    return '<a href="javascript:void(0)" title="remove from wishlist" sid="' + data + '" s_name="' + row.name + '" onclick="javascript:removeWishlist(this)"><i class="fa fa-trash me-sm-2" aria-hidden="true"></i</a> '
                 }
             }
             ],
@@ -254,51 +238,25 @@
         });
     })
 
-    function addwishlist(obj,rowdata) {
-        //alert($(obj).attr("sid"))
-        const form = document.getElementById('addwishlistForm');
-        form.reset();  // 重置表单，将所有控件的值清空
-        $("#symbol").val($(obj).attr("sid"))
-        $('#addwishlistModal').modal('show');
-    }
-
-    function Submit_add_wishlist(){
-        var formData = $('#addwishlistForm').serialize();
-        var obj = {};
-        // formData.forEach(function(value, key) {
-        //     obj[key] = value;
-        // });
-        var obj = {};
-        formData.split('&').forEach(function (item) {
-            var parts = item.split('=');
-            var key = decodeURIComponent(parts[0]);
-            var value = decodeURIComponent(parts[1] || ''); // 防止解码时出错，避免undefined
-            obj[key] = value;
-        });
-         obj.is_filled = $('#is_filled').prop('checked');
-         obj.quantity = 1;
-        if (obj.symbol) {
-            fetch('/wishlist/wishlist_overview/add_wishlist/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(obj)
+    function removeWishlist(obj) {
+        symbol = $(obj).attr("sid")
+        fetch(`/screening/wishlist/${symbol}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the table or remove the row from the table
+                    showMessage('symbol removed from wishlist successfully','success') ;
+                    dt.ajax.reload();
+                } else {
+                    alert('Error deleting symbol: ' + data.error);
+                }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        //alert('Portfolio added successfully');
-                        showMessage('Portfolio added successfully','success') ;
-                    } else {
-                        alert('Error adding portfolio: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
+            .catch(error => console.error('Error delete symbol', error));
     }
 
     function fetchData(params, callback) {

@@ -17,8 +17,8 @@ class Wishlist(models.Model):
     symbol = models.ForeignKey(MarketSymbol, on_delete=models.DO_NOTHING)
     add_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
     pick_at = models.DateField(null=True, blank=True)  # Add pick_at field
-    ref_strategy_id = models.ForeignKey(Strategy, on_delete=models.SET_NULL, null=True, blank=True)  # New field
-    ref_screening_id = models.ForeignKey(Screening, on_delete=models.SET_NULL, null=True, blank=True)
+    ref_strategy = models.ForeignKey(Strategy, on_delete=models.SET_NULL, null=True, blank=True)  # New field
+    ref_screening = models.ForeignKey(Screening, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     class Meta:
