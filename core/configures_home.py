@@ -97,6 +97,7 @@ class Config:
 
     # DB connection
     DB_CONN = {
+        "engine": "postgresql",
         "host": "",
         "port": 0,
         "dbname": "",

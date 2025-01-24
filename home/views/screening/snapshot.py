@@ -6,46 +6,25 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import decimal
-from sqlalchemy import create_engine
-from django.conf import settings
+import business.logic as Logic
 from dotenv import load_dotenv
-import os
-from django.db.utils import (
-    DEFAULT_DB_ALIAS
-)
 
 load_dotenv()
 
 @csrf_exempt
 def fetching(request):
-    engine = create_engine(conStr_sqlalchemy())
-    user_id = request.user.id  # Assuming you have the user_id from the request
-    portfolio = Portfolio.objects.filter(
-        user=user_id, is_default=True).order_by('-portfolio_id').first()
 
-    if not portfolio:
-        return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
-
-    holdings = Holding.objects.filter(portfolio=portfolio)
-    if len(holdings) <= 0:
-        return None, None
-
+    # Pagination parameters
     page_size = int(request.GET.get('pageSize'))
+    page_number = int(request.GET.get('page', 1))
+    # Where parameters
+    search_value = request.GET.get('keywords')
+    search_column = "sd.symbol_id"
+    # Order parameters
+    sort_default_column = " sd.symbol_id, sd.time"
+    sort_column = request.GET.get('sortColumn')
+    sort_direction = request.GET.get('sortDirection')
 
-    sortColumn = request.GET.get('sortColumn')
-    sortDirection = request.GET.get('sortDirection')
-
-    keyWords = request.GET.get('keywords')
-    whereStr = " where 1=1 "
-    params = ()
-    if len(keyWords) > 0:
-        params = (f'%{keyWords}%',)
-        whereStr += " and ( sd.symbol_id) ILIKE %s"
-
-    sort_criteria = " sd.symbol_id, sd.time"
-    if sortColumn and sortDirection:
-        # 将它们连接起来，通常可以用逗号或其他分隔符
-        sort_criteria = f" {sortColumn} {sortDirection}"
 
     # Step 1. Prepare summary query script
     showing_repeat_times = {
@@ -68,31 +47,15 @@ def fetching(request):
              ss.symbol_id, ss.screening_id
         """
 
-    # Step 2. Paginate the DataFrame
-    # Step 2.a. Get Page Number & calculate the offset
-    page_number = int(request.GET.get('page', 1))
-    offset = (page_number - 1) * page_size
-    # Step 2.b. Get the total count
-    count_query = f"""
+    # Step 1.a Count Sql
+    count_sql = f"""
         WITH summary AS ( {summary_query(showing_repeat_times)})
         , count AS (SELECT symbol_id FROM summary  GROUP BY symbol_id)
-        SELECT COUNT(*) FROM count sd {whereStr};
     """
-    total_count = 0
-    try:
-        total_count = pd.read_sql_query(
-            count_query, engine, params=params).iloc[0, 0]
-    except Exception as e:
-        print(e.args)
+    # print(count_sql)
 
-    paginator = Paginator(range(total_count), page_size)
-
-    # Step 3. Sorting parameters
-    sort_column = request.GET.get('sortColumn', 'default_column')
-    sort_direction = request.GET.get('sortDirection', 'asc')
-
-    # Query to fetch the specific page data
-    data_query = f"""
+    # Step 1.b Main Sql
+    main_sql = f"""
     WITH pivot_screening AS (
         SELECT *
         FROM crosstab(
@@ -182,46 +145,16 @@ def fetching(request):
         LEFT JOIN snapshot_bull_flag sbf ON sd.symbol_id = sbf.symbol_id AND sd.time = sbf.time
     )
     select * from result_table sd
-    {whereStr}
-    ORDER BY {sort_criteria}
-    LIMIT {page_size} OFFSET {offset};
     """
     # print(data_query)
-    try:
-        snapshot_df = pd.read_sql_query(data_query, engine, params=params)
-        snapshot_df = snapshot_df.replace({np.nan: None})  # Replace NaN with None
-        snapshot_df = snapshot_df.applymap(lambda x: str(
-            x) if isinstance(x, (int, decimal.Decimal, float)) else x)
-        snapshot_data = snapshot_df.to_dict(orient='records')
 
-        # Prepare the response data
-        response_data = {
-            'data': snapshot_data,
-            'total': paginator.count
-        }
-
-        return JsonResponse(response_data)
-    except Exception as e:
-        print(e.args)
-        return JsonResponse([])
+    return JsonResponse(Logic.engine().sql_alchemy().query_pagination(
+        count_sql=count_sql, main_sql=main_sql,
+        search_column=search_column, search_value=search_value,
+        sort_default_column=sort_default_column, sort_column=sort_column, sort_direction=sort_direction,
+        page_size=page_size, page_number= page_number))
 
 
-def conStr_sqlalchemy():
-    DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
-    DB_NAME     = os.getenv('DB_NAME'     , None)
-    DB_USERNAME = os.getenv('DB_USERNAME' , None)
-    DB_PASS     = os.getenv('DB_PASS'     , None)
-    DB_HOST     = os.getenv('DB_HOST'     , None)
-    DB_PORT     = os.getenv('DB_PORT'     , None)
-
-    # db_config = settings.DATABASES[DEFAULT_DB_ALIAS]
-    db_name = DB_NAME
-    db_user = DB_USERNAME
-    db_password = DB_PASS.replace('@', '%40')
-    db_host = DB_HOST
-    db_port = DB_PORT
-    conStr = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
-    return conStr
 
 
 def default(request):
@@ -229,9 +162,9 @@ def default(request):
     user_id = request.user.id  # Assuming you have the user_id from the request
     try:
         portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
-
         if not portfolio:
             return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+
 
         return render(
             request=request,

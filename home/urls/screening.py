@@ -24,6 +24,7 @@ urlpatterns = [
     ####### wishlist #######
     # wishlist -> Default
     path('wishlist/', screening.wishlist_overview.default, name='wishlist'),
+    path('wishlist/fetching/data', screening.wishlist_overview.fetching, name='wishlist_fetching'),
     # wishlist -> Add Portfolio
     path('wishlist_overview/add_wishlist/',screening.wishlist_overview.add_wishlist, name='add_wishlist'),
 

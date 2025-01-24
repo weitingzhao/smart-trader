@@ -18,6 +18,9 @@ class Engine(BaseEngine):
     def db(self) -> engine.PgSqlEngine:
         return engine.PgSqlEngine(self.config)
 
+    def sql_alchemy(self) -> engine.SqlAlchemyEngine:
+        return engine.SqlAlchemyEngine(self.config)
+
     def json_data(self, *args):
         return self.json(root=self.config.ROOT_Data, *args)
 
