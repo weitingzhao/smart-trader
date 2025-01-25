@@ -28,21 +28,18 @@
             <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
                 <div class="nav-wrapper position-relative end-0">
                     <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-                        <li class="nav-item" role="tab">
-                            <a id="monitor_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:"
-                                aria-selected="true">
+                        <li class="nav-item">
+                            <a id="monitor_btn" class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="true">
                                 <span class="ms-1">Monitor list</span>
                             </a>
                         </li>
-                        <li class="nav-item" role="tab">
-                            <a id="xxx_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
-                                href="javascript:" aria-selected="true">
+                        <li class="nav-item">
+                            <a id="xxx_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
                                 <span class="ms-1">xxx</span>
                             </a>
                         </li>
-                        <li class="nav-item" role="tab">
-                            <a id="yyy_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
-                                href="javascript:" aria-selected="true">
+                        <li class="nav-item">
+                            <a id="yyy_btn" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" href="javascript:" role="tab" aria-selected="false">
                                 <span class="ms-1">yyy</span>
                             </a>
                         </li>
@@ -52,19 +49,161 @@
         </div>
     </div>
 </div>
-<div id="monitor_panel" class="container-fluid py-4" style="display: none;">
+<div id="monitor_panel" class="container-fluid py-4">
+    <div class="row mt-4">
+      <div class="col-sm-8">
+        <div class="card h-100">
+          <div class="card-header pb-0 p-3">
+            <div class="d-flex align-items-center">
+              <h6 class="mb-0">Social</h6>
+              <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="See how much traffic do you get from social media">
+                <i class="fas fa-info"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <ul class="list-group">
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                <div class="w-100">
+                  <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-facebook btn-simple mb-0 p-0" href="javascript:;">
+                      <i class="fab fa-facebook fa-lg"></i>
+                    </a>
+                    <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Facebook</span>
+                    <span class="ms-auto text-sm font-weight-bold">80%</span>
+                  </div>
+                  <div>
+                    <div class="progress progress-md">
+                      <div class="progress-bar bg-gradient-dark w-80" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                <div class="w-100">
+                  <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-twitter btn-simple mb-0 p-0" href="javascript:;">
+                      <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Twitter</span>
+                    <span class="ms-auto text-sm font-weight-bold">40%</span>
+                  </div>
+                  <div>
+                    <div class="progress progress-md">
+                      <div class="progress-bar bg-gradient-dark w-40" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                <div class="w-100">
+                  <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-reddit btn-simple mb-0 p-0" href="javascript:;">
+                      <i class="fab fa-reddit fa-lg"></i>
+                    </a>
+                    <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Reddit</span>
+                    <span class="ms-auto text-sm font-weight-bold">30%</span>
+                  </div>
+                  <div>
+                    <div class="progress progress-md">
+                      <div class="progress-bar bg-gradient-dark w-30" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                <div class="w-100">
+                  <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-youtube btn-simple mb-0 p-0" href="javascript:;">
+                      <i class="fab fa-youtube fa-lg"></i>
+                    </a>
+                    <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Youtube</span>
+                    <span class="ms-auto text-sm font-weight-bold">25%</span>
+                  </div>
+                  <div>
+                    <div class="progress progress-md">
+                      <div class="progress-bar bg-gradient-dark w-25" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                <div class="w-100">
+                  <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-slack btn-simple mb-0 p-0" href="javascript:;">
+                      <i class="fab fa-slack fa-lg"></i>
+                    </a>
+                    <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Slack</span>
+                    <span class="ms-auto text-sm font-weight-bold">15%</span>
+                  </div>
+                  <div>
+                    <div class="progress progress-md">
+                      <div class="progress-bar bg-gradient-dark w-15" role="progressbar" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="card h-100 mt-4 mt-md-0">
+          <div class="card-header pb-0 p-3">
+            <div class="d-flex align-items-center">
+              <h6>Monitor list</h6>
+              <button type="button" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Data is based from sessions and is 100% accurate">
+                <i class="fas fa-check"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body px-3 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center justify-content-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Symbol</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Last</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Chg</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Chg%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for item in watchlist %}
+                  <tr id="monitor_row">
+                    <td>
+                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_symbol">{{ item.symbol_id}}</p>
+                    </td>
+                    <td>
+                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_last"></p>
+                    </td>
+                    <td>
+                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_chg"></p>
+                    </td>
+                    <td>
+                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_chg%"></p>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row mt-3">
         <div class="col-12 col-lg-12">
             <div class="card mb-4">
                 <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">Monitor</h6>
+                        <h6 class="mb-1">Socket Console</h6>
                     </div>
                 </div>
                 <div class="card-body p-3">
                     <div class="row">
-                        <div class="table-responsive">
-                        </div>
+                        <!-- Add this div inside the content block where you want the console to appear -->
+                        <div id="socket-console" style="height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; font-size: 12px;"></div>
                     </div>
                 </div>
             </div>
@@ -82,6 +221,63 @@
 <!-- Specific JS goes HERE -->
 {% block extra_js %}
 <script>
+    let quote_dic = {};
+
+    function socket_onmessage(event) {
+        const data = JSON.parse(event.data);
+        if (data.type !== 'quote')
+            return;
+
+        const key = data.key;
+        let detail = data.detail;
+
+        // Calculate the price parameter
+        detail.price = detail.last !== null  ? detail.last : detail.close;
+
+        // Update the UI with the stock price changes
+        const lastElement = document.getElementById(`${key}_last`);
+        if (lastElement) {
+            lastElement.textContent = detail.price;
+        }
+
+        // Update Quote Dictionary
+        quote_dic[key] = detail;
+        console.log(`k:${key}, d:${JSON.stringify(detail)}`);
+
+        // Format the message
+        const date = new Date(detail.time);
+        const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
+        const formattedMessage = `${formattedDate} ${key} :
+            Last:${detail.last !== null ? detail.last : ''},
+            Close:${detail.close !== null ? detail.close : ''},
+            Bid:${detail.bid !== null ? detail.bid : ''},
+            Ask:${detail.ask !== null ? detail.ask : ''},
+            High:${detail.high !== null ? detail.high : ''},
+            Low:${detail.low !== null ? detail.low : ''},
+            Volume:${detail.volume !== null ? detail.volume : ''}`;
+
+        // Append the original message to the console
+        const consoleElement = document.getElementById('socket-console');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = formattedMessage;
+        consoleElement.appendChild(messageElement);
+        consoleElement.scrollTop = consoleElement.scrollHeight; // Auto-scroll to the bottom
+
+        // Limit the total rows to 100
+        while (consoleElement.children.length > 100) {
+            consoleElement.removeChild(consoleElement.firstChild);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_prices/');
+
+        socket.onmessage = socket_onmessage
+
+        socket.onclose = function(event) {
+            console.error('WebSocket closed unexpectedly');
+        };
+    });
 
 </script>
 {% endblock extra_js %}

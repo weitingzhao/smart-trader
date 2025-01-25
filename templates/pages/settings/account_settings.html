@@ -9,6 +9,12 @@
                   <div class="card position-sticky top-1">
                       <ul class="nav flex-column bg-white border-radius-lg p-3">
                           <li class="nav-item">
+                              <a class="nav-link text-body" data-scroll="" href="#services">
+                                  <i class="fas fa-magnifying-glass me-2"></i>
+                                  <span class="text-sm">Services</span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link text-body" data-scroll="" href="#portfolios_div">
                                   <i class="fas fa-chart-simple me-2"></i>
                                   <span class="text-sm">Portfolios</span>
@@ -18,8 +24,49 @@
                   </div>
               </div>
               <div class="col-lg-10 mt-lg-0 mt-4">
-                <!-- Portfolio List -->
-                <div class="card mt-4" id="portfolios_div">
+                  <!-- Stock Live price  -->
+                  <div class="card mt-4" id="services">
+                      <div class="card-header">
+                          <h5>Services</h5>
+                          <p class="text-sm">below services ideal should running</p>
+                      </div>
+                      <div class="card-body pt-0">
+                          <div class="table-responsive">
+                              <table class="table mb-0">
+                                  <thead>
+                                  <tr>
+                                      <th class="ps-1" colspan="4">
+                                          <p class="mb-0">Services</p>
+                                      </th>
+                                      <th class="text-center">
+                                          <p class="mb-0">Status</p>
+                                      </th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  <tr>
+                                      <td class="ps-1" colspan="4">
+                                          <div class="my-auto">
+                                              <span class="text-dark d-block text-sm">Live Price</span>
+                                              <span class="text-xs font-weight-normal">Stock Live Price Quote websocket services</span>
+                                          </div>
+                                      </td>
+                                      <td>
+                                          <div class="form-check form-switch mb-0 d-flex align-items-center justify-content-center">
+                                              <input class="form-check-input" type="checkbox"
+                                                     id="stock_price_live_socket_status" name="stock_price_live_socket_status"
+                                                     onchange="changeStockLivePirceWS(this)"
+                                                     {% if stock_price_live_socket_status %}checked{% endif %}>
+                                          </div>
+                                      </td>
+                                  </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                  <!-- Portfolio List -->
+                  <div class="card mt-4" id="portfolios_div">
                     <div class="card-header">
                         <h5>Set default portfolios</h5>
                     </div>
@@ -303,6 +350,24 @@
 
         {% endfor %}
     {% endif %}
-</script>
 
+    function changeStockLivePirceWS(obj) {
+        const enabled = obj.checked;
+        fetch(`/settings/stock_live_price_ws/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({enabled: enabled})
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Stock Price Consumer state updated');
+                } else {
+                    console.error('Failed to update Stock Price Consumer state');
+                }
+            });
+    }
+</script>
 {% endblock extra_js %}

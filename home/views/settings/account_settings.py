@@ -1,3 +1,4 @@
+import asyncio
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -6,6 +7,9 @@ from home.forms.portfolio import PortfolioForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
+from home.web_sockets.ib_connection_service import IBConnectionService
+from home.web_sockets.stock_price_ws import StockPriceWS
+
 def default(request):
 
     user_id = request.user
@@ -13,7 +17,7 @@ def default(request):
     portfolios = Portfolio.objects.filter(user=user_id).order_by('-is_default')
     form = PortfolioForm()
 
-
+    stock_price_live_socket_status = not IBConnectionService.is_instance_none()
 
     return render(
         request=request,
@@ -22,9 +26,27 @@ def default(request):
             'parent': 'settings',
             'segment': 'account_settings',
             'portfolios': portfolios,
-            'form': form
+            'form': form,
+            'stock_price_live_socket_status': stock_price_live_socket_status
         })
 
+@csrf_exempt
+def stock_live_price_ws(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        enabled = data.get('enabled', False)
+
+        if enabled:
+            # Create and connect the IB instance
+            if IBConnectionService.is_instance_none():
+                asyncio.run(IBConnectionService().start())
+        else:
+            # Disconnect and destroy the IB instance
+            if not IBConnectionService.is_instance_none():
+                asyncio.run(IBConnectionService().stop())
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 @csrf_exempt
 def add_portfolio(request):

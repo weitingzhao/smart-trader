@@ -11,6 +11,11 @@ urlpatterns = [
         settings.account_settings.default,
         name='account_settings'),
 
+    path(
+        'stock_live_price_ws/',
+        settings.account_settings.stock_live_price_ws,
+        name='stock_live_price_ws'),
+
     # Account Settings -> Add Portfolio
     path(
         'portfolio/add/',

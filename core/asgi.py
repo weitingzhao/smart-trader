@@ -13,15 +13,13 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import threading
 import ray
 from django.apps import apps
-
+import home.websocket as home_websocket
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 # init ray
-ray.init()
-
-
+# ray.init() # no need add ray now
 
 bokeh_app_config = apps.get_app_config('bokeh_django')
 
@@ -33,7 +31,8 @@ application = ProtocolTypeRouter({
     ),
     'websocket': AuthMiddlewareStack(
         URLRouter(
-            bokeh_app_config.routes.get_websocket_urlpatterns()
+            bokeh_app_config.routes.get_websocket_urlpatterns() +
+            home_websocket.websocket_urlpatterns
         )
     ),
 })
