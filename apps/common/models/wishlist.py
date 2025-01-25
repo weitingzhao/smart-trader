@@ -20,6 +20,8 @@ class Wishlist(models.Model):
     ref_strategy = models.ForeignKey(Strategy, on_delete=models.SET_NULL, null=True, blank=True)  # New field
     ref_screening = models.ForeignKey(Screening, on_delete=models.SET_NULL, null=True, blank=True)
 
+    last_sync_time_hour = models.DateTimeField(null=True, blank=True)  # Add last hour sync time field
+    last_sync_time_ext_hour = models.DateTimeField(null=True, blank=True)  # Add last hour sync time field
 
     class Meta:
         db_table = 'wishlist'

@@ -91,3 +91,23 @@ class MarketStockHistoricalBarsByHour(TimescaleModel):
 
     def __str__(self):
         return f"{self.symbol} - {self.time}"
+
+class MarketStockHistoricalBarsByHourExt(TimescaleModel):
+    symbol = models.CharField(max_length=10, null=False, blank=False, default="NaN")
+    open = models.FloatField()
+    high = models.FloatField()
+    low = models.FloatField()
+    close = models.FloatField()
+    volume = models.FloatField()
+
+    class Meta:
+        db_table = 'market_stock_hist_bars_hour_ext_ts'
+        indexes = [
+            models.Index(fields=['symbol', 'time']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['symbol', 'time'], name='symbol_timestamp_hour_extended_pk'),
+        ]
+
+    def __str__(self):
+        return f"{self.symbol} - {self.time}"

@@ -5,11 +5,10 @@ from ib_insync import *
 import pandas as pd
 import json
 import datetime
-from apps.common.models import Wishlist
 from business import logic
 
 
-class IBConnectionService:
+class IntBrokersQuoteService:
     _instance = None
     _lock = threading.Lock()
 

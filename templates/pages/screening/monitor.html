@@ -242,7 +242,7 @@
 
         // Update Quote Dictionary
         quote_dic[key] = detail;
-        console.log(`k:${key}, d:${JSON.stringify(detail)}`);
+        {#console.log(`k:${key}, d:${JSON.stringify(detail)}`);#}
 
         // Format the message
         const date = new Date(detail.time);

@@ -7,8 +7,8 @@ from home.forms.portfolio import PortfolioForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
-from home.web_sockets.ib_connection_service import IBConnectionService
-from home.web_sockets.stock_price_ws import StockPriceWS
+from home.services.ib_quote_service import IntBrokersQuoteService
+from home.services.price_quote_ws import StockPriceWS
 
 def default(request):
 
@@ -17,7 +17,7 @@ def default(request):
     portfolios = Portfolio.objects.filter(user=user_id).order_by('-is_default')
     form = PortfolioForm()
 
-    stock_price_live_socket_status = not IBConnectionService.is_instance_none()
+    stock_price_live_socket_status = not IntBrokersQuoteService.is_instance_none()
 
     return render(
         request=request,
@@ -38,12 +38,12 @@ def stock_live_price_ws(request):
 
         if enabled:
             # Create and connect the IB instance
-            if IBConnectionService.is_instance_none():
-                asyncio.run(IBConnectionService().start())
+            if IntBrokersQuoteService.is_instance_none():
+                asyncio.run(IntBrokersQuoteService().start())
         else:
             # Disconnect and destroy the IB instance
-            if not IBConnectionService.is_instance_none():
-                asyncio.run(IBConnectionService().stop())
+            if not IntBrokersQuoteService.is_instance_none():
+                asyncio.run(IntBrokersQuoteService().stop())
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
