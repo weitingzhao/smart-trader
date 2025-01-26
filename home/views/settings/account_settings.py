@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
 from home.services.ib_quote_server import IntBrokersQuoteService
-from home.services.price_monitor_ws import StockQuoteWS
+from home.services.price_monitor_ws import StockMonitorWS
 from home.services.tw_hist_sever import TradingViewHistService
 
 

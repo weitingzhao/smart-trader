@@ -199,11 +199,22 @@
                     <div>
                         <h6 class="mb-1">Socket Console</h6>
                     </div>
+                    <ul class="nav nav-tabs" id="consoleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="quote-tab" data-bs-toggle="tab" href="#quote-console" role="tab" aria-controls="quote-console" aria-selected="true">Quote Console</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="hist-tab" data-bs-toggle="tab" href="#hist-console" role="tab" aria-controls="hist-console" aria-selected="false">Historical Console</a>
+                    </li>
+                </ul>
                 </div>
                 <div class="card-body p-3">
-                    <div class="row">
-                        <!-- Add this div inside the content block where you want the console to appear -->
-                        <div id="socket-console" style="height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; font-size: 12px;"></div>
+                <div class="tab-content" id="consoleTabsContent">
+                    <div class="tab-pane fade show active" id="quote-console" role="tabpanel" aria-labelledby="quote-tab">
+                        <div id="quote-console-content" style="height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; font-size: 12px;"></div>
+                    </div>
+                    <div class="tab-pane fade" id="hist-console" role="tabpanel" aria-labelledby="hist-tab">
+                        <div id="hist-console-content" style="height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; font-size: 12px;"></div>
                     </div>
                 </div>
             </div>
@@ -225,25 +236,78 @@
 
     function socket_onmessage(event) {
         const data = JSON.parse(event.data);
-        if (data.type !== 'quote')
-            return;
+        let symbol = data.key;
 
-        const key = data.key;
-        let detail = data.detail;
+        if (data.type === 'quote'){
+            stock_obj = cache_stock_obj(true, symbol, data.detail);
+            render_stock_obj(true, symbol, stock_obj);
+            handle_quote(symbol, stock_obj);
+        }
+        if (data.type === 'hist' && data.interval === 'D'){
+            stock_obj = cache_stock_obj(false, data.key, data.detail);
+            render_stock_obj(false, symbol, stock_obj);
+            handle_hist(data.key, stock_obj);
+        }
+    }
 
-        // Calculate the price parameter
-        detail.price = detail.last !== null  ? detail.last : detail.close;
+    function cache_stock_obj(is_quote, key, detail){
+        let old_obj = null;
+        let current_obj = null;
+
+        if (quote_dic.hasOwnProperty(key)){
+            old_obj = { ...quote_dic[key] };
+            if (is_quote)
+                quote_dic[key]['quote'] = detail;
+            else
+                quote_dic[key]['hist'] = detail;
+        }
+        else{
+            if (is_quote)
+                quote_dic[key] = {'quote': detail, 'hist': null};
+            else
+                quote_dic[key] = {'quote': null, 'hist': detail};
+            old_obj = { ...quote_dic[key] };
+        }
+        current_obj = quote_dic[key];
+        return {old: old_obj, current: current_obj};
+    }
+
+    function get_stock_price(detail_json){
+        let detail = detail_json.quote;
+        if (!detail)
+            detail = detail_json.hist;
+        let price = detail.close;
+        if (detail_json.quote) {
+            price = detail.last !== null ? detail.last : detail.close;
+        }
+        return price;
+    }
+
+    function render_stock_obj(is_quote, key, stock_obj){
+
+        // 1. Stock Current Price
+        old_price = get_stock_price(stock_obj.old);
+        price = get_stock_price(stock_obj.current);
+
+        const chgEle = document.getElementById(`${key}_chg`);
+        const chgPctEle = document.getElementById(`${key}_chg%`);
 
         // Update the UI with the stock price changes
-        const lastElement = document.getElementById(`${key}_last`);
-        if (lastElement) {
-            lastElement.textContent = detail.price;
+        const lastEle = document.getElementById(`${key}_last`);
+        if (lastEle) {
+            lastEle.textContent = price;
+            if (price > old_price) {
+                lastEle.style.color = 'green';
+            } else if (price < old_price) {
+                lastEle.style.color = 'red';
+            } else {
+                lastEle.style.color = '';
+            }
         }
+    }
 
-        // Update Quote Dictionary
-        quote_dic[key] = detail;
-        {#console.log(`k:${key}, d:${JSON.stringify(detail)}`);#}
-
+    function handle_quote(key, stock_obj){
+        detail = stock_obj.current.quote
         // Format the message
         const date = new Date(detail.time);
         const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
@@ -257,9 +321,23 @@
             Volume:${detail.volume !== null ? detail.volume : ''}`;
 
         // Append the original message to the console
-        const consoleElement = document.getElementById('socket-console');
+        console_log('quote-console-content', formattedMessage)
+    }
+
+    function handle_hist(key, stock_obj){
+        detail = stock_obj.current.hist
+        // Format the message
+        const formattedMessage = `Symbol: ${key}, Close: ${detail.close}`;
+
+        // Append the original message to the historical console
+        console_log('hist-console-content', formattedMessage)
+    }
+
+    function console_log(console_id, message){
+        // Append the original message to the console
+        const consoleElement = document.getElementById(console_id);
         const messageElement = document.createElement('div');
-        messageElement.textContent = formattedMessage;
+        messageElement.textContent = message;
         consoleElement.appendChild(messageElement);
         consoleElement.scrollTop = consoleElement.scrollHeight; // Auto-scroll to the bottom
 
