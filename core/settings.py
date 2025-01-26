@@ -310,6 +310,12 @@ CELERY_RESULT_SERIALIZER  = 'json'
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
+###### Data Feed
+# TradingView
+TW_USERNAME = os.getenv('TW_USERNAME'   , None)
+TW_PASSWORD = os.getenv('TW_PASSWORD'   , None)
+
+
 ########################################
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'

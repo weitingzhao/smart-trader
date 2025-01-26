@@ -270,7 +270,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_prices/');
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_quote/');
 
         socket.onmessage = socket_onmessage
 

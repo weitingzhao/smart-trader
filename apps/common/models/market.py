@@ -47,6 +47,8 @@ class MarketStockHistoricalBarsByMin(TimescaleModel):
 
 class MarketStockHistoricalBarsByDay(TimescaleModel):
     symbol = models.CharField(max_length=10, null=False, blank=False, default="NaN")
+    time = models.DateField(null=False, blank=False)  # Changed to DateField'
+
     open = models.FloatField()
     high = models.FloatField()
     low = models.FloatField()

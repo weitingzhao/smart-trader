@@ -2,13 +2,17 @@ import asyncio
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
+from fontTools.varLib.plot import stops
+
 from apps.common.models import Portfolio
 from home.forms.portfolio import PortfolioForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
-from home.services.ib_quote_service import IntBrokersQuoteService
-from home.services.price_quote_ws import StockPriceWS
+from home.services.ib_quote_server import IntBrokersQuoteService
+from home.services.price_quote_ws import StockQuoteWS
+from home.services.tw_hist_sever import TradingViewHistService
+
 
 def default(request):
 
@@ -17,7 +21,8 @@ def default(request):
     portfolios = Portfolio.objects.filter(user=user_id).order_by('-is_default')
     form = PortfolioForm()
 
-    stock_price_live_socket_status = not IntBrokersQuoteService.is_instance_none()
+    stock_live_price_service_status = IntBrokersQuoteService.is_exist()
+    stock_hist_price_service_status = TradingViewHistService.is_exist()
 
     return render(
         request=request,
@@ -27,23 +32,35 @@ def default(request):
             'segment': 'account_settings',
             'portfolios': portfolios,
             'form': form,
-            'stock_price_live_socket_status': stock_price_live_socket_status
+            'stock_live_price_service_status': stock_live_price_service_status,
+            'stock_hist_price_service_status': stock_hist_price_service_status
         })
 
 @csrf_exempt
-def stock_live_price_ws(request):
+def stock_price(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        enabled = data.get('enabled', False)
+        starting  = data.get('enabled', False)
+        server = data.get('server', False)
 
-        if enabled:
-            # Create and connect the IB instance
-            if IntBrokersQuoteService.is_instance_none():
-                asyncio.run(IntBrokersQuoteService().start())
-        else:
-            # Disconnect and destroy the IB instance
-            if not IntBrokersQuoteService.is_instance_none():
-                asyncio.run(IntBrokersQuoteService().stop())
+        if server == 'quote':
+            if starting :
+                # Create and connect the IB instance
+                if not IntBrokersQuoteService.is_exist():
+                    asyncio.run(IntBrokersQuoteService().start())
+            else:
+                # Disconnect and destroy the IB instance
+                if IntBrokersQuoteService.is_exist():
+                    asyncio.run(IntBrokersQuoteService().stop())
+        elif server == "hist":
+            if starting:
+                # Create and connect the IB instance
+                if not TradingViewHistService.is_exist():
+                    asyncio.run(TradingViewHistService().start())
+            else:
+                # Disconnect and destroy the IB instance
+                if TradingViewHistService.is_exist():
+                    asyncio.run(TradingViewHistService().stop())
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)

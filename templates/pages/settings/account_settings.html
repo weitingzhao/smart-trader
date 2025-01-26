@@ -47,24 +47,40 @@
                                   <tr>
                                       <td class="ps-1" colspan="4">
                                           <div class="my-auto">
-                                              <span class="text-dark d-block text-sm">Live Price</span>
-                                              <span class="text-xs font-weight-normal">Stock Live Price Quote websocket services</span>
+                                              <span class="text-dark d-block text-sm">Stock Live Price Quote Server</span>
+                                              <span class="text-xs font-weight-normal">Interactive Brokers Stock live price Quote services</span>
                                           </div>
                                       </td>
                                       <td>
                                           <div class="form-check form-switch mb-0 d-flex align-items-center justify-content-center">
                                               <input class="form-check-input" type="checkbox"
-                                                     id="stock_price_live_socket_status" name="stock_price_live_socket_status"
-                                                     onchange="changeStockLivePirceWS(this)"
-                                                     {% if stock_price_live_socket_status %}checked{% endif %}>
+                                                     id="stock_live_price_service_status" name="stock_live_price_service_status"
+                                                     onchange="changeServer(this,'quote', 'stock_quote')"
+                                                     {% if stock_live_price_service_status %}checked{% endif %}>
                                           </div>
                                       </td>
                                   </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                                  <tr>
+                                      <td class="ps-1" colspan="4">
+                                          <div class="my-auto">
+                                              <span class="text-dark d-block text-sm">Stock Historical Price Server</span>
+                                              <span class="text-xs font-weight-normal">Trading View Stock historical price services</span>
+                                          </div>
+                                      </td>
+                                      <td>
+                                          <div class="form-check form-switch mb-0 d-flex align-items-center justify-content-center">
+                                              <input class="form-check-input" type="checkbox"
+                                                     id="stock_hist_price_service_status" name="stock_hist_price_service_status"
+                                                     onchange="changeServer(this,'hist', 'stock_hist')"
+                                                     {% if stock_hist_price_service_status %}checked{% endif %}>
+                                          </div>
+                                      </td>
+                                  </tr>
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
                   </div>
-                </div>
                   <!-- Portfolio List -->
                   <div class="card mt-4" id="portfolios_div">
                     <div class="card-header">
@@ -351,23 +367,26 @@
         {% endfor %}
     {% endif %}
 
-    function changeStockLivePirceWS(obj) {
+    function changeServer(obj, server, server_name) {
         const enabled = obj.checked;
-        fetch(`/settings/stock_live_price_ws/`, {
+        fetch(`/settings/stock_price/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: JSON.stringify({enabled: enabled})
-        }).then(response => response.json())
+            body: JSON.stringify({enabled: enabled, server: server})
+        })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('Stock Price Consumer state updated');
+                    console.log(`${server_name} state updated`);
                 } else {
-                    console.error('Failed to update Stock Price Consumer state');
+                    console.error(`Failed to update ${server_name} state`);
                 }
             });
     }
+
+
 </script>
 {% endblock extra_js %}

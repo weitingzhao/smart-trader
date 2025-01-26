@@ -1,7 +1,7 @@
 from alpaca.data import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
-from apps.common.models import MarketStockHistoricalBarsByDay
+from apps.common.models import *
 
 # Initialize Alpaca API client
 API_KEY = "PK1QV6ECTTX0TOWJ74N4"
