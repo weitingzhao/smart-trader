@@ -181,7 +181,7 @@
                       <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_chg"></p>
                     </td>
                     <td>
-                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_chg%"></p>
+                      <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_chg_pct"></p>
                     </td>
                   </tr>
                   {% endfor %}
@@ -283,14 +283,12 @@
         return price;
     }
 
+
     function render_stock_obj(is_quote, key, stock_obj){
 
         // 1. Stock Current Price
         old_price = get_stock_price(stock_obj.old);
         price = get_stock_price(stock_obj.current);
-
-        const chgEle = document.getElementById(`${key}_chg`);
-        const chgPctEle = document.getElementById(`${key}_chg%`);
 
         // Update the UI with the stock price changes
         const lastEle = document.getElementById(`${key}_last`);
@@ -304,6 +302,25 @@
                 lastEle.style.color = '';
             }
         }
+
+        // Calculate change and change percentage
+        pre_close_price = stock_obj.current.hist.pre_close;
+        const chg = price - pre_close_price;
+        const chgPct = (chg / pre_close_price) * 100;
+
+        const chgEle = document.getElementById(`${key}_chg`);
+        const chgPctEle = document.getElementById(`${key}_chg_pct`);
+        // Update the change and change percentage elements
+        if (chgEle) {
+            chgEle.textContent = chg.toFixed(2);
+            style = price > pre_close_price ? 'green' : price < pre_close_price ? 'red' : '';
+            chgEle.style.color = style;
+        }
+        if (chgPctEle) {
+            chgPctEle.textContent = chgPct.toFixed(2) + '%';
+            style = price > pre_close_price ? 'green' : price < pre_close_price ? 'red' : '';
+            chgPctEle.style.color = style;
+        }
     }
 
     function handle_quote(key, stock_obj){
@@ -311,7 +328,7 @@
         // Format the message
         const date = new Date(detail.time);
         const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
-        const formattedMessage = `${formattedDate} ${key} :
+        const output = `${formattedDate} ${key} :
             Last:${detail.last !== null ? detail.last : ''},
             Close:${detail.close !== null ? detail.close : ''},
             Bid:${detail.bid !== null ? detail.bid : ''},
@@ -321,16 +338,18 @@
             Volume:${detail.volume !== null ? detail.volume : ''}`;
 
         // Append the original message to the console
-        console_log('quote-console-content', formattedMessage)
+        console_log('quote-console-content', output)
     }
 
     function handle_hist(key, stock_obj){
         detail = stock_obj.current.hist
         // Format the message
-        const formattedMessage = `Symbol: ${key}, Close: ${detail.close}`;
+        const output = `${key}:
+            ${detail.date} close @ ${detail.close},
+            ${detail.pre_time} close @ ${detail.pre_close}`;
 
         // Append the original message to the historical console
-        console_log('hist-console-content', formattedMessage)
+        console_log('hist-console-content', output)
     }
 
     function console_log(console_id, message){

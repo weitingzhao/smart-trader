@@ -47,15 +47,37 @@ class StockMonitorWS(AsyncWebsocketConsumer):
 
     async def _init_stock_hist(self):
         recent_prices = pd.read_sql_query("""
-            SELECT w.symbol_id AS symbol, b.close
-            FROM wishlist w
-            LEFT JOIN market_stock_hist_bars_day_ts b
-            ON w.symbol_id = b.symbol
-            WHERE b.time = (SELECT MAX(time) FROM market_stock_hist_bars_day_ts);
+            SELECT
+                w.symbol_id AS symbol,
+                b.close,
+                b.time,
+                prev_b.close AS pre_close,
+                prev_b.time AS pre_time
+            FROM
+                wishlist w
+            LEFT JOIN
+                market_stock_hist_bars_day_ts b
+            ON
+                w.symbol_id = b.symbol
+            LEFT JOIN
+                market_stock_hist_bars_day_ts prev_b
+            ON
+                w.symbol_id = prev_b.symbol
+                AND prev_b.time = (
+                    SELECT MAX(time)
+                    FROM market_stock_hist_bars_day_ts
+                    WHERE symbol = w.symbol_id
+                    AND time < (SELECT MAX(time) FROM market_stock_hist_bars_day_ts WHERE symbol = w.symbol_id)
+                )
+            WHERE
+            b.time = (SELECT MAX(time) FROM market_stock_hist_bars_day_ts);
         """, logic.engine().sql_alchemy().create_engine())
         for _, row in recent_prices.iterrows():
             detail = {
-                'close': row['close']
+                'close': row['close'],
+                'date': row['time'].isoformat(),
+                'pre_close': row['pre_close'],
+                'pre_time': row['pre_time'].isoformat(),
             }
             json_str = json.dumps({'type': 'hist', 'interval': 'D',  'key': row['symbol'], 'detail': detail})
             print(f"Hist->Redis->: {json_str}")
