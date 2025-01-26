@@ -6,7 +6,7 @@ import json
 class StockQuoteWS(AsyncWebsocketConsumer):
 
     async def connect(self):
-        self.group_name = 'stock_quote'
+        self.group_name = 'sstock_quote'
         self.redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
         # await self.channel_layer.group_add(self.group_name, self.channel_name)
