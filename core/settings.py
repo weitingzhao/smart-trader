@@ -51,7 +51,7 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = ['*']
 # Used by DEBUG-Toolbar
-INTERNAL_IPS = ["127.0.0.1",]
+INTERNAL_IPS = ["127.0.0.1","10.0.0.90","10.0.0.80",]
 # Add here your deployment HOSTS
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
