@@ -253,78 +253,91 @@
     function cache_stock_obj(is_quote, key, detail){
         let old_obj;
         let current_obj;
-
         if (quote_dic.hasOwnProperty(key)){
-            old_obj = { ...quote_dic[key] };
+            //UPDATE
+            old_obj = is_quote ? { ...quote_dic[key]['quote']}  : { ...quote_dic[key]['hist']};
             if (is_quote)
                 quote_dic[key]['quote'] = detail;
             else
+            {
                 quote_dic[key]['hist'] = detail;
+                quote_dic[key]['pre_close'] = detail.pre_close;
+            }
         }
-        else{
-            if (is_quote)
-                quote_dic[key] = {'quote': detail, 'hist': null};
-            else
-                quote_dic[key] = {'quote': null, 'hist': detail};
-            old_obj = { ...quote_dic[key] };
+        else
+        {
+            //ADD
+            quote_dic[key] = is_quote
+                ? {'quote': detail, 'hist': null, 'pre_close': 0}
+                : {'quote': null, 'hist': detail, 'pre_close': detail.pre_close};
+            old_obj = is_quote ? { ...quote_dic[key]['quote'] } : { ...quote_dic[key]['hist'] };
         }
-        current_obj = quote_dic[key];
-        return {old: old_obj, current: current_obj};
+        current_obj = is_quote? quote_dic[key]['quote'] : quote_dic[key]['hist'];
+        return {old: old_obj, current: current_obj, pre_close: quote_dic[key]['pre_close']};
     }
 
-    function get_stock_price(detail_json){
-        let detail = detail_json.quote;
-        if (!detail)
-            detail = detail_json.hist;
-        let price = detail.close;
-        if (detail_json.quote) {
-            price = detail.last !== null ? detail.last : detail.close;
-        }
-        return price;
+    function get_stock_price(is_quote, detail){
+        {#console.log("quote=>"+ JSON.stringify(detail_json));#}
+        {#console.log("close=>"+ detail_json.close);#}
+        if(is_quote)
+            return  detail.last !== null ? detail.last.toFixed(2) : detail.close.toFixed(2);
+        else
+            return  detail.close.toFixed(2);
     }
 
 
     function render_stock_obj(is_quote, key, stock_obj){
+        console.log('stock_obj=>'+JSON.stringify(stock_obj));
 
         // 1. Stock Current Price
-        old_price = get_stock_price(stock_obj.old);
-        price = get_stock_price(stock_obj.current);
+        old = get_stock_price(is_quote, stock_obj.old);
+        current = get_stock_price(is_quote, stock_obj.current);
+        pre_close = stock_obj.pre_close;
+        console.log('current=>'+current);
+        console.log('pre_close=>'+pre_close);
 
         // Update the UI with the stock price changes
         const lastEle = document.getElementById(`${key}_last`);
         if (lastEle) {
-            lastEle.textContent = price;
-            if (price > old_price) {
-                lastEle.style.color = 'green';
-            } else if (price < old_price) {
-                lastEle.style.color = 'red';
-            } else {
-                lastEle.style.color = '';
+            if(is_quote){
+                lastEle.textContent = current;
+                if (current > old) {
+                    lastEle.style.color = 'green';
+                } else if (current < old) {
+                    lastEle.style.color = 'red';
+                } else {
+                    lastEle.style.color = '';
+                }
+            }else{
+                 lastEle.textContent = current;
             }
         }
 
         // Calculate change and change percentage
-        pre_close_price = stock_obj.current.hist.pre_close;
-        const chg = price - pre_close_price;
-        const chgPct = (chg / pre_close_price) * 100;
+        update_stock_chg(key, current, pre_close);
+    }
+
+    function update_stock_chg(key, current, pre_close){
+        const chg = current - pre_close;
+        const chgPct = (chg / pre_close) * 100;
 
         const chgEle = document.getElementById(`${key}_chg`);
         const chgPctEle = document.getElementById(`${key}_chg_pct`);
         // Update the change and change percentage elements
         if (chgEle) {
             chgEle.textContent = chg.toFixed(2);
-            style = price > pre_close_price ? 'green' : price < pre_close_price ? 'red' : '';
+            style = current > pre_close ? 'green' : current < pre_close ? 'red' : '';
             chgEle.style.color = style;
         }
         if (chgPctEle) {
             chgPctEle.textContent = chgPct.toFixed(2) + '%';
-            style = price > pre_close_price ? 'green' : price < pre_close_price ? 'red' : '';
+            style = current > pre_close ? 'green' : current < pre_close ? 'red' : '';
             chgPctEle.style.color = style;
         }
     }
 
     function handle_quote(key, stock_obj){
-        detail = stock_obj.current.quote
+        detail = stock_obj.current
         // Format the message
         const date = new Date(detail.time);
         const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
@@ -342,7 +355,7 @@
     }
 
     function handle_hist(key, stock_obj){
-        detail = stock_obj.current.hist
+        detail = stock_obj.current
         // Format the message
         const output = `${key}:
             ${detail.date} close @ ${detail.close},
