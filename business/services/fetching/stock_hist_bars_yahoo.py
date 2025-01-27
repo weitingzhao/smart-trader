@@ -163,8 +163,7 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
                     return
 
                 records = []
-                min_date_in_history = bar_result.index.min()
-                date = min_date_in_history
+                min_date_in_history = bar_result.index.min().date()
                 if is_append:
                     # step 1. get existing records from db and all times for those records
                     existing_records_dates = sorted(model.objects.filter(
@@ -181,7 +180,8 @@ class StockHistBarsYahoo(BaseService, TaskFetchingWorker):
                         existing_records_dates.remove(max_date)
 
                     # step 3. append new records from history api, append to db
-                    for date, row in bar_result.iterrows():
+                    for time, row in bar_result.iterrows():
+                        date = time.date()
                         if date in existing_records_dates:
                             continue
                         append()

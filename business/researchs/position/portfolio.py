@@ -1,5 +1,7 @@
 import pandas as pd
 import datetime
+
+from cupyx.profiler import time_range
 from pandas.core.interchange.dataframe_protocol import DataFrame
 from ...service import Service
 from .position_base import PositionBase
@@ -171,11 +173,10 @@ class Portfolio(PositionBase):
 
     def get_market_data(self, symbols_df: DataFrame, min_date: pd.Timestamp) -> pd.DataFrame:
         today = pd.to_datetime('today').date()
-
         # Create a DataFrame with all symbols
         market_data = MarketStockHistoricalBarsByDay.objects.filter(
             symbol__in=symbols_df['symbol'].tolist(),
-            time__date__range=[min_date, today]
+            time__range=[min_date, today]
         ).values('symbol', 'time', 'close')
 
         # Convert market data to DataFrame

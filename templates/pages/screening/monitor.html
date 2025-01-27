@@ -244,15 +244,15 @@
             handle_quote(symbol, stock_obj);
         }
         if (data.type === 'hist' && data.interval === 'D'){
-            stock_obj = cache_stock_obj(false, data.key, data.detail);
+            stock_obj = cache_stock_obj(false, symbol, data.detail);
             render_stock_obj(false, symbol, stock_obj);
-            handle_hist(data.key, stock_obj);
+            handle_hist(symbol, stock_obj);
         }
     }
 
     function cache_stock_obj(is_quote, key, detail){
-        let old_obj = null;
-        let current_obj = null;
+        let old_obj;
+        let current_obj;
 
         if (quote_dic.hasOwnProperty(key)){
             old_obj = { ...quote_dic[key] };

@@ -374,7 +374,7 @@ class TradingResearch(BaseResearch):
         for symbol, group in df.groupby('symbol'):
             for _, date in filter(lambda x: x[0] == symbol, symbol_date_pairs):
                 # Locate the row number based on the date
-                row_num = group.loc[group['time'].dt.date == pd.to_datetime(date).date(), 'row_num'].values[0]
+                row_num = group.loc[group['time'] == pd.to_datetime(date).date(), 'row_num'].values[0]
 
                 # Calculate the final index using row_delta
                 final_row_num = row_num + row_delta
