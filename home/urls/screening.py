@@ -27,6 +27,7 @@ urlpatterns = [
     path('wishlist/', screening.wishlist_overview.default, name='wishlist'),
     path('wishlist/fetching/data', screening.wishlist_overview.fetching, name='wishlist_fetching'),
     path('wishlist/<str:symbol>/delete/', screening.wishlist_overview.delete_wishlist, name='delete_wishlist'),
+    path('wishlist/update-order/<str:direction>/', screening.wishlist_overview.order_wishlist, name='wishlist_update_order'),
 
     ####### Monitor #######
     # wishlist -> Default (web socket)

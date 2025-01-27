@@ -21,9 +21,6 @@ def default(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
-
-
-
     return render(
         request=request,
         template_name='pages//screening/wishlist.html',
@@ -31,6 +28,43 @@ def default(request):
             'parent': 'screening',
             'segment': 'wishlist',
         })
+
+@csrf_exempt
+def order_wishlist(request, direction: str):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        symbol_id = data.get('symbol_id')
+
+        if not symbol_id:
+            return JsonResponse({'success': False, 'error': 'Symbol ID is missing'}, status=400)
+
+        wishlist_item = Wishlist.objects.get(symbol_id=symbol_id)
+        current_order = wishlist_item.order_position
+
+        if direction == 'up':
+            new_order = current_order - 1
+        elif direction == 'down':
+            new_order = current_order + 1
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid direction'}, status=400)
+
+        # Swap orders with the adjacent item
+        adjacent_item = Wishlist.objects.filter(order_position=new_order).first()
+        if adjacent_item:
+            adjacent_item.order_position = current_order
+            adjacent_item.save()
+
+        wishlist_item.order_position = new_order
+        wishlist_item.save()
+
+        return JsonResponse({'success': True})
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Wishlist item not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -64,6 +98,11 @@ def add_wishlist(request):
             }
         )
 
+        if created:
+            max_order_position = Wishlist.objects.aggregate(max_order=models.Max('order_position'))['max_order']
+            wishlist.order_position = (max_order_position or 0) + 1
+            wishlist.save()
+
         return JsonResponse({'success': True, 'wishlist_id': wishlist.pk, 'created': created})
     except Exception as e:
         print(e.args)
@@ -94,9 +133,11 @@ def fetching(request):
              , s.strategy_id
              , s.name
              , s.description
+             , w.order_position
          FROM
              wishlist w
              LEFT JOIN strategy s ON w.ref_strategy_id = s.strategy_id
+        ORDER BY w.order_position DESC
         """
 
     # Step 1.a Count Sql
@@ -112,7 +153,7 @@ def fetching(request):
         {summary_query()}
     )
     SELECT
-        ROW_NUMBER() OVER (ORDER BY sd.symbol_id) AS row_num,
+        ROW_NUMBER() OVER (ORDER BY sd.order_position) AS row_num,
         *
     FROM
         result sd    
@@ -132,6 +173,13 @@ def delete_wishlist(request, symbol: str):
         try:
             wishlist_item = Wishlist.objects.get(symbol=symbol)
             wishlist_item.delete()
+
+            # Recalculate order_position for remaining items
+            remaining_items = Wishlist.objects.all().order_by('order_position')
+            for index, item in enumerate(remaining_items):
+                item.order_position = index + 1
+                item.save()
+
             return JsonResponse({'success': True})
         except Wishlist.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Wishlist item not found'}, status=404)

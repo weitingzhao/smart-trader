@@ -24,6 +24,8 @@ class Wishlist(models.Model):
     last_sync_time_ext_hour = models.DateTimeField(null=True, blank=True)  # Add last hour sync time field
     last_sync_time_day = models.DateTimeField(null=True, blank=True)  # Add last hour sync time field
 
+    order_position = models.IntegerField(default=0, null=True, blank=True)  # Add order_position field
+
     class Meta:
         db_table = 'wishlist'
 

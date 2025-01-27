@@ -10,8 +10,8 @@ def default(request):
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
 
-    wishlist_items = Wishlist.objects.all()
-    
+    wishlist_items = Wishlist.objects.all().order_by('order_position')
+
     return render(
         request=request,
         template_name='pages//screening/monitor.html',
