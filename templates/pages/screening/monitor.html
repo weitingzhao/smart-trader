@@ -52,97 +52,129 @@
 <div id="monitor_panel" class="container-fluid py-4">
     <div class="row mt-4">
       <div class="col-sm-8">
-        <div class="card h-100">
+        <div class="card" id="strategy_model">
             <div class="card-header pb-0 p-3">
                 <div class="d-flex align-items-center">
-                    <h6 class="mb-0" id="title_risk_model"></h6><span>&nbsp;Risk Model</span>
-                    <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="See risk model detail">
+                    <h6 class="mb-0" id="title_strategy_performance"></h6><span>&nbsp;Strategy Performance</span>
+                    <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Strategy Performance detail">
                         <i class="fas fa-info"></i>
                     </button>
                 </div>
             </div>
-            <div class="card-body p-3" id="risk_model">
+            <div class="card-body p-3">
                 <div class="row">
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> probability</label>
-                        <input id="profit_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title=" loss_avg_pct * max(buy_total_value)">Marginal Position Risk</label>
+                        <input id="marginal_position_risk" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
                     </div>
-                    <div class="col-2">
-                        <label class="form-label">Total <span style="color: green;">Profit</span></label>
-                        <input id="total_profit" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title=" win_trade / (win_trade + loss_trade)"><span style="color: green;">Profit</span> probability</label>
+                        <input id="profit_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
                         <label class="form-label"><span style="color: green;">Profit</span> Trade</label>
                         <input id="profit_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profitable</span> Invest</label>
-                        <input id="profitable_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                        <label class="form-label"><span style="color: red;">Loss</span> Trade</label>
+                        <input id="loss_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label">Total <span style="color: green;">Profit</span></label>
+                        <input id="total_profit" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title=" realized.net / abs(max_loss)">Marginal Return Rate</label>
+                        <input id="marginal_return_rate" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title=" 1 - (win_trade / (win_trade + loss_trade))"><span style="color: red;">Loss</span> probability</label>
+                        <input id="loss_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label"><span style="color: green;">Profit</span> Invest</label>
+                        <input id="profit_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label"><span style="color: red;">Loss</span> Invest</label>
+                        <input id="loss_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label">Total Invest</label>
+                        <input id="total_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / abs(marginal_position_risk)">Profitability Ratio</label>
+                        <input id="profitability_ratio" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title="(profit_probability * win_avg) - (loss_probability * loss_avg)">Expected</label>
+                        <input id="expected" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
                         <label class="form-label"><span style="color: green;">Profit</span> Average %</label>
                         <input id="profit_avg_pct" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Average $</label>
-                        <input id="profit_avg" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> probability</label>
-                        <input id="loss_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Yield</label>
-                        <input id="yield" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Trade</label>
-                        <input id="loss_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Lossing</span> Invest</label>
-                        <input id="loss_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
                         <label class="form-label"><span style="color: red;">Loss</span> Average %</label>
                         <input id="loss_avg_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Average $</label>
-                        <input id="loss_avg" class="form-control" style="font-weight: bold;border: none; color: red;" readonly type="text" data-input>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-2">
-                        <label class="form-label">
-                            <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> Ratio
-                        </label>
-                        <input id="profit_loss_ratio" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Expected</label>
-                        <input id="expected" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Efficiency</label>
-                        <input id="profit_efficiency" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Total Invest</label>
-                        <input id="total_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
                         <label class="form-label">Single Max <span style="color: red;">Loss</span> %</label>
                         <input id="single_max_loss_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
                     </div>
-                    <div class="col-2">
-                        <label class="form-label">Single Max <span style="color: red;">Loss</span> $</label>
-                        <input id="single_max_loss" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
-                    </div>
                 </div>
                 <div class="row">
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / sum(buy_total_value)">Profit Efficiency</label>
+                        <input id="profit_efficiency" class="form-control" style="font-weight: bold;border-color: green;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label" data-bs-toggle="tooltip" title="win_avg / abs(loss_avg)">
+                            <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> Ratio %
+                        </label>
+                        <input id="profit_loss_ratio" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label"><span style="color: green;">Profit</span> Average $</label>
+                        <input id="profit_avg" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label"><span style="color: red;">Loss</span> Average $</label>
+                        <input id="loss_avg" class="form-control" style="font-weight: bold;border: none; color: red;" readonly type="text" data-input>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-label">Single Max <span style="color: red;">Loss</span> $</label>
+                        <input id="single_max_loss" class="form-control" style="font-weight: bold;border-color: red;color: red;" readonly type="text" data-input>
+                    </div>
+                </div>
+            </div>
+        </div>
+          <div class="card align-items-start mt-4" id="risk_model">
+              <div class="card-header pb-0 p-3">
+                  <div class="d-flex align-items-center">
+                    <h6 class="mb-0" id="title_risk_model"></h6><span>&nbsp;Risk Model</span>
+                    <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Risk Model detail">
+                        <i class="fas fa-info"></i>
+                    </button>
+                </div>
+              </div>
+              <div class="card-body p-3">
+                  <div class="row">
+                    <div class="col-2">
+                        <label class="form-label">Total Position Risk</label>
+                        <input id="total_position_risk" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                    </div>
+
+
+                  </div>
+                  <div class="row">
                     <ul class="list-group">
                       <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                         <div class="w-100">
@@ -162,8 +194,8 @@
                       </li>
                     </ul>
                 </div>
-            </div>
-        </div>
+              </div>
+          </div>
       </div>
       <div class="col-sm-4">
         <div class="card h-100 mt-4 mt-md-0">
@@ -265,39 +297,70 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('data=>'+JSON.stringify(data));
+                    {#console.log('data=>'+JSON.stringify(data));#}
 
                     r = data.summary.realized;
-                    p = data.summary.performance;
+                    p = data.summary;
 
-                    document.getElementById('title_risk_model').textContent = data.strategy_name
-                    document.getElementById('profit_probability').value = p.rate.toFixed(2)+" %";
-                    document.getElementById('loss_probability').value = (100-p.rate.toFixed(2))+" %";
+                    document.getElementById('title_strategy_performance').textContent = data.strategy_name
 
-                    document.getElementById('total_profit').value = `${r.net.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    // Profit
                     document.getElementById('profit_trade').value = p.win_trade;
-                    document.getElementById('profitable_inv').value = `${p.win_invest.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('profit_avg_pct').value = p.win_percent.toFixed(2)+" %";
+                    document.getElementById('profit_inv').value = `${p.win_inv.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('profit_avg_pct').value = p.win_avg_pct.toFixed(2)+" %";
                     document.getElementById('profit_avg').value = `${p.win_avg.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
-                    document.getElementById('yield').value = "";
+                    // Loss
                     document.getElementById('loss_trade').value = p.loss_trade;
-                    document.getElementById('loss_inv').value = `${p.loss_invest.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('loss_avg_pct').value = p.loss_percent.toFixed(2)+" %";
+                    document.getElementById('loss_inv').value = `${p.loss_inv.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('loss_avg_pct').value = p.loss_avg_pct.toFixed(2)+" %";
                     document.getElementById('loss_avg').value = `${p.loss_avg.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
-                    document.getElementById('profit_loss_ratio').value = p.win_loss_ratio.toFixed(2);
-                    document.getElementById('expected').value = `${p.expected.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('profit_efficiency').value = p.profit_efficiency.toFixed(2)+" %";
-                    document.getElementById('total_inv').value =`${(p.win_invest + p.loss_invest).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    // Total & Max
+                    document.getElementById('total_profit').value = `${r.net.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('total_inv').value =`${(p.win_inv + p.loss_inv).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('single_max_loss_pct').value = p.max_loss_pct.toFixed(2)+" %";
-                    document.getElementById('single_max_loss').value = `${p.max_loss.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;;
+                    document.getElementById('single_max_loss').value = `${p.max_loss.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
+                    // Statistics
+                    document.getElementById('profit_probability').value = p.rate.toFixed(2)+" %";
+                    document.getElementById('loss_probability').value = (100-p.rate.toFixed(2))+" %";
+                    document.getElementById('expected').value = `${p.expected.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('profit_loss_ratio').value = p.win_loss_ratio.toFixed(2);
 
+                    // Main indicator
+                    document.getElementById('marginal_position_risk').value = `${p.marginal_position_risk.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('marginal_return_rate').value = p.marginal_return_rate.toFixed(2);
+                    document.getElementById('profitability_ratio').value = p.profitability_ratio.toFixed(2);
+                    document.getElementById('profit_efficiency').value = p.profit_efficiency.toFixed(2)+" %";
                 }
             })
             .catch(error => console.error('Error fetching risk data:', error));
     }
+
+    function calculateSizing(element) {
+        const symbolId = element.id.split('_')[0];
+        fetch(`/screening/sizing/${symbolId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const riskData = data.risk_data;
+
+                    document.getElementById('total_position_risk').value = riskData.total_position_risk.toFixed(2);
+                    document.getElementById('marginal_return_rate').value = riskData.marginal_return_rate.toFixed(2) + " %";
+                    document.getElementById('profitability_ratio').value = riskData.profitability_ratio.toFixed(2);
+                    document.getElementById('profit_efficiency').value = riskData.profit_efficiency.toFixed(2) + " %";
+                }
+            })
+            .catch(error => console.error('Error fetching risk data:', error));
+    }
+
 
 
 //#####Socket function################//
