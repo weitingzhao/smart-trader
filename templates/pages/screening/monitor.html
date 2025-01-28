@@ -123,11 +123,11 @@
                     </div>
                     <div class="col-2">
                         <label class="form-label">Expected</label>
-                        <input id="expected" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                        <input id="expected" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
                         <label class="form-label"><span style="color: green;">Profit</span> Efficiency</label>
-                        <input id="profit_efficiency" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                        <input id="profit_efficiency" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
                     </div>
                     <div class="col-2">
                         <label class="form-label">Total Invest</label>
@@ -287,8 +287,8 @@
                     document.getElementById('loss_avg').value = `${p.loss_avg.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
                     document.getElementById('profit_loss_ratio').value = p.win_loss_ratio.toFixed(2);
-                    document.getElementById('expected').value = "";
-                    document.getElementById('profit_efficiency').value = "";
+                    document.getElementById('expected').value = `${p.expected.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('profit_efficiency').value = p.profit_efficiency.toFixed(2)+" %";
                     document.getElementById('total_inv').value =`${(p.win_invest + p.loss_invest).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('single_max_loss_pct').value = p.max_loss_pct.toFixed(2)+" %";
                     document.getElementById('single_max_loss').value = `${p.max_loss.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;;

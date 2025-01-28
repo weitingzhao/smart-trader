@@ -83,6 +83,9 @@ class ClosePosition(PositionBase):
 
                 'max_loss': 0,
                 'max_loss_pct': 0,
+                'expected': 0,
+                'yield': 0,
+                'profit_efficiency': 0,
             }
         }
         summary['total_amt'] = final_df['trade_margin'].count()
@@ -114,6 +117,19 @@ class ClosePosition(PositionBase):
         summary['performance']['win_loss_ratio'] = summary['performance']['win_avg'] / abs(summary['performance']['loss_avg'])
         summary['performance']['max_loss'] = final_df['trade_margin'].min()
         summary['performance']['max_loss_pct'] = final_df['trade_performance'].min()
+
+        # Calculate expected value
+        summary['performance']['expected'] = (
+                float(summary['performance']['rate'])/100 * float(summary['performance']['win_avg'])
+                - (100 - float(summary['performance']['rate']))/100 * float(summary['performance']['loss_avg'])
+        )
+
+        # Calculate  Yield
+        # summary['performance']['yield'] = float(summary['realized']['gain']) / float(summary['performance']['max_loss'])
+
+        # Calculate profit_efficiency
+        summary['performance']['profit_efficiency'] = float(summary['realized']['net'])/float(final_df['buy_total_value'].sum())*100
+
         return summary
 
     def get_holding_symbol(self, final_df: DataFrame) -> pd.DataFrame:
