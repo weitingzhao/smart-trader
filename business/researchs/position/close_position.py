@@ -65,15 +65,24 @@ class ClosePosition(PositionBase):
                 'lost': 0,
             },
             'performance': {
-                'rate': 0,
                 'win_trade': 0,
+                'loss_trade': 0,
+                'rate': 0,
+
                 'win_percent': 0,
+                'loss_percent': 0,
+
+                'win_avg': 0,
+                'loss_avg': 0,
+
                 'win_invest': 0,
-                'lose_trade': 0,
-                'lose_percent': 0,
-                'lose_invest': 0,
+                'loss_invest': 0,
+
                 'win_avg_days': 0,
-                'lose_avg_days': 0,
+                'loss_avg_days': 0,
+
+                'max_loss': 0,
+                'max_loss_pct': 0,
             }
         }
         summary['total_amt'] = final_df['trade_margin'].count()
@@ -86,20 +95,25 @@ class ClosePosition(PositionBase):
 
         # Part 2. win rate calculation
         summary['performance']['win_trade'] = final_df[final_df['trade_margin'] > 0].shape[0]
-        summary['performance']['lose_trade'] = final_df[final_df['trade_margin'] < 0].shape[0]
-        summary['performance']['rate'] = summary['performance']['win_trade'] / (summary['performance']['win_trade'] + summary['performance']['lose_trade']) * 100
+        summary['performance']['loss_trade'] = final_df[final_df['trade_margin'] < 0].shape[0]
+        summary['performance']['rate'] = summary['performance']['win_trade'] / (summary['performance']['win_trade'] + summary['performance']['loss_trade']) * 100
 
         win_trades = final_df[final_df['trade_margin'] > 0]
-        lose_trades = final_df[final_df['trade_margin'] < 0]
+        loss_trades = final_df[final_df['trade_margin'] < 0]
         if not win_trades.empty:
             summary['performance']['win_percent'] = (win_trades['trade_margin'].sum() / win_trades['buy_total_value'].sum()) * 100
+            summary['performance']['win_avg'] = win_trades['trade_margin'].sum() / summary['performance']['win_trade']
             summary['performance']['win_invest'] = (win_trades['buy_total_value'].sum() / summary['performance']['win_trade'])
             summary['performance']['win_avg_days'] = win_trades['held_day'].mean()
-        if not lose_trades.empty:
-            summary['performance']['lose_percent'] = (lose_trades['trade_margin'].sum() / lose_trades['buy_total_value'].sum()) * 100
-            summary['performance']['lose_invest'] = (lose_trades['buy_total_value'].sum() / summary['performance']['lose_trade'])
-            summary['performance']['lose_avg_days'] = lose_trades['held_day'].mean()
+        if not loss_trades.empty:
+            summary['performance']['loss_percent'] = (loss_trades['trade_margin'].sum() / loss_trades['buy_total_value'].sum()) * 100
+            summary['performance']['loss_avg'] = loss_trades['trade_margin'].sum() / summary['performance']['loss_trade']
+            summary['performance']['loss_invest'] = (loss_trades['buy_total_value'].sum() / summary['performance']['loss_trade'])
+            summary['performance']['loss_avg_days'] = loss_trades['held_day'].mean()
 
+        summary['performance']['win_loss_ratio'] = summary['performance']['win_avg'] / abs(summary['performance']['loss_avg'])
+        summary['performance']['max_loss'] = final_df['trade_margin'].min()
+        summary['performance']['max_loss_pct'] = final_df['trade_performance'].min()
         return summary
 
     def get_holding_symbol(self, final_df: DataFrame) -> pd.DataFrame:

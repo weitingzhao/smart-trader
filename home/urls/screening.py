@@ -31,8 +31,8 @@ urlpatterns = [
 
     ####### Monitor #######
     # wishlist -> Default (web socket)
-    path('Monitor/', screening.monitor.default, name='monitor'),
-
+    path('monitor/', screening.monitor.default, name='monitor'),
+    path('risk/<str:symbol>/', screening.monitor.risk, name='monitor'),
 
     # wishlist -> position_sizing
     path('position_sizing/', screening.position_sizing.default, name='position_sizing'),

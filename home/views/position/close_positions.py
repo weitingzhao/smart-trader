@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from apps.common.models import *
 from django.shortcuts import render
 import business.logic as Logic
-from collections import OrderedDict
 
 def default(request, strategy_id):
     user_id = request.user.id  # Assuming you have the user_id from the request
