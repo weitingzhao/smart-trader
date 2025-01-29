@@ -39,6 +39,8 @@ class IntBrokersQuoteService(TickerSever):
     def _on_attach(self, symbol):
         async def on_tick(ticker):
             try:
+                if ticker.last is None and ticker.close is None:
+                    return
                 key = ticker.contract.symbol
                 detail = {
                     'bid': ticker.bid if not pd.isna(ticker.bid) else None,

@@ -407,8 +407,11 @@
     function socket_onmessage(event) {
         const data = JSON.parse(event.data);
         let symbol = data.key;
-
         if (data.type === 'quote'){
+            if (data.detail.last === null && data.detail.close === null){
+                {#console.log('Drop this. no value inside. found one');#}
+                return;
+            }
             stock_obj = cache_stock_obj(true, symbol, data.detail);
             render_stock_obj(true, symbol, stock_obj);
             handle_quote(symbol, stock_obj);
@@ -421,15 +424,25 @@
     }
 
     function cache_stock_obj(is_quote, key, detail){
+        {#console.log('key:['+key+'] stock_obj=>'+JSON.stringify(detail));#}
         let old_obj;
         let current_obj;
         if (quote_dic.hasOwnProperty(key)){
             //UPDATE
-            old_obj = is_quote ? { ...quote_dic[key]['quote']}  : { ...quote_dic[key]['hist']};
-            if (is_quote)
+            if(is_quote)
+            {
+                if(quote_dic[key]['quote'] === null)
+                    quote_dic[key]['quote'] = detail;
+
+                old_obj = { ...quote_dic[key]['quote'] };
                 quote_dic[key]['quote'] = detail;
+            }
             else
             {
+                if(quote_dic[key]['hist'] === null)
+                    quote_dic[key]['hist'] = detail;
+
+                old_obj = { ...quote_dic[key]['hist'] };
                 quote_dic[key]['hist'] = detail;
                 quote_dic[key]['pre_close'] = detail.pre_close;
             }
@@ -437,9 +450,15 @@
         else
         {
             //ADD
-            quote_dic[key] = is_quote
-                ? {'quote': detail, 'hist': null, 'pre_close': 0}
-                : {'quote': null, 'hist': detail, 'pre_close': detail.pre_close};
+            if(is_quote){
+                quote_dic[key] = {'quote': detail, 'hist': null, 'pre_close': 0};
+                old_obj = { ...quote_dic[key]['quote'] }
+            }
+            else{
+                quote_dic[key] = {'quote': null, 'hist': detail, 'pre_close': detail.pre_close};
+                old_obj = { ...quote_dic[key]['hist'] }
+            }
+
             old_obj = is_quote ? { ...quote_dic[key]['quote'] } : { ...quote_dic[key]['hist'] };
         }
         current_obj = is_quote? quote_dic[key]['quote'] : quote_dic[key]['hist'];
@@ -447,7 +466,10 @@
     }
 
     function get_stock_price(is_quote, detail){
-        {#console.log("quote=>"+ JSON.stringify(detail_json));#}
+        if (Object.keys(detail).length === 0) {
+            return 0;
+        }
+        {#console.log("is_quote=>[" + is_quote+ "] quote=>"+ JSON.stringify(detail));#}
         {#console.log("close=>"+ detail_json.close);#}
         if(is_quote)
             return  detail.last !== null ? detail.last.toFixed(2) : detail.close.toFixed(2);
