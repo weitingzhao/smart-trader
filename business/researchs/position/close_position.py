@@ -84,6 +84,7 @@ class ClosePosition(PositionBase):
             'max_loss_pct': 0,
 
            # Statistics
+            'kelly_criterion': 0,
             'rate': 0,
             'expected': 0,
             'win_loss_ratio': 0,
@@ -129,6 +130,10 @@ class ClosePosition(PositionBase):
         data['expected'] = (float(data['rate']) / 100 * float(data['win_avg'])
                 - (100 - float(data['rate'])) / 100 * float(data['loss_avg']))
         data['win_loss_ratio'] = data['win_avg'] / abs(data['loss_avg'])
+        if data['win_loss_ratio']  == 0:
+            data['kelly_criterion'] = 0
+        else:
+            data['kelly_criterion'] = (float(data['win_loss_ratio']) * float(data['rate'])/100 - (1 - float(data['rate'])/100)) / float(data['win_loss_ratio']) * 100
 
         # Main Indicator
         data['marginal_position_risk'] =  (data['loss_avg_pct'] /100)* final_df['buy_total_value'].max()
