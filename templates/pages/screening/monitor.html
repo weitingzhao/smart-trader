@@ -50,274 +50,374 @@
     </div>
 </div>
 <div id="monitor_panel" class="container-fluid py-4">
+
     <div class="row mt-4">
         <div class="col-sm-8">
             <div class="card mt-md-0 mt-4" id="risk_model">
-              <div class="card-header pb-0 p-3">
-                <div class="d-flex align-items-center">
-                  <h6>Live Position Sizing</h6>
-                  <button type="button" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Data is based from sessions and is 100% accurate">
-                    <i class="fas fa-check"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="card-body px-3 pt-0 pb-2">
-                <div class="table-responsive p-0">
-                  <table class="table align-items-center justify-content-center mb-0">
-                    <thead>
-                      <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Page</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Page Views</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Avg. Time</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bounce Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">1. /bits</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">345</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">00:17:07</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">40.91%</p>
-                        </td>
-                      </tr>
+                <div class="card-body px-3 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center justify-content-center mb-0" id="live_position_sizing_model" >
+                            <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-danger" colspan="3">Live Position Sizing</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 bg-gradient-dark text-white" colspan="5">
+                                    Base Risk = (Kelly Criterion * Capital) = <span id="kelly_criterion_2" class="text-success"></span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Indicator</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Order Estimate">[Order Sizing]</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Static Risk Model settings -> Risk %">Fix Rate</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Static Risk Model settings -> Single Max Draw down %">Max Draw down</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Strategy Performance -> Single Max Loss %">Max Loss</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Strategy Performance -> Loss Average %">Avg Loss</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Portfolio -> Available Cash $">Available Cash</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                       <tr>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">2. /pages/argon-dashboard</p>
+                            <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend Shares</h6>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">520</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="order_share">Shares</h6>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">00:23:13</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="fix_rate_share">Shares</h6>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">30.14%</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">3. /pages/soft-ui-dashboard</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="max_drawdown_share">Shares</h6>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">122</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="max_loss_share">Shares</h6>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">00:3:10</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="avg_loss_share">Shares</h6>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">54.10%</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="available_cash_share">Shares</h6>
+                            </div>
                         </td>
                       </tr>
                       <tr>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">4. /bootstrap-themes</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">1,900</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">00:30:42</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">20.93%</p>
-                        </td>
+                          <td>
+                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend Risk</h6>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="order_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="fix_rate_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="max_drawdown_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="max_loss_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="avg_loss_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="available_cash_intend_risk">intend risk $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_intend_risk_pct">intend risk %</p>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>
+                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend Investment</h6>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="order_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="fix_rate_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="max_drawdown_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="max_loss_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="avg_loss_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                  <h6 class="mb-0 text-sm" id="available_cash_intend_inv">intend inv $</h6>
+                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_intend_inv_pct">intend inv %</p>
+                              </div>
+                          </td>
                       </tr>
                       <tr>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">5. /react-themes</p>
+                          <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Cash left</h6>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">1,442</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="order_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="order_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">00:31:50</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="fix_rate_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">34.98%</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">6. /product/argon-dashboard-angular</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="max_drawdown_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">201</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="max_loss_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">00:12:42</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="avg_loss_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                         <td>
-                          <p class="text-sm font-weight-bold mb-0">21.4%</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">7. /product/material-dashboard-pro</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">2,115</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">00:50:11</p>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">34.98%</p>
+                            <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id="available_cash_cash">cash $</h6>
+                                <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_cash_pct">cash pct %</p>
+                            </div>
                         </td>
                       </tr>
                     </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="card mt-md-4  mt-4" id="portfolio_model">
-                <div class="card-header pb-0 p-3">
-                    <div class="d-flex align-items-center">
-                        <h6 class="mb-0" id="title_risk_model">Portfolio Situation</h6>
-                        <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
-                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Portfolio detail">
-                            <i class="fas fa-info"></i>
-                        </button>
+                        </table>
                     </div>
                 </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-label">Total Position Risk</label>
-                            <input id="total_position_risk" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+            </div>
+            <div class="row mt-4">
+                <div class="col-sm-3"  id="portfolio_model">
+                    <div class="card  mt-md-4  mt-4">
+                        <div class="card-header pb-0 p-3">
+                          <div class="row">
+                              <div class="d-flex align-items-center">
+                                <h6 class="mb-0" id="title_risk_model">Portfolio Situation</h6>
+                                <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Portfolio detail">
+                                    <i class="fas fa-info"></i>
+                                </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card-body p-3">
+                          <ul class="list-group">
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                              <div class="d-flex">
+                                <div class="d-flex align-items-center">
+                                  <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                                  <div class="d-flex flex-column">
+                                    <h6 class="mb-1 text-dark text-sm">Capital</h6>
+                                  </div>
+                                </div>
+                                <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                  <span id="capital"></span>
+                                </div>
+                              </div>
+                              <hr class="horizontal dark mt-3 mb-2" />
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                              <div class="d-flex">
+                                <div class="d-flex align-items-center">
+                                  <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                                  <div class="d-flex flex-column">
+                                    <h6 class="mb-1 text-dark text-sm">Available Cash</h6>
+                                  </div>
+                                </div>
+                                <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                  <span id="available_cash"></span>
+                                </div>
+                              </div>
+                              <hr class="horizontal dark mt-3 mb-2" />
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 mb-2 border-radius-lg">
+                              <div class="d-flex">
+                                <div class="d-flex align-items-center">
+                                  <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                                  <div class="d-flex flex-column">
+                                    <h6 class="mb-1 text-dark text-sm">Total Risk</h6>
+                                  </div>
+                                </div>
+                                <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                  <span id="total_risk"></span>
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 mb-2 border-radius-lg">
+                              <div class="d-flex">
+                                <div class="d-flex align-items-center">
+                                  <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                                  <div class="d-flex flex-column">
+                                    <h6 class="mb-1 text-dark text-sm">Max Drawdown</h6>
+                                  </div>
+                                </div>
+                                <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                    <span id="single_max_drawdown"></span>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
                         </div>
                     </div>
-                    <div class="row">
-                      <ul class="list-group">
-                          <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
-                              <div class="w-100">
-                                  <div class="d-flex align-items-center mb-2">
-                                      <a class="btn btn-facebook btn-simple mb-0 p-0" href="javascript:;">
-                                          <i class="fab fa-facebook fa-lg"></i>
-                                      </a>
-                                      <span class="me-2 text-sm font-weight-bold text-capitalize ms-2">Facebook</span>
-                                      <span class="ms-auto text-sm font-weight-bold">80%</span>
-                                  </div>
-                                  <div>
-                                      <div class="progress progress-md">
-                                          <div class="progress-bar bg-gradient-dark w-80" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </li>
-                      </ul>
-                  </div>
                 </div>
-            </div>
-            <div class="card mt-md-4  mt-4" id="strategy_model">
-                <div class="card-header pb-0 p-3">
-                <div class="d-flex align-items-center">
-                    <h6 class="mb-0">Strategy Performance : </h6><span id="title_strategy_performance">&nbsp</span>
-                    <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
-                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Strategy Performance detail">
-                        <i class="fas fa-info"></i>
-                    </button>
-                </div>
-            </div>
-                <div class="card-body p-3">
-                    <div class="row">
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title=" loss_avg_pct * max(buy_total_value)">Marginal Position Risk</label>
-                        <input id="marginal_position_risk" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
+                <div class="col-sm-9" id="strategy_model">
+                    <div class="card mt-md-4  mt-4" >
+                        <div class="card-header pb-0 p-3">
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0">Strategy Performance : </h6>&nbsp;<span id="title_strategy_performance" class="text-primary">&nbsp</span>
+                                <button type="button" class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="See Strategy Performance detail">
+                                    <i class="fas fa-info"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row">
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title=" loss_avg_pct * max(buy_total_value)">Marginal Position Risk</label>
+                                <input id="marginal_position_risk" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title=" (Profit_Loss Ratio * Profit Probability - Loss Probability) / Profit_Loss Ratio">
+                                    Kelly Criterion</label>
+                                <input id="kelly_criterion" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: green;">Profit</span> Trade</label>
+                                <input id="profit_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: red;">Loss</span> Trade</label>
+                                <input id="loss_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Total <span style="color: green;">Profit</span></label>
+                                <input id="total_profit" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
+                            </div>
+                        </div>
+                            <div class="row">
+                          <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title=" realized.net / abs(max_loss)">Marginal Return Rate</label>
+                                <input id="marginal_return_rate" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title=" Profit = win_trade / (win_trade + loss_trade)">
+                                    <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> probability</label>
+                                <input id="profit_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: green;">Profit</span> Invest</label>
+                                <input id="profit_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: red;">Loss</span> Invest</label>
+                                <input id="loss_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Total Invest</label>
+                                <input id="total_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
+                            </div>
+                        </div>
+                            <div class="row">
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / abs(marginal_position_risk)">Profitability Ratio</label>
+                                <input id="profitability_ratio" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title="(profit_probability * win_avg) - (loss_probability * loss_avg)">Expected</label>
+                                <input id="expected" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: green;">Profit</span> Average %</label>
+                                <input id="profit_avg_pct" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: red;">Loss</span> Average %</label>
+                                <input id="loss_avg_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Single Max <span style="color: red;">Loss</span> %</label>
+                                <input id="single_max_loss_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
+                            </div>
+                        </div>
+                            <div class="row">
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / sum(buy_total_value)">Profit Efficiency</label>
+                                <input id="profit_efficiency" class="form-control" style="font-weight: bold;border-color: green;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" data-bs-toggle="tooltip" title="win_avg / abs(loss_avg)">
+                                    <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> Ratio %
+                                </label>
+                                <input id="profit_loss_ratio" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: green;">Profit</span> Average $</label>
+                                <input id="profit_avg" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label"><span style="color: red;">Loss</span> Average $</label>
+                                <input id="loss_avg" class="form-control" style="font-weight: bold;border: none; color: red;" readonly type="text" data-input>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Single Max <span style="color: red;">Loss</span> $</label>
+                                <input id="single_max_loss" class="form-control" style="font-weight: bold;border-color: red;color: red;" readonly type="text" data-input>
+                            </div>
+                        </div>
+                        </div>
                     </div>
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title=" (Profit_Loss Ratio * Profit Probability - Loss Probability) / Profit_Loss Ratio">
-                            Kelly Criterion</label>
-                        <input id="kelly_criterion" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Trade</label>
-                        <input id="profit_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Trade</label>
-                        <input id="loss_trade" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Total <span style="color: green;">Profit</span></label>
-                        <input id="total_profit" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                </div>
-                    <div class="row">
-                  <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title=" realized.net / abs(max_loss)">Marginal Return Rate</label>
-                        <input id="marginal_return_rate" class="form-control" style="font-weight: bold; border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title=" Profit = win_trade / (win_trade + loss_trade)">
-                            <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> probability</label>
-                        <input id="profit_probability" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Invest</label>
-                        <input id="profit_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Invest</label>
-                        <input id="loss_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Total Invest</label>
-                        <input id="total_inv" class="form-control" style="font-weight: bold;border: none;" readonly type="text" data-input>
-                    </div>
-                </div>
-                    <div class="row">
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / abs(marginal_position_risk)">Profitability Ratio</label>
-                        <input id="profitability_ratio" class="form-control" style="font-weight: bold;border-color: mediumpurple;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title="(profit_probability * win_avg) - (loss_probability * loss_avg)">Expected</label>
-                        <input id="expected" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Average %</label>
-                        <input id="profit_avg_pct" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Average %</label>
-                        <input id="loss_avg_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Single Max <span style="color: red;">Loss</span> %</label>
-                        <input id="single_max_loss_pct" class="form-control" style="font-weight: bold;border: none;color: red;" readonly type="text" data-input>
-                    </div>
-                </div>
-                    <div class="row">
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title="realized.gain / sum(buy_total_value)">Profit Efficiency</label>
-                        <input id="profit_efficiency" class="form-control" style="font-weight: bold;border-color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-3">
-                        <label class="form-label" data-bs-toggle="tooltip" title="win_avg / abs(loss_avg)">
-                            <span style="color: green;">Profit</span> / <span style="color: red;">Loss</span> Ratio %
-                        </label>
-                        <input id="profit_loss_ratio" class="form-control" style="font-weight: bold; border: none;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: green;">Profit</span> Average $</label>
-                        <input id="profit_avg" class="form-control" style="font-weight: bold;border: none; color: green;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label"><span style="color: red;">Loss</span> Average $</label>
-                        <input id="loss_avg" class="form-control" style="font-weight: bold;border: none; color: red;" readonly type="text" data-input>
-                    </div>
-                    <div class="col-2">
-                        <label class="form-label">Single Max <span style="color: red;">Loss</span> $</label>
-                        <input id="single_max_loss" class="form-control" style="font-weight: bold;border-color: red;color: red;" readonly type="text" data-input>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>
@@ -409,6 +509,23 @@
 {% block extra_js %}
 <script>
 //#####Click Event################//
+    function getPortfolio() {
+        fetch('/screening/portfolio/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('data=>', data);
+                    document.getElementById('capital').textContent =`${data.capital.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('available_cash').textContent = `${data.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('total_risk').textContent = data.total_risk + " %";
+                    document.getElementById('single_max_drawdown').textContent = data.single_max_drawdown + " %";
+                } else {
+                    console.error('Error fetching portfolio data:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function calculateSizing(element) {
         const symbolId = element.id.split('_')[0];
         fetch(`/screening/sizing/${symbolId}/`, {
@@ -471,7 +588,8 @@
                     document.getElementById('single_max_loss').value = `${p.max_loss.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
                     // Statistics
-                    document.getElementById('kelly_criterion').value = p.kelly_criterion.toFixed(2)+" %";;
+                    document.getElementById('kelly_criterion').value = p.kelly_criterion.toFixed(2)+" %";
+                    document.getElementById('kelly_criterion_2').textContent = p.kelly_criterion.toFixed(2)+" %";
                     document.getElementById('profit_probability').value = p.rate.toFixed(2)+" %" + " / " + (100-p.rate.toFixed(2))+" %";
                     document.getElementById('expected').value = `${p.expected.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('profit_loss_ratio').value = p.win_loss_ratio.toFixed(2);
@@ -590,7 +708,6 @@
                  lastEle.textContent = current;
             }
         }
-
         // Calculate change and change percentage
         update_stock_chg(key, current, pre_close);
     }
@@ -638,7 +755,6 @@
         const output = `${key}:
             ${detail.date} close @ ${detail.close},
             ${detail.pre_time} close @ ${detail.pre_close}`;
-
         // Append the original message to the historical console
         console_log('hist-console-content', output)
     }
@@ -659,12 +775,13 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_quote/');
-
         socket.onmessage = socket_onmessage
-
         socket.onclose = function(event) {
             console.error('WebSocket closed unexpectedly');
         };
+
+        //Init Portfolio
+        getPortfolio();
     });
 
 </script>

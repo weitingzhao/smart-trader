@@ -13,7 +13,7 @@ class UserStaticSettingForm(forms.ModelForm):
         fields = [
             'capital', 'risk', 'rounding', 'commission', 'tax',
             'expect_gain_risk_ratio', 'position_min', 'position_max','total_risk_cap','net_risk_cap',
-            'performance_tracking_date']
+            'performance_tracking_date','single_max_drawdown']
 
 
 class HoldingForm(forms.ModelForm):

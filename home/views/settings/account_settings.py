@@ -1,16 +1,13 @@
 import asyncio
 import json
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render
-from fontTools.varLib.plot import stops
-
-from apps.common.models import Portfolio
+from apps.common.models import *
 from home.forms.portfolio import PortfolioForm
-from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-
 from home.services.ib_quote_server import IntBrokersQuoteService
-from home.services.price_monitor_ws import StockMonitorWS
+from home.forms.portfolio import UserStaticSettingForm
 from home.services.tw_hist_sever import TradingViewHistService
 
 
@@ -19,7 +16,16 @@ def default(request):
     user_id = request.user
     # user_id = 2 # for testing user
     portfolios = Portfolio.objects.filter(user=user_id).order_by('-is_default')
-    form = PortfolioForm()
+    if not portfolio:
+        return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+
+    try:
+        user_static_setting = UserStaticSetting.objects.get(user=request.user)
+        form_static_risk = UserStaticSettingForm(instance=user_static_setting)
+    except UserStaticSetting.DoesNotExist:
+        form_static_risk = UserStaticSettingForm()
+
+    portfolio_form = PortfolioForm()
 
     stock_live_price_service_status = IntBrokersQuoteService.is_exist()
     stock_hist_price_service_status = TradingViewHistService.is_exist()
@@ -30,11 +36,33 @@ def default(request):
         context={
             'parent': 'settings',
             'segment': 'account_settings',
+            'page_title': 'Account settings',  # title
             'portfolios': portfolios,
-            'form': form,
+            'form': portfolio_form,
+            'static_risk_form': form_static_risk,
             'stock_live_price_service_status': stock_live_price_service_status,
             'stock_hist_price_service_status': stock_hist_price_service_status
         })
+
+@csrf_exempt
+def static_risk(request):
+    if request.method == 'POST':
+        form = UserStaticSettingForm(request.POST)
+        if form.is_valid():
+            position_sizing, created = UserStaticSetting.objects.update_or_create(
+                user=request.user,
+                defaults=form.cleaned_data
+            )
+            if created:
+                messages.success(request, 'static risk created successfully.', extra_tags='static risk')
+            else:
+                messages.success(request, 'static risk updated successfully.', extra_tags='static risk')
+        else:
+            messages.error(request, f'static risk form is invalid.', extra_tags='static risk')
+            return redirect('account_settings')
+    else:
+        messages.error(request, "method not supported", extra_tags='position sizing')
+    return redirect('account_settings')
 
 @csrf_exempt
 def stock_price(request):

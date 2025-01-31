@@ -21,6 +21,7 @@ def default(request):
         context={
             'parent': 'screening',
             'segment': 'monitor',
+            'page_title': 'Live Monitor !!!',  # title
             'watchlist': wishlist_items
         })
 
@@ -58,3 +59,36 @@ def risk(request, symbol):
 @csrf_exempt
 def sizing(request, symbol):
     pass
+
+@csrf_exempt
+def portfolio(request):
+    try:
+        user_id = request.user.id  # Assuming you have the user_id from the request
+        portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+
+        if not portfolio:
+            return JsonResponse({'error': 'Default portfolio not found'}, status=404)
+
+        cash = portfolio.cash + portfolio.money_market
+        # Get the UserStaticSetting based on the user_id
+        user_static_setting = UserStaticSetting.objects.filter(user_id=user_id).first()
+
+        open_final_df, max_date = Logic.research().position().Open().Position(portfolio)
+        open_summary = Logic.research().position().Open().summary(portfolio, open_final_df)
+
+        # Prepare the response data
+        response_data = {
+            'success': True,
+            'capital' : open_summary['category']['total'],
+            'available_cash': cash,
+            'total_risk' : user_static_setting.risk,
+            'single_max_drawdown': user_static_setting.single_max_drawdown,
+        }
+
+        return JsonResponse(response_data, status=200)
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'error': 'Wishlist item not found'}, status=404)
+    except Strategy.DoesNotExist:
+        return JsonResponse({'error': 'Strategy not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

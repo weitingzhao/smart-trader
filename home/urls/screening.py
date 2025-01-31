@@ -32,6 +32,7 @@ urlpatterns = [
     ####### Monitor #######
     # wishlist -> Default (web socket)
     path('monitor/', screening.monitor.default, name='monitor'),
+    path('portfolio/', screening.monitor.portfolio, name='screening_portfolio'),
     path('risk/<str:symbol>/', screening.monitor.risk, name='screening_risk'),
     path('sizing/<str:symbol>/', screening.monitor.sizing, name='screening_sizing'),
 
