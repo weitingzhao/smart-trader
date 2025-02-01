@@ -20,11 +20,14 @@ urlpatterns = [
     # snapshot -> Default
     path('snapshot/', screening.snapshot.default, name='snapshot'),
     path('snapshot/fetching/data', screening.snapshot.fetching, name='snapshot_fetching'),
-    path('snapshot/add_wishlist/', screening.wishlist_overview.add_wishlist, name='add_wishlist'),
 
     ####### wishlist #######
     # wishlist -> Default
     path('wishlist/', screening.wishlist_overview.default, name='wishlist'),
+    path('wishlist/get/<str:symbol>/', screening.wishlist_overview.get_wishlist, name='get_wishlist'),
+
+    path('wishlist/add_wishlist/', screening.wishlist_overview.add_wishlist, name='add_wishlist'),
+    path('wishlist/update_wishlist/', screening.wishlist_overview.update_wishlist, name='update_wishlist'),
     path('wishlist/fetching/data', screening.wishlist_overview.fetching, name='wishlist_fetching'),
     path('wishlist/<str:symbol>/delete/', screening.wishlist_overview.delete_wishlist, name='delete_wishlist'),
     path('wishlist/update-order/<str:direction>/', screening.wishlist_overview.order_wishlist, name='wishlist_update_order'),

@@ -11,6 +11,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def default(request):
+
+    user_id = request.user.id  # Assuming you have the user_id from the request
+    try:
+        portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
+        if not portfolio:
+            return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
+
+        # Query all records from the Strategy model
+        trade_strategy = Logic.research().category().strategy().get_simple_dic(need_uncategorized=False)
+
+        return render(
+            request=request,
+            template_name='pages/screening/snapshot.html',
+            context= {
+                'parent': 'screening',
+                'segment': 'snapshot',
+                'trade_strategy': trade_strategy  # Add trade_strategy to context
+            })
+
+    except Exception as e:
+        print(e.args)
+
+
 @csrf_exempt
 def fetching(request):
 
@@ -157,25 +181,3 @@ def fetching(request):
 
 
 
-def default(request):
-
-    user_id = request.user.id  # Assuming you have the user_id from the request
-    try:
-        portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
-        if not portfolio:
-            return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
-
-        # Query all records from the Strategy model
-        trade_strategy = Logic.research().category().strategy().get_simple_dic(need_uncategorized=False)
-
-        return render(
-            request=request,
-            template_name='pages/screening/snapshot.html',
-            context= {
-                'parent': 'screening',
-                'segment': 'snapshot',
-                'trade_strategy': trade_strategy  # Add trade_strategy to context
-            })
-
-    except Exception as e:
-        print(e.args)

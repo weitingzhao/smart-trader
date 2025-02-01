@@ -216,7 +216,7 @@
         });
     })
 
-    function show_wishlist_Modal(obj, rowdata) {
+    function show_wishlist_Modal(obj) {
         //alert($(obj).attr("sid"))
         const form = document.getElementById('addwishlistForm');
         form.reset();  // 重置表单，将所有控件的值清空
@@ -240,7 +240,7 @@
          obj.quantity = 1;
          {#console.log(obj);#}
         if (obj.symbol) { 
-            fetch('/screening/snapshot/add_wishlist/', {
+            fetch('/screening/wishlist/add_wishlist/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

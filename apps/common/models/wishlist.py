@@ -26,6 +26,18 @@ class Wishlist(models.Model):
 
     order_position = models.IntegerField(default=0, null=True, blank=True)  # Add order_position field
 
+    # New fields
+    bollinger_upper = models.FloatField(null=True, blank=True)
+    bollinger_lower = models.FloatField(null=True, blank=True)
+    rs_upper_max = models.FloatField(null=True, blank=True)
+    rs_upper_min = models.FloatField(null=True, blank=True)
+    rs_lower_max = models.FloatField(null=True, blank=True)
+    rs_lower_min = models.FloatField(null=True, blank=True)
+    rs_upper_max_2 = models.FloatField(null=True, blank=True)
+    rs_upper_min_2 = models.FloatField(null=True, blank=True)
+    rs_lower_max_2 = models.FloatField(null=True, blank=True)
+    rs_lower_min_2 = models.FloatField(null=True, blank=True)
+
     class Meta:
         db_table = 'wishlist'
 

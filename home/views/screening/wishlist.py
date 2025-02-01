@@ -21,12 +21,17 @@ def default(request):
     if not portfolio:
         return JsonResponse({'success': False, 'error': 'Default portfolio not found'}, status=404)
 
+    # Query all records from the Strategy model
+    trade_strategy = Logic.research().category().strategy().get_simple_dic(need_uncategorized=False)
+
+
     return render(
         request=request,
         template_name='pages//screening/wishlist.html',
         context={
             'parent': 'screening',
             'segment': 'wishlist',
+            'trade_strategy': trade_strategy  # Add trade_strategy to context
         })
 
 @csrf_exempt
@@ -61,6 +66,30 @@ def order_wishlist(request, direction: str):
         wishlist_item.save()
 
         return JsonResponse({'success': True})
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Wishlist item not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+def get_wishlist(request, symbol):
+    try:
+        wishlist_item = Wishlist.objects.get(symbol=symbol)
+        data = {
+            'symbol': wishlist_item.symbol.pk,
+            'trade_strategy': wishlist_item.ref_strategy.pk if wishlist_item.ref_strategy else None,
+            'bollinger_upper': wishlist_item.bollinger_upper,
+            'bollinger_lower': wishlist_item.bollinger_lower,
+            'rs_upper_max': wishlist_item.rs_upper_max,
+            'rs_upper_min': wishlist_item.rs_upper_min,
+            'rs_lower_max': wishlist_item.rs_lower_max,
+            'rs_lower_min': wishlist_item.rs_lower_min,
+            'rs_upper_max_2': wishlist_item.rs_upper_max_2,
+            'rs_upper_min_2': wishlist_item.rs_upper_min_2,
+            'rs_lower_max_2': wishlist_item.rs_lower_max_2,
+            'rs_lower_min_2': wishlist_item.rs_lower_min_2,
+        }
+        return JsonResponse({'success': True, 'wishlist': data})
     except Wishlist.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Wishlist item not found'}, status=404)
     except Exception as e:
@@ -109,6 +138,62 @@ def add_wishlist(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+@csrf_exempt
+def update_wishlist(request):
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        symbol_id = data.get('symbol')
+
+        if not symbol_id:
+            return JsonResponse({'success': False, 'error': 'Portfolio name is missing'}, status=400)
+
+        user = request.user
+        symbol = MarketSymbol.objects.get(pk=symbol_id)
+        # user = User.objects.get(pk=2)
+
+        strategy_id = data.get('trade_strategy')
+        strategy = None
+        if strategy_id:
+            strategy = Strategy.objects.get(strategy_id=strategy_id)
+
+        def get_value_or_none(value):
+            return value if value != "" else None
+
+        wishlist, created = Wishlist.objects.update_or_create(
+            symbol=symbol,
+            defaults={
+                'ref_strategy': strategy,
+                'bollinger_upper': get_value_or_none(data.get('bollinger_upper')),
+                'bollinger_lower': get_value_or_none(data.get('bollinger_lower')),
+                'rs_upper_max': get_value_or_none(data.get('rs_upper_max')),
+                'rs_upper_min': get_value_or_none(data.get('rs_upper_min')),
+                'rs_lower_max': get_value_or_none(data.get('rs_lower_max')),
+                'rs_lower_min': get_value_or_none(data.get('rs_lower_min')),
+                'rs_upper_max_2': get_value_or_none(data.get('rs_upper_max_2')),
+                'rs_upper_min_2': get_value_or_none(data.get('rs_upper_min_2')),
+                'rs_lower_max_2': get_value_or_none(data.get('rs_lower_max_2')),
+                'rs_lower_min_2': get_value_or_none(data.get('rs_lower_min_2')),
+                'add_by': user
+            }
+        )
+
+        if created:
+            max_order_position = Wishlist.objects.aggregate(max_order=models.Max('order_position'))['max_order']
+            wishlist.order_position = (max_order_position or 0) + 1
+            wishlist.save()
+
+        return JsonResponse({'success': True, 'wishlist_id': wishlist.pk, 'created': created})
+    except Exception as e:
+        print(e.args)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
 
 @csrf_exempt
 def fetching(request):
