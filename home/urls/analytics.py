@@ -8,7 +8,7 @@ urlpatterns = [
     # Wishlist Overview -> Default
     path('strategy/',
          analytics.strategy_analysis.default, name='strategy_analysis'),
-    path('strategy/test/<str:data>/',
+    path('strategy/run_plot/<str:data>/',
          analytics.strategy_analysis.backtrader_plot, name='strategy_analysis_plot'),
 
     ####### analytics.strategy_optimize #######

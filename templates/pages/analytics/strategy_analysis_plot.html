@@ -57,38 +57,4 @@
 
 <!-- Specific JS goes HERE -->
 {% block extra_js %}
-<script src="{% static 'assets/js/plugins/choices.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/countup.min.js' %}"></script>
-<script>
-
-    function refreshTask(input,period_select,interval_select, since_date) {
-        let symbolInput = document.getElementById(input).value;
-        symbolInput = symbolInput.replace(/,/g, '|'); // Replace commas with pipe characters
-        const period = document.getElementById(period_select).value; // Get the selected period
-        const interval = document.getElementById(interval_select).value; // Get the selected interval
-        const since = document.getElementById(since_date).value; // Get the selected interval
-
-        // Collect all parameters into an object
-        const params = {
-            symbols: symbolInput,
-            period: period,
-            interval: interval,
-            since: since
-        };
-
-        // Convert the object to a JSON string
-        const jsonString = JSON.stringify(params);
-        {#print(jsonString);#}
-
-        // Encode the JSON string to base64
-        const base64String = btoa(jsonString);
-
-        // Construct the URL with the base64-encoded parameter
-        const url = `/analytics/strategy/test/${encodeURIComponent(base64String)}`;
-
-        // Open the constructed URL in a new browser window
-        window.open(url, '_blank');
-    }
-
-</script>
 {% endblock extra_js %}

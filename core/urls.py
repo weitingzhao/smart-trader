@@ -71,7 +71,7 @@ urlpatterns +=([
 ])
 
 bokeh_apps = [
-    autoload(r"analytics/strategy/test/(?P<data>[\w_\-=%]+)", views.analytics.strategy_analysis.test_result),
+    autoload(r"analytics/strategy/run_plot/(?P<data>[\w_\-=%]+)", views.analytics.strategy_analysis.test_result),
     autoload(r"analytics/strategy_optimize/(?P<symbol>[\w_\-]+)/(?P<cut_over>[\w_\-]+)",
              views.analytics.strategy_optimize.bokeh_optimize),
 

@@ -51,7 +51,7 @@
     </div>
     <div class="container-fluid py-3">
         <div class="row py-3">
-            <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+            <div class="col-xl-8 col-sm-8 mb-xl-0 mb-8">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -62,26 +62,18 @@
                                 <button class="btn bg-gradient-primary mb-0 mt-lg-auto w-100"
                                         type="button" id="refreshButton"
                                         onclick="refreshTask('index_input','index_period_select', 'index_interval_select', 'index_since_date')">
-                                    Test
+                                    Run plot
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
-                            <div class="col-4">
-                            <label>yyy</label>
-                        </div>
-                            <div class="col-4">
-                            <label>xxx</label>
-                        </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <label>Since</label>
                                 <input type="date" class="form-control" id="index_since_date" value="2024-05-01">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
+                            <div class="col-3">
                             <label>Period</label>
                             <select class="form-select" id="index_period_select">
                                 <option value="max">max</option>
@@ -97,7 +89,7 @@
                                 <option value="ytd">ytd</option>
                             </select>
                         </div>
-                            <div class="col-4">
+                            <div class="col-3">
                             <label>Interval</label>
                             <select class="form-select" id="index_interval_select">
                                 <option value="1m">1m</option>
@@ -115,73 +107,13 @@
                                 <option value="3mo">3mo</option>
                             </select>
                         </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <label>Symbols</label>
                                 <input type="text" class="form-control" id="index_input" placeholder="Enter symbols separated by commas" value="DAVE">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-8 mt-lg-0 mt-4">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="font-weight-bolder">Product Information</h5>
-                  <div class="row">
-                    <div class="col-12 col-sm-6">
-                      <label>Name</label>
-                      <input class="form-control" type="text" value="Minimal Bar Stool" />
-                    </div>
-                    <div class="col-12 col-sm-6 mt-3 mt-sm-0">
-                      <label>Weight</label>
-                      <input class="form-control" type="number" value="2" />
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3">
-                      <label class="mt-4">Collection</label>
-                      <input class="form-control" type="text" value="Summer" />
-                    </div>
-                    <div class="col-3">
-                      <label class="mt-4">Price</label>
-                      <input class="form-control" type="text" value="$90" />
-                    </div>
-                    <div class="col-3">
-                      <label class="mt-4">Quantity</label>
-                      <input class="form-control" type="number" value="50" />
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <label class="mt-4">Description</label>
-                      <p class="form-text text-muted text-xs ms-1 d-inline">
-                        (optional)
-                      </p>
-                      <div id="edit-deschiption-edit" class="h-50">
-                        Long sleeves black denim jacket with a twisted design. Contrast stitching. Button up closure. White arrow prints on the back.
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                      <label class="mt-4">Category</label>
-                      <select class="form-control" name="choices-category" id="choices-category-edit">
-                        <option value="Choice 1" selected="">Furniture</option>
-                        <option value="Choice 2">Real Estate</option>
-                        <option value="Choice 3">Electronics</option>
-                        <option value="Choice 4">Clothing</option>
-                        <option value="Choice 5">Others</option>
-                      </select>
-                      <label>Color</label>
-                      <select class="form-control" name="choices-color" id="choices-color-edit">
-                        <option value="Choice 1" selected="">Black</option>
-                        <option value="Choice 2">White</option>
-                        <option value="Choice 3">Blue</option>
-                        <option value="Choice 4">Orange</option>
-                        <option value="Choice 5">Green</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
         </div>
         <div class="row">
@@ -220,7 +152,7 @@
         const base64String = btoa(jsonString);
 
         // Construct the URL with the base64-encoded parameter
-        const url = `/analytics/strategy/test/${encodeURIComponent(base64String)}`;
+        const url = `/analytics/strategy/run_plot/${encodeURIComponent(base64String)}`;
 
         // Open the constructed URL in a new browser window
         window.open(url, '_blank');
