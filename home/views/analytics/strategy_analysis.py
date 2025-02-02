@@ -32,7 +32,7 @@ def default(request, data:str = None):
         })
 
 
-def test(request, data:str = None):
+def backtrader_plot(request, data:str = None):
     user_id = request.user.id  # Assuming you have the user_id from the request
     # Step 0. Get default portfolio
     portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
@@ -47,7 +47,7 @@ def test(request, data:str = None):
 
     return render(
         request=request,
-        template_name='pages/analytics/strategy_analysis_test.html',
+        template_name='pages/analytics/strategy_analysis_plot.html',
         context= {
             'script':script,
             'data_json': data_json,

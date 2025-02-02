@@ -9,7 +9,7 @@ urlpatterns = [
     path('strategy/',
          analytics.strategy_analysis.default, name='strategy_analysis'),
     path('strategy/test/<str:data>/',
-         analytics.strategy_analysis.test, name='strategy_analysis_test'),
+         analytics.strategy_analysis.backtrader_plot, name='strategy_analysis_plot'),
 
     ####### analytics.strategy_optimize #######
     # Saved Screeners -> Default
