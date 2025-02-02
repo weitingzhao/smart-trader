@@ -26,15 +26,13 @@ def default(request):
         })
 
 @csrf_exempt
-def risk(request, symbol):
+def strategy(request, strategy_id):
     try:
         user_id = request.user.id  # Assuming you have the user_id from the request
         portfolio = Portfolio.objects.filter(user=user_id, is_default=True).order_by('-portfolio_id').first()
 
-        # Get the wishlist record based on the symbol
-        wishlist_item = Wishlist.objects.get(symbol=symbol)
         # Get the strategy based on the ref_strategy_id
-        strategy = Strategy.objects.get(strategy_id=wishlist_item.ref_strategy_id)
+        strategy = Strategy.objects.get(strategy_id=strategy_id)
 
         # Get the strategy based on the ref_strategy_id
         final_df = Logic.research().position().Close().Position(portfolio, strategy.strategy_id)
@@ -57,8 +55,59 @@ def risk(request, symbol):
         return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-def sizing(request, symbol):
-    pass
+def quote(request, symbol):
+    try:
+
+
+
+        # # Check data readiness
+        # market_symbol = MarketSymbol.objects.get(symbol=symbol)
+        # if not market_symbol.daily_data_ready:
+        #     return JsonResponse({'success': False, 'error': 'Daily data not ready'}, status=400)
+        #
+        # # Enable listen price Quote if needed
+        # if not market_symbol.price_quote_enabled:
+        #     market_symbol.enable_price_quote()
+
+        # # Calculate indicators using backtrader
+        # cerebro = bt.Cerebro()
+        # # Add your data feed and strategy here
+        # # cerebro.adddata(data)
+        # # cerebro.addstrategy(MyStrategy)
+        # cerebro.run()
+
+        # # Calculate Stock ATR based on hist daily data
+        # atr = calculate_atr(market_symbol.hist_data)
+        #
+        # # Calculate Bollinger bands and R/S using backtrader
+        # bollinger_bands = calculate_bollinger_bands(market_symbol.hist_data)
+        # rs_levels = calculate_rs_levels(market_symbol.hist_data)
+        #
+        # # Load band and R/S manual values
+        # support_manual_low_price = market_symbol.support_manual_low_price
+        # support_lv2_low_price = market_symbol.support_lv2_low_price
+        # fix_1_percent_rate = calculate_fix_1_percent_rate(market_symbol)
+
+        # Return all indicators to front page
+        # return JsonResponse({
+        #     'success': True,
+        #     'order_section': {
+        #         'atr': atr,
+        #         'bollinger_bands': bollinger_bands,
+        #         'rs_levels': rs_levels,
+        #     },
+        #     'sr_section': {
+        #         'support_manual_low_price': support_manual_low_price,
+        #         'support_lv2_low_price': support_lv2_low_price,
+        #         'fix_1_percent_rate': fix_1_percent_rate,
+        #     }
+        # })
+        return JsonResponse({'success': False, 'error': 'Symbol not found'}, status=404)
+    except MarketSymbol.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Symbol not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
 
 @csrf_exempt
 def portfolio(request):

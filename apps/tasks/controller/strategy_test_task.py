@@ -2,12 +2,12 @@ from typing import List
 
 import pandas as pd
 
+from cerebro.strategy.strategy1stoperation import Strategy1stOperation
 from .instance import Instance
 from .base_task import BaseTask
 from django_celery_results.models import TaskResult
 from cerebro.ray_strategy import RayStrategyProfile
 from ...common.models import MarketStockHistoricalBarsByDay
-from cerebro.strategy.test_strategy_1st import TestStrategy
 import redis
 
 class StrategyTestTask(BaseTask):
@@ -48,7 +48,7 @@ class StrategyTestTask(BaseTask):
         # Step 3. Load Startegy
         # file_content = StrategyAlgoScript.objects.filter(name='default_strategy.py').first()
         # strategyProfile.set_strategy(file_content.content)
-        strategyProfile.set_strategy(TestStrategy)
+        strategyProfile.set_strategy(Strategy1stOperation)
 
         # Step 4. Run the strategy
         strategyProfile.run()

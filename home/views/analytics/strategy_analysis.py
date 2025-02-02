@@ -1,18 +1,17 @@
 import json
-from bokeh.document import Document
-import pandas as pd
 import base64
-from apps.tasks.controller.instance import Instance
-from cerebro.ray_strategy import RayStrategyProfile
 from django.shortcuts import render
 from apps.common.models import *
 from django.http import JsonResponse
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource
-from cerebro.strategy.test_strategy_1st import TestStrategy
 from bokeh.embed import server_document
+from bokeh.document import Document
+from apps.tasks.controller.instance import Instance
+from cerebro.ray_strategy import RayStrategyProfile
 
+from cerebro.strategy.strategy1stoperation import Strategy1stOperation
 from home.templatetags.request_url import with_url_args
 
 instance = Instance()
@@ -66,7 +65,7 @@ def test_result(doc: Document, data) -> None:
     # Step 2. Set Data
     strategyProfile.set_data(data_json = data_json)
     # Step 3. Load Startegy
-    strategyProfile.set_strategy(TestStrategy)
+    strategyProfile.set_strategy(Strategy1stOperation)
     # Step 4. Run the strategy
     strategyProfile.run()
     # Step 5. Plot the strategy
@@ -91,7 +90,7 @@ def ray_strategy_optimize(symbol, cut_over):
     # Step 3. Load Startegy
     # file_content = StrategyAlgoScript.objects.filter(name='default_strategy.py').first()
     # strategyProfile.set_strategy(file_content.content)
-    strategyProfile.set_strategy(TestStrategy)
+    strategyProfile.set_strategy(Strategy1stOperation)
     # Step 4. Run the strategy
     strategyProfile.run()
     # Step 5. Plot the strategy

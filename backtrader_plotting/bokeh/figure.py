@@ -303,7 +303,7 @@ class Figure(object):
         """extra_axis displays a second axis (for overlay on data plotting)"""
         source_id = get_source_id(data)
 
-        self._add_columns([(source_id + 'volume', np.float64), (source_id + 'colors_volume', np.object)])
+        self._add_columns([(source_id + 'volume', np.float64), (source_id + 'colors_volume', object)])
         kwargs = {'fill_alpha': alpha,
                   'line_alpha': alpha,
                   'name': 'Volume',

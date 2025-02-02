@@ -34,7 +34,7 @@ urlpatterns = [
     ########## Utilities ############$$########
     # Authorization & Authentication
     path('accounts/', include('home.urls.accounts')),
-    path('logout/', views.account.logout_view, name='logout'),
+    path('logout/', views.accounts.logout_view, name='logout'),
     # Error
     path('error/404/', views.accounts.error_404, name="error_404"),
     path('error/500/', views.accounts.error_500, name="error_500"),

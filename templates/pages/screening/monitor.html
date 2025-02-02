@@ -581,7 +581,7 @@
                           <tr id="monitor_row">
                             <td>
                               <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_symbol"
-                                 style="cursor:pointer;" onclick="showRiskModel(this)">{{ item.symbol_id}}</p>
+                                 style="cursor:pointer;" onclick="orderSymbol(this, {{ item.ref_strategy_id }})">{{ item.symbol_id}}</p>
                             </td>
                             <td>
                               <p class="text-sm font-weight-bold mb-0" id="{{ item.symbol_id }}_last"></p>
@@ -643,12 +643,45 @@
 {% block extra_js %}
 <script>
 //#####Click Event################//
-    function getPortfolio() {
+
+    function orderSymbol(element, strategy_id){
+        const symbol = element.id.split('_')[0];
+        {#console.log('symbol_Id=>'+symbol_Id);#}
+        {#console.log('strategy_id=>'+strategy_id);#}
+        {#console.log('url=>'+url);#}
+
+        //Render Symbol
+        showSymbol(symbol);
+        //Render Strategy
+        showStrategyPerf(strategy_id);
+    }
+
+    function showSymbol(symbol) {
+        fetch(`/screening/quote/${symbol}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fill order section & SR section with the returned indicators
+                    $('#order_section').val(data.order_section);
+                    $('#sr_section').val(data.sr_section);
+                    // Set default values for entry price, stop price, and share
+                    $('#entry_price').val(data.support_manual_low_price);
+                    $('#stop_price').val(data.support_lv2_low_price);
+                    $('#share').val(data.fix_1_percent_rate);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
+    function showPortfolio() {
         fetch('/screening/portfolio/')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('data=>', data);
+                    {#console.log('data=>', data);#}
                     document.getElementById('capital').textContent =`${data.capital.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('available_cash').textContent = `${data.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('total_risk').textContent = data.total_risk + " %";
@@ -683,10 +716,9 @@
             .catch(error => console.error('Error fetching risk data:', error));
     }
 
-    function showRiskModel(element) {
-        const symbolId = element.id.split('_')[0];
-        {#console.log('url=>'+url);#}
-        fetch(`/screening/risk/${symbolId}/`,{
+    function showStrategyPerf(strategy_id) {
+
+        fetch(`/screening/strategy/${strategy_id}/`,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -915,7 +947,7 @@
         };
 
         //Init Portfolio
-        getPortfolio();
+        showPortfolio();
     });
 
 </script>

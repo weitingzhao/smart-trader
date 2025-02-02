@@ -5,7 +5,6 @@ import ray
 from backtrader_plotting import Bokeh
 from backtrader_plotting.schemes import Tradimo
 from cerebro.cerebro_base import cerebroBase
-from .strategy.test_strategy_1st import TestStrategy
 
 # @ray.remote
 class RayStrategyProfile(cerebroBase):

@@ -67,7 +67,7 @@ class DrawDown(bt.Analyzer):
     def start(self):
         super(DrawDown, self).start()
         if self.p.fund is None:
-            self._fundmode = self.strategy.broker.fundmode
+            self._fundmode = self.trade_strategy.broker.fundmode
         else:
             self._fundmode = self.p.fund
 
