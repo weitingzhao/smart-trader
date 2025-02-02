@@ -6,16 +6,19 @@ import pandas as pd
 from business import logic
 
 class StockMonitorWS(AsyncWebsocketConsumer):
-    sms_name_stock_quote = 'stock_quote'
-    sms_name_stock_hist = 'stock_hist'
+    sms_stock_quote = 'stock_quote'
+    sms_stock_hist = 'stock_hist'
+    sms__stock_bt_result = 'stock_bt_result'
 
     async def connect(self):
         self.redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
         self.pubsub = self.redis_client.pubsub()
         self.pubsub.subscribe(
-            self.sms_name_stock_quote,
-            self.sms_name_stock_hist)
+            self.sms_stock_quote,
+            self.sms_stock_hist,
+            self.sms__stock_bt_result)
+
 
         await self.accept()
         self.redis_task = asyncio.create_task(self.listen_to_redis())
@@ -23,8 +26,8 @@ class StockMonitorWS(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         self.pubsub.unsubscribe(
-            self.sms_name_stock_quote,
-            self.sms_name_stock_hist)
+            self.sms_stock_quote,
+            self.sms_stock_hist)
 
         self.redis_task.cancel()
         try:
@@ -81,4 +84,4 @@ class StockMonitorWS(AsyncWebsocketConsumer):
             }
             json_str = json.dumps({'type': 'hist', 'interval': 'D',  'key': row['symbol'], 'detail': detail})
             print(f"Hist->Redis->: {json_str}")
-            self.redis_client.publish(self.sms_name_stock_hist, json_str)
+            self.redis_client.publish(self.sms_stock_hist, json_str)

@@ -56,37 +56,84 @@
             <div class="row mt-4">
                 <div class="col-sm-3"  id="order_model">
                     <div class="card">
-                      <div class="card-header pb-0 px-3">
-                          <div class="row">
-                              <div class="d-flex align-items-center">
-                                <h6 class="mb-0">Order detail</h6>
-                                  <div class="ms-auto text-end">
-                                      <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                                  </div>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="card-body pt-4 p-3">
+                      <div class="card-body pt-2 p-1">
                         <ul class="list-group">
-                          <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                            <div class="d-flex flex-column">
-                                <h6 class="mb-3 text-sm">NVDA</h6>
-                                <span class="mb-2 text-xs">Order Type: <span class="text-dark font-weight-bold ms-sm-2">Viking Burrito</span></span>
-                                <span class="mb-2 text-xs">Current Bid: <span class="text-dark ms-sm-2 font-weight-bold">oliver@burrito.com</span></span>
-                                <span class="text-xs">Entry Price: <span class="text-dark ms-sm-2 font-weight-bold">100$</span></span>
-                                <span class="text-xs">Exist Price: <span class="text-dark ms-sm-2 font-weight-bold">90$</span></span>
-                                <span class="text-xs">Shares <span class="text-dark ms-sm-2 font-weight-bold">200</span></span>
-                            </div>
+                          <li class="list-group-item border-0 p-2 mb-1 bg-gray-100 border-radius-lg">
+                              <div class="row mb-1 d-flex align-items-center">
+                                  <div class="ms-auto text-start">
+                                      <h6 class="mb-3 text-sm" id="order_detail_title">Order</h6>
+                                  </div>
+                                  <div class="ms-auto text-end">
+                                      <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-save text-dark me-2" aria-hidden="true"></i>Submit</a>
+                                  </div>
+                              </div>
+                              <div class="row mb-1">
+                                  <div class="col-sm-5 text-xs d-flex align-items-center">Type:</div>
+                                  <div class="col-sm-7">
+                                      <select class="form-control text-xs" id="order_type">
+                                          <option value="market">Market</option>
+                                          <option value="stop_limit">Stop limit</option>
+                                      </select>
+                                  </div>
+                              </div>
+                              <div class="row mb-1">
+                                  <div class="col-sm-5 text-xs d-flex align-items-center">Bid:</div>
+                                  <div class="col-sm-7">
+                                      <input class="form-control text-xs" id="current_bid" value="100">
+                                  </div>
+                              </div>
+                              <div class="row mb-1">
+                                  <div class="col-sm-3 text-xs d-flex align-items-center">Entry:</div>
+                                  <div class="col-sm-9 text-xs d-flex">
+                                      <input class="form-control text-xs me-1" id="entry_price_stop" value="100">
+                                      <input class="form-control text-xs" id="entry_price_limit" value="100">
+                                  </div>
+                              </div>
+                              <div class="row mb-1">
+                                  <div class="col-sm-3 text-xs d-flex align-items-center">Exist:</div>
+                                  <div class="col-sm-9 text-xs d-flex">
+                                      <input class="form-control text-xs me-1" id="exit_price_stop" value="100">
+                                      <input class="form-control text-xs" id="exit_price_limit" value="100">
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-sm-5 text-xs d-flex align-items-center">Shares:</div>
+                                  <div class="col-sm-7 text-xs">
+                                      <input class="form-control text-xs" id="share_amt" value="100">
+                                  </div>
+                              </div>
                           </li>
                           <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
                             <div class="d-flex flex-column">
-                                <h6 class="mb-3 text-sm">Verify Risk condition</h6>
-                                <span class="text-xs">distance: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
-                                <span class="text-xs">ATR: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
-                                <span class="text-xs">ATR Risk: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
-                                <span class="text-xs">ATR Percent: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
-                                <span class="text-xs">ATR Per Share: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
-                                <span class="text-xs">Portional Drawdown: <span class="text-dark ms-sm-2 font-weight-bold">xx</span></span>
+                                <div class="row">
+                                    <div class="ms-auto text-start">
+                                      <h6 class="mb-3 text-sm" id="order_detail_title">Verify Risk condition</h6>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">Distance:</div>
+                                  <div class="col-sm-5 text-xs" id="price_distance">$ -</div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">ATR:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr">$ -</div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">ATR Risk:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr_risk">$ -</div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">ATR %:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr_pct">- %</div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">Risk Share:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr_share">$ -</div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">Max Drawdown:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_potential_drawdown">$ -</div>
+                                </div>
                             </div>
                           </li>
                         </ul>
@@ -109,9 +156,9 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Indicator</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"></th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Manual</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">BT Indicator</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Machine</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Manual</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">BT Indicator</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Machine</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -121,31 +168,31 @@
                                         </td>
                                         <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="bollinger_up">bollinger r</h6>
+                                                  <h6 class="mb-0 text-sm" id="bbands_upper">-</h6>
                                               </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="sr_up_manual">sr up manual</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_up_min_manual">sr up min manual</p>
+                                                <h6 class="mb-0 text-sm" id="rs_upper_max">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_upper_min">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="sr_up_bt">sr up bt</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_up_min_bt">sr up min bt</p>
+                                                <h6 class="mb-0 text-sm" id="rs_upper_max_bt">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_upper_min_bt">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="sr_up_manual_2">sr up manual 2</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_up_min_manual_2">sr up min manual 2</p>
+                                                <h6 class="mb-0 text-sm" id="rs_upper_max_2">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_upper_min_2">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="sr_up_bt_2">sr up bt 2</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_up_min_bt_2">sr up min bt 2</p>
+                                                <h6 class="mb-0 text-sm" id="rs_upper_max_bt_2">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_upper_min_bt_2">-</p>
                                             </div>
                                         </td>
                                       </tr>
@@ -155,31 +202,31 @@
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="bollinger_down">bollinger d</h6>
+                                                  <h6 class="mb-0 text-sm" id="bbands_lower">-</h6>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="sr_down_manual">sr down manual</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_down_min_manual">sr down min manual</p>
+                                                  <h6 class="mb-0 text-sm" id="rs_lower_max">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_lower_min">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="sr_down_bt">sr down bt</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_down_min_bt">sr down min bt</p>
+                                                  <h6 class="mb-0 text-sm" id="rs_lower_max_bt">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_lower_min_bt">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="sr_down_manual_2">sr down manual</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_down_min_manual_2">sr down min manual 2</p>
+                                                  <h6 class="mb-0 text-sm" id="rs_lower_max_2">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_lower_min_2">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="sr_down_bt_2">sr down bt 2</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="sr_down_min_bt_2">sr down min bt 2</p>
+                                                  <h6 class="mb-0 text-sm" id="rs_lower_max_bt_2">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="rs_lower_min_bt_2">-</p>
                                               </div>
                                           </td>
                                       </tr>
@@ -650,24 +697,63 @@
         {#console.log('strategy_id=>'+strategy_id);#}
         {#console.log('url=>'+url);#}
 
+        //calculate indicator by using backtrader
+        backtrader_sms_plot(symbol);
         //Render Symbol
         showSymbol(symbol);
         //Render Strategy
         showStrategyPerf(strategy_id);
     }
 
+    function backtrader_sms_plot(symbol){
+        // Convert the object to a JSON string
+        const jsonString = JSON.stringify({
+            symbols: symbol,
+            period: '6mo',
+            interval: '1d',
+            since: '2024-05-01',
+            sms: true,
+        });
+        {#print(jsonString);#}
+        // Encode the JSON string to base64
+        const base64String = btoa(jsonString);
+        // Construct the URL with the base64-encoded parameter
+        const url = `/analytics/strategy/run_plot/${encodeURIComponent(base64String)}`;
+        // Open the constructed URL in a new browser window
+        window.open(url, '_blank');
+    }
+
     function showSymbol(symbol) {
+
         fetch(`/screening/quote/${symbol}/`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    document.getElementById('order_detail_title').textContent = `${data.symbol_id} Order`;
+
+                    document.getElementById('rs_upper_max').textContent = `${data.rs_upper_max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_upper_min').textContent = `${data.rs_upper_min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
                     // Fill order section & SR section with the returned indicators
-                    $('#order_section').val(data.order_section);
-                    $('#sr_section').val(data.sr_section);
-                    // Set default values for entry price, stop price, and share
-                    $('#entry_price').val(data.support_manual_low_price);
-                    $('#stop_price').val(data.support_lv2_low_price);
-                    $('#share').val(data.fix_1_percent_rate);
+                    document.getElementById('rs_upper_max').textContent = `${data.rs_upper_max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_upper_min').textContent = `${data.rs_upper_min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_lower_max').textContent = `${data.rs_lower_max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_lower_min').textContent = `${data.rs_lower_min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
+                    document.getElementById('rs_upper_max_2').textContent = `${data.rs_upper_max_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_upper_min_2').textContent = `${data.rs_upper_min_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_lower_max_2').textContent = `${data.rs_lower_max_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('rs_lower_min_2').textContent = `${data.rs_lower_min_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
+
+                    entry_stop = data.rs_upper_min;
+                    entry_limit = data.rs_upper_min+data.rs_upper_min*0.1;
+                    exit_stop = data.rs_lower_max;
+                    exit_limit = data.rs_lower_min;
+                    share = 50; //data.share;
+                    {#console.log('entry_stop=>', entry_stop);#}
+                    orderAdjust(entry_stop, entry_limit,exit_stop, exit_limit, share)
+
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -675,6 +761,14 @@
             .catch(error => console.error('Error:', error));
     }
 
+    function orderAdjust(entry_stop, entry_limit, exit_stop, exit_limit, share){
+        document.getElementById('entry_price_stop').value = entry_stop;
+        document.getElementById('entry_price_limit').value = entry_limit;
+        document.getElementById('exit_price_stop').value = exit_stop;
+        document.getElementById('exit_price_limit').value = exit_limit;
+
+        document.getElementById('share_amt').value = share;
+    }
 
     function showPortfolio() {
         fetch('/screening/portfolio/')
@@ -770,6 +864,26 @@
             .catch(error => console.error('Error fetching risk data:', error));
     }
 
+    function render_symbol_bt(data){
+        {#console.log('bt_symbol=>'+JSON.stringify(data));#}
+        // Set the symbol_atr element's value to the extracted atr value
+        document.getElementById('symbol_atr').textContent = `${data.indicator.atr.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        // Bollinger Bands
+        document.getElementById('bbands_upper').textContent = `${data.indicator.bbands.upper.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('bbands_lower').textContent = `${data.indicator.bbands.lower.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
+        // Fill order section & SR section with the returned indicators
+        document.getElementById('rs_upper_max_bt').textContent = `${data.indicator.rs.upper.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_upper_min_bt').textContent = `${data.indicator.rs.upper.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_upper_max_bt_2').textContent = `${data.indicator.rs2.upper.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_upper_min_bt_2').textContent = `${data.indicator.rs2.upper.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
+        document.getElementById('rs_lower_max_bt').textContent = `${data.indicator.rs.lower.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_lower_min_bt').textContent = `${data.indicator.rs.lower.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_lower_max_bt_2').textContent = `${data.indicator.rs2.lower.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_lower_min_bt_2').textContent = `${data.indicator.rs2.lower.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+
+    }
 
 //#####Socket function################//
 
@@ -777,20 +891,26 @@
 
     function socket_onmessage(event) {
         const data = JSON.parse(event.data);
-        let symbol = data.key;
+
+        // Handle Symbol Watchlist
         if (data.type === 'quote'){
             if (data.detail.last === null && data.detail.close === null){
                 {#console.log('Drop this. no value inside. found one');#}
                 return;
             }
-            stock_obj = cache_stock_obj(true, symbol, data.detail);
-            render_stock_obj(true, symbol, stock_obj);
-            handle_quote(symbol, stock_obj);
+            stock_obj = cache_stock_obj(true, data.key, data.detail);
+            render_stock_obj(true, data.key, stock_obj);
+            handle_quote(data.key, stock_obj);
         }
         if (data.type === 'hist' && data.interval === 'D'){
-            stock_obj = cache_stock_obj(false, symbol, data.detail);
-            render_stock_obj(false, symbol, stock_obj);
-            handle_hist(symbol, stock_obj);
+            stock_obj = cache_stock_obj(false, data.key, data.detail);
+            render_stock_obj(false, data.key, stock_obj);
+            handle_hist(data.key, stock_obj);
+        }
+
+        // Handle Symbol Order
+        if (data.type === 'bt_symbol'){
+            render_symbol_bt(data)
         }
     }
 

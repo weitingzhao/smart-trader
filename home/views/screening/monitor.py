@@ -1,9 +1,11 @@
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+import json
+import base64
 from django.shortcuts import render
 from apps.common.models import *
 import business.logic as Logic
 import home.templatetags.request_url as url
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 def default(request):
 
@@ -57,52 +59,29 @@ def strategy(request, strategy_id):
 @csrf_exempt
 def quote(request, symbol):
     try:
+        # Get the wishlist record based on the symbol
+        wishlist_item = Wishlist.objects.get(symbol_id=symbol)
 
+        # Prepare the response data
+        quote_data = {
+            'success': True,
+            'wishlist_id': wishlist_item.wishlist_id,
+            'symbol_id': wishlist_item.symbol_id,
 
+            'bollinger_upper': wishlist_item.bollinger_upper,
+            'bollinger_lower': wishlist_item.bollinger_lower,
+            'rs_upper_max': wishlist_item.rs_upper_max,
+            'rs_upper_min': wishlist_item.rs_upper_min,
+            'rs_lower_max': wishlist_item.rs_lower_max,
+            'rs_lower_min': wishlist_item.rs_lower_min,
+            'rs_upper_max_2': wishlist_item.rs_upper_max_2,
+            'rs_upper_min_2': wishlist_item.rs_upper_min_2,
+            'rs_lower_max_2': wishlist_item.rs_lower_max_2,
+            'rs_lower_min_2': wishlist_item.rs_lower_min_2,
 
-        # # Check data readiness
-        # market_symbol = MarketSymbol.objects.get(symbol=symbol)
-        # if not market_symbol.daily_data_ready:
-        #     return JsonResponse({'success': False, 'error': 'Daily data not ready'}, status=400)
-        #
-        # # Enable listen price Quote if needed
-        # if not market_symbol.price_quote_enabled:
-        #     market_symbol.enable_price_quote()
+        }
 
-        # # Calculate indicators using backtrader
-        # cerebro = bt.Cerebro()
-        # # Add your data feed and strategy here
-        # # cerebro.adddata(data)
-        # # cerebro.addstrategy(MyStrategy)
-        # cerebro.run()
-
-        # # Calculate Stock ATR based on hist daily data
-        # atr = calculate_atr(market_symbol.hist_data)
-        #
-        # # Calculate Bollinger bands and R/S using backtrader
-        # bollinger_bands = calculate_bollinger_bands(market_symbol.hist_data)
-        # rs_levels = calculate_rs_levels(market_symbol.hist_data)
-        #
-        # # Load band and R/S manual values
-        # support_manual_low_price = market_symbol.support_manual_low_price
-        # support_lv2_low_price = market_symbol.support_lv2_low_price
-        # fix_1_percent_rate = calculate_fix_1_percent_rate(market_symbol)
-
-        # Return all indicators to front page
-        # return JsonResponse({
-        #     'success': True,
-        #     'order_section': {
-        #         'atr': atr,
-        #         'bollinger_bands': bollinger_bands,
-        #         'rs_levels': rs_levels,
-        #     },
-        #     'sr_section': {
-        #         'support_manual_low_price': support_manual_low_price,
-        #         'support_lv2_low_price': support_lv2_low_price,
-        #         'fix_1_percent_rate': fix_1_percent_rate,
-        #     }
-        # })
-        return JsonResponse({'success': False, 'error': 'Symbol not found'}, status=404)
+        return JsonResponse(quote_data, status=200)
     except MarketSymbol.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Symbol not found'}, status=404)
     except Exception as e:

@@ -68,7 +68,9 @@ def test_result(doc: Document, data) -> None:
     strategyProfile.set_strategy(Strategy1stOperation)
     # Step 4. Run the strategy
     strategyProfile.run()
-    # Step 5. Plot the strategy
+    # Step 5. Sent Message through Redis
+    strategyProfile.sent_messge()
+    # Step 6. Plot the strategy
     analysis_result, model = strategyProfile.plot()
     doc.add_root(model)
 
