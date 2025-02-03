@@ -58,7 +58,7 @@
                     <div class="card">
                       <div class="card-body pt-2 p-1">
                         <ul class="list-group">
-                          <li class="list-group-item border-0 p-2 mb-1 bg-gray-100 border-radius-lg">
+                          <li class="list-group-item border-1 p-2 mb-1 bg-gray-100 border-radius-lg">
                               <div class="row mb-1 d-flex align-items-center">
                                   <div class="ms-auto text-start">
                                       <h6 class="mb-3 text-sm" id="order_detail_title">Order</h6>
@@ -79,60 +79,60 @@
                               <div class="row mb-1">
                                   <div class="col-sm-5 text-xs d-flex align-items-center">Bid:</div>
                                   <div class="col-sm-7">
-                                      <input class="form-control text-xs" id="current_bid" value="100">
+                                      <input class="form-control text-xs" id="current_bid" value="121.11">
                                   </div>
                               </div>
                               <div class="row mb-1">
                                   <div class="col-sm-3 text-xs d-flex align-items-center">Entry:</div>
                                   <div class="col-sm-9 text-xs d-flex">
-                                      <input class="form-control text-xs me-1" id="entry_price_stop" value="100">
-                                      <input class="form-control text-xs" id="entry_price_limit" value="100">
+                                      <input class="form-control text-xs me-1" id="entry_price_stop">
+                                      <input class="form-control text-xs" id="entry_price_limit">
                                   </div>
                               </div>
                               <div class="row mb-1">
                                   <div class="col-sm-3 text-xs d-flex align-items-center">Exist:</div>
                                   <div class="col-sm-9 text-xs d-flex">
-                                      <input class="form-control text-xs me-1" id="exit_price_stop" value="100">
-                                      <input class="form-control text-xs" id="exit_price_limit" value="100">
+                                      <input class="form-control text-xs me-1" id="exit_price_stop">
+                                      <input class="form-control text-xs" id="exit_price_limit">
                                   </div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-5 text-xs d-flex align-items-center">Shares:</div>
                                   <div class="col-sm-7 text-xs">
-                                      <input class="form-control text-xs" id="share_amt" value="100">
+                                      <input class="form-control text-xs" id="share_amt">
                                   </div>
                               </div>
                           </li>
-                          <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                            <div class="d-flex flex-column">
-                                <div class="row">
+                          <li class="list-group-item border-1 p-2 mb-1 bg-gray-100 border-radius-lg ">
+                            <div class="d-flex flex-column mb-1">
+                                <div class="row mb-1">
                                     <div class="ms-auto text-start">
                                       <h6 class="mb-3 text-sm" id="order_detail_title">Verify Risk condition</h6>
                                   </div>
                                 </div>
-                                <div class="row">
+                                <div class="row mb-1">
                                   <div class="col-sm-7 text-xs d-flex align-items-center">Distance:</div>
-                                  <div class="col-sm-5 text-xs" id="price_distance">$ -</div>
+                                  <div class="col-sm-5 text-xs" id="price_distance">-</div>
                                 </div>
-                                <div class="row">
+                                <div class="row mb-1">
                                   <div class="col-sm-7 text-xs d-flex align-items-center">ATR:</div>
-                                  <div class="col-sm-5 text-xs" id="symbol_atr">$ -</div>
+                                  <div class="col-sm-5 text-xs font-weight-bold" id="symbol_atr" style="color: black">-</div>
                                 </div>
-                                <div class="row">
-                                  <div class="col-sm-7 text-xs d-flex align-items-center">ATR Risk:</div>
-                                  <div class="col-sm-5 text-xs" id="symbol_atr_risk">$ -</div>
-                                </div>
-                                <div class="row">
+                                <div class="row mb-1">
                                   <div class="col-sm-7 text-xs d-flex align-items-center">ATR %:</div>
-                                  <div class="col-sm-5 text-xs" id="symbol_atr_pct">- %</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr_pct">-</div>
                                 </div>
-                                <div class="row">
+                                <div class="row mb-1">
+                                  <div class="col-sm-7 text-xs  d-flex align-items-center">ATR Risk:</div>
+                                  <div class="col-sm-5 text-xs font-weight-bold" id="symbol_atr_risk">-</div>
+                                </div>
+                                <div class="row mb-1">
                                   <div class="col-sm-7 text-xs d-flex align-items-center">Risk Share:</div>
-                                  <div class="col-sm-5 text-xs" id="symbol_atr_share">$ -</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_atr_share">-</div>
                                 </div>
-                                <div class="row">
-                                  <div class="col-sm-7 text-xs d-flex align-items-center">Max Drawdown:</div>
-                                  <div class="col-sm-5 text-xs" id="symbol_potential_drawdown">$ -</div>
+                                <div class="row mb-1">
+                                  <div class="col-sm-7 text-xs d-flex align-items-center">Max Loss:</div>
+                                  <div class="col-sm-5 text-xs" id="symbol_max_loss">-</div>
                                 </div>
                             </div>
                           </li>
@@ -244,170 +244,170 @@
                                     </tr>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Indicator</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Order Estimate">[Order Sizing]</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Order Estimate">[Order]</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Static Risk Model settings -> Risk %">Fix Rate</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Static Risk Model settings -> Single Max Draw down %">Max Draw down</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Static Risk Model settings -> Single Max Draw down %">Max Loss</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Strategy Performance -> Single Max Loss %">Max Loss</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Strategy Performance -> Loss Average %">Avg Loss</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Portfolio -> Available Cash $">Available Cash</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" data-bs-toggle="tooltip" title="Current Portfolio -> Available Cash $">Left Cash</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr>
                                         <td>
-                                            <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend<br/>Shares</h6>
+                                            <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Shares</h6>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="order_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="order_share">-</h6>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="fix_rate_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="fix_rate_share">-</h6>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="max_drawdown_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="max_loss_share">-</h6>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="max_loss_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="single_max_share">-</h6>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="avg_loss_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="single_avg_share">-</h6>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="available_cash_share">Shares</h6>
+                                                <h6 class="mb-0 text-sm" id="left_cash_share">-</h6>
                                             </div>
                                         </td>
                                       </tr>
                                     <tr>
                                           <td>
-                                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend<br/>Risk</h6>
+                                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Risk</h6>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="order_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_intend_risk_pct">intend risk %</p>
+                                                  <h6 class="mb-0 text-sm" id="order_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_risk_pct">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="fix_rate_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_intend_risk_pct">intend risk %</p>
+                                                  <h6 class="mb-0 text-sm" id="fix_rate_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_risk_pct">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="max_drawdown_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_intend_risk_pct">intend risk %</p>
+                                                  <h6 class="mb-0 text-sm" id="max_loss_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_risk_pct">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="max_loss_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_intend_risk_pct">intend risk %</p>
+                                                  <h6 class="mb-0 text-sm" id="single_max_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="single_max_risk_pct">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="avg_loss_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_intend_risk_pct">intend risk %</p>
+                                                  <h6 class="mb-0 text-sm" id="single_avg_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="single_avg_risk_pct">-</p>
                                               </div>
                                           </td>
                                           <td>
                                               <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="available_cash_intend_risk">intend risk $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_intend_risk_pct">intend risk %</p>
-                                              </div>
-                                          </td>
-                                      </tr>
-                                    <tr>
-                                          <td>
-                                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Intend<br/>Investment</h6>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="order_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_intend_inv_pct">intend inv %</p>
-                                              </div>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="fix_rate_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_intend_inv_pct">intend inv %</p>
-                                              </div>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="max_drawdown_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_intend_inv_pct">intend inv %</p>
-                                              </div>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="max_loss_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_intend_inv_pct">intend inv %</p>
-                                              </div>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="avg_loss_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_intend_inv_pct">intend inv %</p>
-                                              </div>
-                                          </td>
-                                          <td>
-                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                  <h6 class="mb-0 text-sm" id="available_cash_intend_inv">intend inv $</h6>
-                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_intend_inv_pct">intend inv %</p>
+                                                  <h6 class="mb-0 text-sm" id="left_cash_risk">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="left_cash_risk_pct">-</p>
                                               </div>
                                           </td>
                                       </tr>
                                     <tr>
+                                          <td>
+                                              <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Invest</h6>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="order_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="order_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="fix_rate_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="max_loss_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="single_max_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="single_max_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="single_avg_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="single_avg_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                          <td>
+                                              <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
+                                                  <h6 class="mb-0 text-sm" id="left_cash_inv">-</h6>
+                                                  <p class="text-sm font-weight-bold text-secondary mb-0" id="left_cash_inv_pct">-</p>
+                                              </div>
+                                          </td>
+                                      </tr>
+                                    <tr>
                                         <td>
-                                          <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Cash<br/>Remain</h6>
+                                          <h6 class="d-flex px-3 py-1 mb-0 text-sm d-flex flex-column justify-content-center">Shortage</h6>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="order_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="order_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="order_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="order_cash_pct">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="fix_rate_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="fix_rate_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="fix_rate_cash_pct">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="max_drawdown_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="max_drawdown_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="max_loss_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_cash_pct">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="max_loss_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="max_loss_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="single_max_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="single_max_cash_pct">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="avg_loss_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="avg_loss_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="single_avg_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="single_avg_cash_pct">-</p>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1 d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm" id="available_cash_cash">cash $</h6>
-                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="available_cash_cash_pct">cash pct %</p>
+                                                <h6 class="mb-0 text-sm" id="left_cash_cash">-</h6>
+                                                <p class="text-sm font-weight-bold text-secondary mb-0" id="left_cash_cash_pct">-</p>
                                             </div>
                                         </td>
                                       </tr>
@@ -454,7 +454,7 @@
                                 <div class="d-flex align-items-center">
                                   <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
                                   <div class="d-flex flex-column">
-                                    <h6 class="mb-1 text-dark text-sm">Available Cash</h6>
+                                    <h6 class="mb-1 text-dark text-sm">Cash</h6>
                                   </div>
                                 </div>
                                 <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
@@ -481,7 +481,7 @@
                                 <div class="d-flex align-items-center">
                                   <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
                                   <div class="d-flex flex-column">
-                                    <h6 class="mb-1 text-dark text-sm">Max Drawdown</h6>
+                                    <h6 class="mb-1 text-dark text-sm">Max Loss</h6>
                                   </div>
                                 </div>
                                 <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
@@ -689,20 +689,30 @@
 <!-- Specific JS goes HERE -->
 {% block extra_js %}
 <script>
+//#####Define Global object ################//
+    let portfolio = null
+    let strategy = null
+    let symbol_order = null
+    let symbol_indicators = null
+
+    let quote_dic = {}
+
+
 //#####Click Event################//
 
     function orderSymbol(element, strategy_id){
+
         const symbol = element.id.split('_')[0];
         {#console.log('symbol_Id=>'+symbol_Id);#}
         {#console.log('strategy_id=>'+strategy_id);#}
         {#console.log('url=>'+url);#}
 
+        //Render Strategy
+        showStrategyPerf(strategy_id);
         //calculate indicator by using backtrader
         backtrader_sms_plot(symbol);
         //Render Symbol
         showSymbol(symbol);
-        //Render Strategy
-        showStrategyPerf(strategy_id);
     }
 
     function backtrader_sms_plot(symbol){
@@ -724,11 +734,13 @@
     }
 
     function showSymbol(symbol) {
+        symbol_order = null;
 
         fetch(`/screening/quote/${symbol}/`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+
                     document.getElementById('order_detail_title').textContent = `${data.symbol_id} Order`;
 
                     document.getElementById('rs_upper_max').textContent = `${data.rs_upper_max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
@@ -746,14 +758,20 @@
                     document.getElementById('rs_lower_min_2').textContent = `${data.rs_lower_min_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
 
-                    entry_stop = data.rs_upper_min;
-                    entry_limit = data.rs_upper_min+data.rs_upper_min*0.1;
-                    exit_stop = data.rs_lower_max;
-                    exit_limit = data.rs_lower_min;
-                    share = 50; //data.share;
-                    {#console.log('entry_stop=>', entry_stop);#}
-                    orderAdjust(entry_stop, entry_limit,exit_stop, exit_limit, share)
+                    // Get the selected order type
+                    const order_type = document.getElementById('order_type').value;
 
+                    bid = 121.11;
+                    entry_stop = data.rs_lower_max;
+                    entry_limit = data.rs_lower_min;
+                    exit_stop = data.rs_lower_max_2;
+                    exit_limit = data.rs_lower_min_2;
+                    share = 50; //data.share;
+
+                    {#console.log('entry_stop=>', entry_stop);#}
+                    cache_order(order_type,  bid, entry_stop, entry_limit, exit_stop, exit_limit, share)
+
+                    order_calculate();
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -761,25 +779,19 @@
             .catch(error => console.error('Error:', error));
     }
 
-    function orderAdjust(entry_stop, entry_limit, exit_stop, exit_limit, share){
-        document.getElementById('entry_price_stop').value = entry_stop;
-        document.getElementById('entry_price_limit').value = entry_limit;
-        document.getElementById('exit_price_stop').value = exit_stop;
-        document.getElementById('exit_price_limit').value = exit_limit;
-
-        document.getElementById('share_amt').value = share;
-    }
 
     function showPortfolio() {
+        portfolio = null;
         fetch('/screening/portfolio/')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    portfolio = data;
                     {#console.log('data=>', data);#}
-                    document.getElementById('capital').textContent =`${data.capital.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('available_cash').textContent = `${data.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('total_risk').textContent = data.total_risk + " %";
-                    document.getElementById('single_max_drawdown').textContent = data.single_max_drawdown + " %";
+                    document.getElementById('capital').textContent =`${portfolio.capital.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('available_cash').textContent = `${portfolio.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('total_risk').textContent = portfolio.total_risk + " %";
+                    document.getElementById('single_max_drawdown').textContent = portfolio.single_max_drawdown + " %";
                 } else {
                     console.error('Error fetching portfolio data:', data.error);
                 }
@@ -787,30 +799,8 @@
             .catch(error => console.error('Error:', error));
     }
 
-    function calculateSizing(element) {
-        const symbolId = element.id.split('_')[0];
-        fetch(`/screening/sizing/${symbolId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const riskData = data.risk_data;
-
-                    document.getElementById('total_position_risk').value = riskData.total_position_risk.toFixed(2);
-                    document.getElementById('marginal_return_rate').value = riskData.marginal_return_rate.toFixed(2) + " %";
-                    document.getElementById('profitability_ratio').value = riskData.profitability_ratio.toFixed(2);
-                    document.getElementById('profit_efficiency').value = riskData.profit_efficiency.toFixed(2) + " %";
-                }
-            })
-            .catch(error => console.error('Error fetching risk data:', error));
-    }
-
     function showStrategyPerf(strategy_id) {
+        strategy = null;
 
         fetch(`/screening/strategy/${strategy_id}/`,{
             method: 'POST',
@@ -822,6 +812,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    strategy = data;
                     {#console.log('data=>'+JSON.stringify(data));#}
 
                     r = data.summary.realized;
@@ -859,6 +850,8 @@
                     document.getElementById('marginal_return_rate').value = p.marginal_return_rate.toFixed(2);
                     document.getElementById('profitability_ratio').value = p.profitability_ratio.toFixed(2);
                     document.getElementById('profit_efficiency').value = p.profit_efficiency.toFixed(2)+" %";
+
+                    order_calculate();
                 }
             })
             .catch(error => console.error('Error fetching risk data:', error));
@@ -873,8 +866,7 @@
         document.getElementById('bbands_lower').textContent = `${data.indicator.bbands.lower.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
         // Fill order section & SR section with the returned indicators
-        document.getElementById('rs_upper_max_bt').textContent = `${data.indicator.rs.upper.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-        document.getElementById('rs_upper_min_bt').textContent = `${data.indicator.rs.upper.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('rs_upper_max_bt').textContent = `${data.indicator.rs.upper.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;        document.getElementById('rs_upper_min_bt').textContent = `${data.indicator.rs.upper.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
         document.getElementById('rs_upper_max_bt_2').textContent = `${data.indicator.rs2.upper.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
         document.getElementById('rs_upper_min_bt_2').textContent = `${data.indicator.rs2.upper.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
@@ -885,9 +877,113 @@
 
     }
 
-//#####Socket function################//
+//#####Order Sizing ##################//
 
-    let quote_dic = {};
+
+    function cache_order(type, bid, entry_stop, entry_limit, exit_stop, exit_limit, share){
+        symbol_order = {};
+
+        symbol_order.bid = bid;
+        symbol_order.type = type;
+        symbol_order.entry_stop = entry_stop;
+        symbol_order.entry_limit = entry_limit;
+        symbol_order.exit_stop = exit_stop;
+        symbol_order.exit_limit = exit_limit;
+        symbol_order.share = share;
+
+        //Assign Order Detail
+        document.getElementById('entry_price_stop').value = entry_stop;
+        document.getElementById('entry_price_limit').value = entry_limit;
+        document.getElementById('exit_price_stop').value = exit_stop;
+        document.getElementById('exit_price_limit').value = exit_limit;
+        document.getElementById('share_amt').value = share;
+    }
+
+    // every time when order value change, this function will run
+    function order_calculate(){
+        //check data readiness
+        if(portfolio === null || strategy === null || symbol_order === null || quote_dic === null || symbol_indicators === null)
+            return;
+
+        entry_price = (symbol_order.entry_limit + symbol_order.entry_stop) / 2;
+        exit_price = (symbol_order.exit_limit + symbol_order.exit_stop) / 2;
+
+        // Section: Verify Risk condition
+        atr = symbol_indicators.indicator.atr
+        price_distance = bid - entry_price
+        symbol_atr_risk = price_distance / atr
+        symbol_atr_pct = atr / entry_price * 100
+        symbol_atr_share = entry_price - exit_price
+        symbol_max_loss = symbol_atr_share / entry_price * 100
+
+        document.getElementById('price_distance').textContent = `$${price_distance.toFixed(2).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('symbol_atr_pct').textContent = symbol_atr_pct.toFixed(2) + "%"
+        document.getElementById('symbol_atr_risk').textContent = `${symbol_atr_risk.toFixed(2)}`;
+        document.getElementById('symbol_atr_risk').style.color = symbol_atr_risk > 2 ? 'green' : 'red';
+        document.getElementById('symbol_atr_share').textContent = '$' + symbol_atr_share.toFixed(2)
+        document.getElementById('symbol_max_loss').textContent = symbol_max_loss.toFixed(2) + "%"
+
+        //Order
+        calculate_sizing('order', symbol_atr_share*symbol_order.share,  portfolio, symbol_atr_share, entry_price);
+        //Fix Rate
+        calculate_sizing('fix_rate', portfolio.capital * portfolio.total_risk / 100, portfolio, symbol_atr_share, entry_price);
+        //Max Loss
+        calculate_sizing('max_loss', portfolio.capital * (strategy.summary.kelly_criterion / 100) * (portfolio.single_max_drawdown/100), portfolio, symbol_atr_share, entry_price);
+        //Single Max
+        calculate_sizing('single_max', portfolio.capital * (strategy.summary.kelly_criterion / 100) * Math.abs(strategy.summary.max_loss_pct/100), portfolio, symbol_atr_share, entry_price);
+        //Single Avg
+        calculate_sizing('single_avg', portfolio.capital * (strategy.summary.kelly_criterion / 100) * Math.abs(strategy.summary.loss_avg_pct/100), portfolio, symbol_atr_share, entry_price);
+        //Left Cash
+        calculate_sizing('left_cash', Math.floor(portfolio.available_cash/entry_price)*symbol_atr_share, portfolio, symbol_atr_share, entry_price);
+
+        {#console.log("portfolio->"+JSON.stringify(portfolio));#}
+        {#console.log("strategy->"+JSON.stringify(strategy));#}
+        {#console.log("symbol_order->"+JSON.stringify(symbol_order));#}
+        {#console.log("symbol_indicators->"+JSON.stringify(symbol_indicators));#}
+    }
+
+    function calculate_sizing(name, risk, portfolio, atr, entry_price){
+        d = {}
+        d.risk = Math.round(risk);
+        d.risk_pct =  d.risk / portfolio.capital * 100
+        d.share = Math.floor(d.risk / atr)
+        d.inv = Math.round(d.share * entry_price)
+        d.inv_pct = d.inv / portfolio.capital * 100
+        d.cash = Math.floor(portfolio.available_cash - d.inv)
+        d.cash_pct = d.cash / portfolio.capital * 100
+
+        document.getElementById(name+'_share').textContent = d.share;
+        document.getElementById(name+'_risk').textContent = d.risk.toLocaleString('en-US');
+        document.getElementById(name+'_risk_pct').textContent = d.risk_pct.toFixed(2) +'%';
+        document.getElementById(name+'_inv').textContent = d.inv.toLocaleString('en-US');
+        document.getElementById(name+'_inv_pct').textContent = d.inv_pct.toFixed(2)+'%';
+        document.getElementById(name+'_cash').textContent = d.cash.toLocaleString('en-US');
+        document.getElementById(name+'_cash_pct').textContent = d.cash_pct.toFixed(2) +'%';
+    }
+
+    function calculateSizing(element) {
+        const symbolId = element.id.split('_')[0];
+        fetch(`/screening/sizing/${symbolId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const riskData = data.risk_data;
+
+                    document.getElementById('total_position_risk').value = riskData.total_position_risk.toFixed(2);
+                    document.getElementById('marginal_return_rate').value = riskData.marginal_return_rate.toFixed(2) + " %";
+                    document.getElementById('profitability_ratio').value = riskData.profitability_ratio.toFixed(2);
+                    document.getElementById('profit_efficiency').value = riskData.profit_efficiency.toFixed(2) + " %";
+                }
+            })
+            .catch(error => console.error('Error fetching risk data:', error));
+    }
+//#####Socket function################//
 
     function socket_onmessage(event) {
         const data = JSON.parse(event.data);
@@ -910,6 +1006,8 @@
 
         // Handle Symbol Order
         if (data.type === 'bt_symbol'){
+            symbol_indicators = data;
+            order_calculate();
             render_symbol_bt(data)
         }
     }
