@@ -79,27 +79,27 @@
                               <div class="row mb-1">
                                   <div class="col-sm-5 text-xs d-flex align-items-center">Bid:</div>
                                   <div class="col-sm-7">
-                                      <input class="form-control text-xs" id="current_bid" value="121.11">
+                                      <input class="form-control text-xs" id="current_bid" value="121.11" type="number">
                                   </div>
                               </div>
                               <div class="row mb-1">
                                   <div class="col-sm-3 text-xs d-flex align-items-center">Entry:</div>
                                   <div class="col-sm-9 text-xs d-flex">
-                                      <input class="form-control text-xs me-1" id="entry_price_stop">
-                                      <input class="form-control text-xs" id="entry_price_limit">
+                                      <input class="form-control text-xs me-1" id="entry_price_stop" type="number">
+                                      <input class="form-control text-xs" id="entry_price_limit" type="number">
                                   </div>
                               </div>
                               <div class="row mb-1">
                                   <div class="col-sm-3 text-xs d-flex align-items-center">Exist:</div>
                                   <div class="col-sm-9 text-xs d-flex">
-                                      <input class="form-control text-xs me-1" id="exit_price_stop">
-                                      <input class="form-control text-xs" id="exit_price_limit">
+                                      <input class="form-control text-xs me-1" id="exit_price_stop" type="number">
+                                      <input class="form-control text-xs" id="exit_price_limit" type="number">
                                   </div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-5 text-xs d-flex align-items-center">Shares:</div>
                                   <div class="col-sm-7 text-xs">
-                                      <input class="form-control text-xs" id="share_amt">
+                                      <input class="form-control text-xs" id="share_amt" value="50" type="number">
                                   </div>
                               </div>
                           </li>
@@ -758,20 +758,18 @@
                     document.getElementById('rs_lower_min_2').textContent = `${data.rs_lower_min_2.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
 
 
-                    // Get the selected order type
-                    const order_type = document.getElementById('order_type').value;
+                    // Inital order value
+                    let entry_stop = data.rs_lower_max;
+                    let entry_limit = data.rs_lower_min;
+                    let exit_stop = data.rs_lower_max_2;
+                    let  exit_limit = data.rs_lower_min_2;
 
-                    bid = 121.11;
-                    entry_stop = data.rs_lower_max;
-                    entry_limit = data.rs_lower_min;
-                    exit_stop = data.rs_lower_max_2;
-                    exit_limit = data.rs_lower_min_2;
-                    share = 50; //data.share;
+                    document.getElementById('entry_price_stop').value = entry_stop;
+                    document.getElementById('entry_price_limit').value = entry_limit;
+                    document.getElementById('exit_price_stop').value = exit_stop;
+                    document.getElementById('exit_price_limit').value = exit_limit;
 
-                    {#console.log('entry_stop=>', entry_stop);#}
-                    cache_order(order_type,  bid, entry_stop, entry_limit, exit_stop, exit_limit, share)
-
-                    order_calculate();
+                    order_change();
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -879,24 +877,17 @@
 
 //#####Order Sizing ##################//
 
-
-    function cache_order(type, bid, entry_stop, entry_limit, exit_stop, exit_limit, share){
+    function order_change(){
         symbol_order = {};
-
-        symbol_order.bid = bid;
-        symbol_order.type = type;
-        symbol_order.entry_stop = entry_stop;
-        symbol_order.entry_limit = entry_limit;
-        symbol_order.exit_stop = exit_stop;
-        symbol_order.exit_limit = exit_limit;
-        symbol_order.share = share;
-
-        //Assign Order Detail
-        document.getElementById('entry_price_stop').value = entry_stop;
-        document.getElementById('entry_price_limit').value = entry_limit;
-        document.getElementById('exit_price_stop').value = exit_stop;
-        document.getElementById('exit_price_limit').value = exit_limit;
-        document.getElementById('share_amt').value = share;
+        symbol_order.type = document.getElementById('order_type').value;
+        symbol_order.bid = parseFloat(document.getElementById('current_bid').value);
+        symbol_order.entry_stop = parseFloat(document.getElementById('entry_price_stop').value);
+        symbol_order.entry_limit = parseFloat(document.getElementById('entry_price_limit').value);
+        symbol_order.exit_stop = parseFloat(document.getElementById('exit_price_stop').value);
+        symbol_order.exit_limit = parseFloat(document.getElementById('exit_price_limit').value);
+        symbol_order.share = parseFloat(document.getElementById('share_amt').value);
+        //Calculate after order changed
+        order_calculate();
     }
 
     // every time when order value change, this function will run
@@ -905,22 +896,27 @@
         if(portfolio === null || strategy === null || symbol_order === null || quote_dic === null || symbol_indicators === null)
             return;
 
+        {#console.log("portfolio->"+JSON.stringify(portfolio));#}
+        {#console.log("strategy->"+JSON.stringify(strategy));#}
+        {#console.log("symbol_order->"+JSON.stringify(symbol_order));#}
+        {#console.log("symbol_indicators->"+JSON.stringify(symbol_indicators));#}
+
         entry_price = (symbol_order.entry_limit + symbol_order.entry_stop) / 2;
         exit_price = (symbol_order.exit_limit + symbol_order.exit_stop) / 2;
 
         // Section: Verify Risk condition
         atr = symbol_indicators.indicator.atr
-        price_distance = bid - entry_price
+        price_distance = Math.round(symbol_order.bid - entry_price, 2)
         symbol_atr_risk = price_distance / atr
         symbol_atr_pct = atr / entry_price * 100
-        symbol_atr_share = entry_price - exit_price
+        symbol_atr_share = Math.round(entry_price - exit_price, 2)
         symbol_max_loss = symbol_atr_share / entry_price * 100
 
-        document.getElementById('price_distance').textContent = `$${price_distance.toFixed(2).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        document.getElementById('price_distance').textContent = price_distance.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
         document.getElementById('symbol_atr_pct').textContent = symbol_atr_pct.toFixed(2) + "%"
-        document.getElementById('symbol_atr_risk').textContent = `${symbol_atr_risk.toFixed(2)}`;
+        document.getElementById('symbol_atr_risk').textContent = symbol_atr_risk.toFixed(2);
         document.getElementById('symbol_atr_risk').style.color = symbol_atr_risk > 2 ? 'green' : 'red';
-        document.getElementById('symbol_atr_share').textContent = '$' + symbol_atr_share.toFixed(2)
+        document.getElementById('symbol_atr_share').textContent = symbol_atr_share.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
         document.getElementById('symbol_max_loss').textContent = symbol_max_loss.toFixed(2) + "%"
 
         //Order
@@ -935,11 +931,6 @@
         calculate_sizing('single_avg', portfolio.capital * (strategy.summary.kelly_criterion / 100) * Math.abs(strategy.summary.loss_avg_pct/100), portfolio, symbol_atr_share, entry_price);
         //Left Cash
         calculate_sizing('left_cash', Math.floor(portfolio.available_cash/entry_price)*symbol_atr_share, portfolio, symbol_atr_share, entry_price);
-
-        {#console.log("portfolio->"+JSON.stringify(portfolio));#}
-        {#console.log("strategy->"+JSON.stringify(strategy));#}
-        {#console.log("symbol_order->"+JSON.stringify(symbol_order));#}
-        {#console.log("symbol_indicators->"+JSON.stringify(symbol_indicators));#}
     }
 
     function calculate_sizing(name, risk, portfolio, atr, entry_price){
@@ -961,28 +952,6 @@
         document.getElementById(name+'_cash_pct').textContent = d.cash_pct.toFixed(2) +'%';
     }
 
-    function calculateSizing(element) {
-        const symbolId = element.id.split('_')[0];
-        fetch(`/screening/sizing/${symbolId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const riskData = data.risk_data;
-
-                    document.getElementById('total_position_risk').value = riskData.total_position_risk.toFixed(2);
-                    document.getElementById('marginal_return_rate').value = riskData.marginal_return_rate.toFixed(2) + " %";
-                    document.getElementById('profitability_ratio').value = riskData.profitability_ratio.toFixed(2);
-                    document.getElementById('profit_efficiency').value = riskData.profit_efficiency.toFixed(2) + " %";
-                }
-            })
-            .catch(error => console.error('Error fetching risk data:', error));
-    }
 //#####Socket function################//
 
     function socket_onmessage(event) {
@@ -1157,14 +1126,26 @@
         }
     }
 
+    //#####Load ################//
+
     document.addEventListener('DOMContentLoaded', function() {
+
+        // Web socket for Quote & backtrader Indicator
         const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_quote/');
         socket.onmessage = socket_onmessage
         socket.onclose = function(event) {
             console.error('WebSocket closed unexpectedly');
         };
 
-        //Init Portfolio
+        // Order Change Event
+        document.getElementById('current_bid').addEventListener('input', order_change);
+        document.getElementById('entry_price_stop').addEventListener('input', order_change);
+        document.getElementById('entry_price_limit').addEventListener('input', order_change);
+        document.getElementById('exit_price_stop').addEventListener('input', order_change);
+        document.getElementById('exit_price_limit').addEventListener('input', order_change);
+        document.getElementById('share_amt').addEventListener('input', order_change);
+
+        //Portfolio Load
         showPortfolio();
     });
 
