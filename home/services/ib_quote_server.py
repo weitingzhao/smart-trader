@@ -1,13 +1,12 @@
 import asyncio
 import threading
-from ib_insync import *
 import pandas as pd
 import json
 from business import logic
 from home.services.ticker_sever import TickerSever
 
 
-class IntBrokersQuoteService(TickerSever):
+class IBPriceQuoteService(TickerSever):
     _instance = None
     _lock = threading.Lock()
 
@@ -67,7 +66,11 @@ class IntBrokersQuoteService(TickerSever):
         self.ib.cancelMktData(ticker.contract)
 
 
+    def _running_cycle(self):
+        self.ib.sleep(self.loop_period)
 
+    def _before_final_shutdown(self):
+        self.ib.disconnect()
 
 
 

@@ -53,6 +53,22 @@
                                   <tr>
                                       <td class="ps-1" colspan="4">
                                           <div class="my-auto">
+                                              <span class="text-dark d-block text-sm">Stock Live Trading Server</span>
+                                              <span class="text-xs font-weight-normal">Back Trader utilize Interactive Brokers live price stream services</span>
+                                          </div>
+                                      </td>
+                                      <td>
+                                          <div class="form-check form-switch mb-0 d-flex align-items-center justify-content-center">
+                                              <input class="form-check-input" type="checkbox"
+                                                     id="stock_live_trading_service_status" name="stock_live_trading_service_status"
+                                                     onchange="changeServer(this,'trading', 'stock_trading')"
+                                                     {% if stock_live_trading_service_status %}checked{% endif %}>
+                                          </div>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td class="ps-1" colspan="4">
+                                          <div class="my-auto">
                                               <span class="text-dark d-block text-sm">Stock Live Price Quote Server</span>
                                               <span class="text-xs font-weight-normal">Interactive Brokers Stock live price Quote services</span>
                                           </div>

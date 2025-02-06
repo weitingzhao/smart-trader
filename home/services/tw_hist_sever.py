@@ -6,7 +6,7 @@ import pandas as pd
 from business import logic
 from sqlalchemy import text
 
-class TradingViewHistService(TickerSever):
+class TWPriceHistService(TickerSever):
     _instance = None
     _lock = threading.Lock()
 
@@ -35,7 +35,6 @@ class TradingViewHistService(TickerSever):
             symbol = row['symbol_id']
             print(f"----{self.server_name} Services Attach {symbol}----")
             self.attach(symbol)
-
 
     def _on_attach(self, symbol):
         engine = logic.engine().sql_alchemy().create_engine()
@@ -118,6 +117,8 @@ class TradingViewHistService(TickerSever):
                     'volume': volume
                 })
             connection.commit()
+
+
 
 
     # # symbol = tv.search_symbol("TSLA", exchange="NASDAQ")

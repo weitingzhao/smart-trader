@@ -6,9 +6,10 @@ from django.http import JsonResponse
 from apps.common.models import *
 from home.forms.portfolio import PortfolioForm
 from django.views.decorators.csrf import csrf_exempt
-from home.services.ib_quote_server import IntBrokersQuoteService
 from home.forms.portfolio import UserStaticSettingForm
-from home.services.tw_hist_sever import TradingViewHistService
+from home.services.bt_trading_server import BTTradingService
+from home.services.ib_quote_server import IBPriceQuoteService
+from home.services.tw_hist_sever import TWPriceHistService
 
 
 def default(request):
@@ -27,8 +28,9 @@ def default(request):
 
     portfolio_form = PortfolioForm()
 
-    stock_live_price_service_status = IntBrokersQuoteService.is_exist()
-    stock_hist_price_service_status = TradingViewHistService.is_exist()
+    stock_live_trading_service_status = BTTradingService.is_exist()
+    stock_live_price_service_status = IBPriceQuoteService.is_exist()
+    stock_hist_price_service_status = TWPriceHistService.is_exist()
 
     return render(
         request=request,
@@ -40,6 +42,7 @@ def default(request):
             'portfolios': portfolios,
             'form': portfolio_form,
             'static_risk_form': form_static_risk,
+            'stock_live_trading_service_status': stock_live_trading_service_status,
             'stock_live_price_service_status': stock_live_price_service_status,
             'stock_hist_price_service_status': stock_hist_price_service_status
         })
@@ -71,24 +74,33 @@ def stock_price(request):
         starting  = data.get('enabled', False)
         server = data.get('server', False)
 
-        if server == 'quote':
+        if server == "trading":
+            if starting :
+                # Create and connect the Back Trader instance
+                if not BTTradingService.is_exist():
+                    asyncio.run(BTTradingService().start())
+            else:
+                # Disconnect and destroy the Back Trader  instance
+                if BTTradingService.is_exist():
+                    asyncio.run(BTTradingService().stop())
+        elif server == 'quote':
             if starting :
                 # Create and connect the IB instance
-                if not IntBrokersQuoteService.is_exist():
-                    asyncio.run(IntBrokersQuoteService().start())
+                if not IBPriceQuoteService.is_exist():
+                    asyncio.run(IBPriceQuoteService().start())
             else:
                 # Disconnect and destroy the IB instance
-                if IntBrokersQuoteService.is_exist():
-                    asyncio.run(IntBrokersQuoteService().stop())
+                if IBPriceQuoteService.is_exist():
+                    asyncio.run(IBPriceQuoteService().stop())
         elif server == "hist":
             if starting:
                 # Create and connect the IB instance
-                if not TradingViewHistService.is_exist():
-                    asyncio.run(TradingViewHistService().start())
+                if not TWPriceHistService.is_exist():
+                    asyncio.run(TWPriceHistService().start())
             else:
                 # Disconnect and destroy the IB instance
-                if TradingViewHistService.is_exist():
-                    asyncio.run(TradingViewHistService().stop())
+                if TWPriceHistService.is_exist():
+                    asyncio.run(TWPriceHistService().stop())
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
