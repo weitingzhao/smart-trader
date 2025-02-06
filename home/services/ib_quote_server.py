@@ -2,6 +2,9 @@ import asyncio
 import threading
 import pandas as pd
 import json
+
+from ib_insync import IB, Stock
+
 from business import logic
 from home.services.ticker_sever import TickerSever
 

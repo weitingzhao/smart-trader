@@ -1,11 +1,11 @@
 import threading
 
-from ibapi.contract import Contract
+from ib_insync import IB, Stock
 
 from cerebro.strategy.live_strategy import LiveStrategy
 from home.services.ib.ib_interface import IBApi
 import backtrader as bt
-# from backtrader.feeds import ibdata
+from backtrader.feeds import ibdata
 import time
 from datetime import datetime, timedelta
 from home.services.ticker_sever import TickerSever
@@ -24,10 +24,6 @@ class BTTradingService(TickerSever):
                     loop_period= 1
                 )
 
-                # Services
-                cls.ib = IBApi()
-                cls.ib.connect('127.0.0.1', 7497, clientId=1) # Connect to IB Gateway 7496 is live trading
-
         return cls._instance
 
     def _on_attach(self, symbol):
@@ -36,19 +32,15 @@ class BTTradingService(TickerSever):
 
         # Add data source
         # Create Contract
-        contract = Contract()
-        contract.symbol = symbol
-        contract.secType = "STK"
-        contract.exchange = "SMART"
-        contract.currency = "USD"
+        contract = Stock('NVDA','SMART','USD')
 
         # Calculate fromdate and todate
         todate = datetime.now()
         fromdate = todate - timedelta(days=365)
 
         # Get IB Data Live
-        hourly_data = bt.feeds.IBData(
-            contract = contract,
+        hourly_data = ibdata.IBData(
+            dataname = contract,
             timeframe = bt.TimeFrame.Minutes,
             compression = 60,
             historical=False,
