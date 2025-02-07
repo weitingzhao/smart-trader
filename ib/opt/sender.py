@@ -65,7 +65,7 @@ class Sender(object):
         """
         try:
             value = getattr(self.client, name)
-        except (AttributeError, ):
+        except (AttributeError, ) as e:
             raise
         if name not in self.clientMethodNames:
             return value

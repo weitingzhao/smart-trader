@@ -51,7 +51,7 @@ class Connection(object):
         for obj in (self.dispatcher, self.receiver, self.sender):
             try:
                 return getattr(obj, name)
-            except (AttributeError, ):
+            except (AttributeError, ) as e:
                 pass
         err = "'%s' object has no attribute '%s'"
         raise AttributeError(err % (self.__class__.__name__, name))

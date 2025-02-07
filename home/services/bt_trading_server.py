@@ -3,9 +3,9 @@ import threading
 from ib_insync import IB, Stock
 
 from cerebro.strategy.live_strategy import LiveStrategy
+from cerebro.strategy.strategy1stoperation import Strategy1stOperation
 from home.services.ib.ib_interface import IBApi
 import backtrader as bt
-from backtrader.feeds import ibdata
 import time
 from datetime import datetime, timedelta
 from home.services.ticker_sever import TickerSever
@@ -30,32 +30,33 @@ class BTTradingService(TickerSever):
         # setup Cerebro
         cerebro = bt.Cerebro()
 
-        # Add data source
-        # Create Contract
-        contract = Stock('NVDA','SMART','USD')
-
         # Calculate fromdate and todate
         todate = datetime.now()
         fromdate = todate - timedelta(days=365)
 
         # Get IB Data Live
-        hourly_data = ibdata.IBData(
-            dataname = contract,
-            timeframe = bt.TimeFrame.Minutes,
-            compression = 60,
+        ibstore = bt.stores.IBStore(host='127.0.0.1', port=7496, clientId=35)
+
+        hourly_data = ibstore.getdata(
+            # IB symbol
+            dataname=symbol, sectype='STK', exchange='SMART', currency='',
+
+            timeframe=bt.TimeFrame.Minutes,
+            compression=60,
             historical=False,
             fromdate=fromdate,
             todate=todate,
             useRTH=True,
-            what='TRADES'
-        )
+            what='TRADES',)
+
         # daily_data = IBDataLive(contract=contract, timeframe=bt.TimeFrame.Days)
 
-        cerebro.addstrategy(hourly_data, name='Hourly')
-        cerebro.resampledata(hourly_data, timeframe=bt.TimeFrame.Days, name="Daily")
+        cerebro.adddata(hourly_data, name='Hourly')
+        # cerebro.resampledata(hourly_data, timeframe=bt.TimeFrame.Days, name="Daily")
 
         # Add Strategy
-        cerebro.addstrategy(LiveStrategy)
+        # cerebro.addstrategy(LiveStrategy)
+        cerebro.addstrategy(Strategy1stOperation)
 
         # Add Broker
         broker = cerebro.getbroker()
@@ -63,6 +64,7 @@ class BTTradingService(TickerSever):
 
         # Start Live Trading
         cerebro.run()
+        a = ""
         return cerebro
 
 

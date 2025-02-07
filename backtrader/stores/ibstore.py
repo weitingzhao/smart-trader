@@ -341,7 +341,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
         # the check for the AttributeError exception
         try:
             return self.conn.isConnected()
-        except AttributeError:
+        except (AttributeError,) as e:
             pass
 
         return False  # non-connected (including non-initialized)
@@ -366,7 +366,8 @@ class IBStore(with_metaclass(MetaSingleton, object)):
                 if resub:
                     self.startdatas()
                 return True  # nothing to do
-        except AttributeError:
+        except (AttributeError,) as e:
+            print("ib.store reconnect: ", e)
             # Not connected, several __getattr__ indirections to
             # self.conn.sender.client.isConnected
             firstconnect = True
@@ -633,10 +634,17 @@ class IBStore(with_metaclass(MetaSingleton, object)):
         cds = list()
         q = self.reqContractDetails(contract)
         while True:
-            msg = q.get()
-            if msg is None:
-                break
-            cds.append(msg)
+            try:
+                msg = q.get(timeout=5)  # Wait for a message for up to 5 seconds
+                # Process the message
+                print(msg)
+                if msg is None:
+                    break
+                cds.append(msg)
+            except queue.Empty:
+                # Handle the case where no message was received within the timeout
+                print("No message received within the timeout period")
+                break  # Exit the loop or handle it as needed
 
         if not cds or (maxcount and len(cds) > maxcount):
             err = 'Ambiguous contract: none/multiple answers received'
@@ -644,6 +652,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
             return None
 
         return cds
+
 
     def reqContractDetails(self, contract):
         # get a ticker/queue for identification/data delivery

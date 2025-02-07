@@ -26,7 +26,7 @@ from __future__ import (absolute_import, division, print_function,
 
 try:
     from .ibstore import IBStore
-except ImportError:
+except ImportError as ex:
     pass  # The user may not have ibpy installed
 
 try:
@@ -36,7 +36,7 @@ except ImportError:
 
 try:
     from .oandastore import OandaStore
-except ImportError:
+except ImportError as ex:
     pass  # The user may not have a module installed
 
 
