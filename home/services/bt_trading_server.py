@@ -1,6 +1,5 @@
 import threading
 
-from ib_insync import IB, Stock
 
 from cerebro.strategy.live_strategy import LiveStrategy
 from cerebro.strategy.strategy1stoperation import Strategy1stOperation

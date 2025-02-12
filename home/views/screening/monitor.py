@@ -1,5 +1,6 @@
 import json
 import base64
+from decimal import Decimal
 from django.shortcuts import render
 from apps.common.models import *
 import business.logic as Logic
@@ -109,6 +110,7 @@ def portfolio(request):
             'success': True,
             'capital' : open_summary['category']['total'],
             'available_cash': cash,
+            'available_cash_percent':  (cash / Decimal(open_summary['category']['total']) * 100).quantize(Decimal('0.00')),
             'total_risk' : user_static_setting.risk,
             'single_max_drawdown': user_static_setting.single_max_drawdown,
         }

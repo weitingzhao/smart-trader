@@ -50,10 +50,15 @@ def makeOptOrder(action, orderID, tif, orderType):
     return newOptOrder
 
 
+
+
+
 if __name__ == '__main__':
     con = ibConnection()
     con.registerAll(watcher)
     con.connect()
+
+
 
     tickID = 36
     orderID = -100 #50002 + 10

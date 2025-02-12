@@ -786,8 +786,10 @@
                 if (data.success) {
                     portfolio = data;
                     {#console.log('data=>', data);#}
+
                     document.getElementById('capital').textContent =`${portfolio.capital.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
-                    document.getElementById('available_cash').textContent = `${portfolio.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+                    document.getElementById('available_cash').textContent =
+                        `${portfolio.available_cash_percent}% $${portfolio.available_cash.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
                     document.getElementById('total_risk').textContent = portfolio.total_risk + " %";
                     document.getElementById('single_max_drawdown').textContent = portfolio.single_max_drawdown + " %";
                 } else {

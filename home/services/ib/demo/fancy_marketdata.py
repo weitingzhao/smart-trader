@@ -7,7 +7,7 @@ from time import sleep
 
 # print all messages from TWS
 def watcher(msg):
-    print msg
+    print(msg)
 
 # show Bid and Ask quotes
 def my_BidAsk(msg):
