@@ -51,7 +51,7 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = ['*']
 # Used by DEBUG-Toolbar
-INTERNAL_IPS = ["127.0.0.1","10.0.0.90","10.0.0.80",]
+INTERNAL_IPS = ["127.0.0.1","10.0.0.90","10.0.0.80","10.0.0.75","10.0.0.60"]
 # Add here your deployment HOSTS
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
@@ -70,6 +70,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,7 +94,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
 
     # Bokeh
-    'daphne',
     'channels',
     'bokeh_django',
 
@@ -261,7 +261,7 @@ LOGIN_REDIRECT_URL = '/'
 # AllAuth
 ACCOUNT_EMAIL_VERIFICATION =  os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'none')
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True

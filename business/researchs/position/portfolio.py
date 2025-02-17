@@ -1,7 +1,6 @@
 import pandas as pd
 import datetime
 
-from cupyx.profiler import time_range
 from pandas.core.interchange.dataframe_protocol import DataFrame
 from ...service import Service
 from .position_base import PositionBase

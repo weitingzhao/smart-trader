@@ -11,12 +11,12 @@ import time
 try:
     import java
 except (ImportError, ):
-    print 'Run this script with jython, not python.'
+    print('Run this script with jython, not python.')
     sys.exit(1)
 try:
     import com.ib
 except (ImportError, ):
-    print 'Could not import com.ib.  Try adding jtsclient.jar to CLASSPATH.'
+    print('Could not import com.ib.  Try adding jtsclient.jar to CLASSPATH.')
     sys.exit(2)
 import com.ib.client
 
@@ -28,9 +28,9 @@ def showmessage(message, mapping):
         pass
     items = mapping.items()
     items.sort()
-    print '### %s' % (message, )
+    print('### %s' % (message, ))
     for k, v in items:
-        print '    %s:%s' % (k, v)
+        print('    %s:%s' % (k, v))
 
 
 class ReferenceWrapper(com.ib.client.EWrapper):
@@ -184,11 +184,11 @@ if __name__ == '__main__':
         if 'eDisconnect' not in args:
             args.append('eDisconnect')
 
-    print '### calling functions:', args
+    print('### calling functions:', args)
     for name in args:
         call = getattr(app, name, None)
         if call is None:
-            print '### warning: no call %s' % (name, )
+            print('### warning: no call %s' % (name, ))
         call()
 
 

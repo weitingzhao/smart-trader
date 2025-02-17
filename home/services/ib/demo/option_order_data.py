@@ -8,7 +8,7 @@ from time import sleep
 
 
 def watcher(msg):
-    print msg
+    print(msg)
 
 
 def makeStkContract(sym):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     con.placeOrder(orderID, optContract, optOrder)
 
 
-    print con.reqMktData(tickID, optContract, '', False)
+    print(con.reqMktData(tickID, optContract, '', False))
 
     sleep(5)
     con.disconnect()
