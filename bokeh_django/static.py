@@ -63,6 +63,20 @@ class BokehExtensionFinder(BaseFinder):
 
         return matches
 
+
+    def list(self, ignore_patterns):
+        """
+        List all files in the Bokeh extensions directories.
+        """
+        files = []
+        for name, artifacts_dir in self._root.items():
+            for dirpath, dirnames, filenames in os.walk(artifacts_dir):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    if not any(re.search(pattern, file_path) for pattern in ignore_patterns):
+                        files.append((file_path, self.storage_class(location=artifacts_dir)))
+        return files
+
     @classmethod
     def find_location(cls, path, prefix=None, as_components=False):
         """

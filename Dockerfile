@@ -1,5 +1,8 @@
 FROM python:3.11.9
 
+# Set the working directory in the container
+WORKDIR /app
+
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -11,9 +14,9 @@ ENV SECRET_KEY <STRONG_KEY_HERE>
 ENV DB_ENGINE timescale.db.backends.postgresql
 ENV DB_NAME smart_trader
 ENV DB_USERNAME postgres
-ENV DB_PASS ******
-ENV DB_HOST 152.32.172.45
-ENV DB_PORT 54321
+ENV DB_PASS Spm123!@#
+ENV DB_HOST 10.0.0.80
+ENV DB_PORT 5432
 
 #CELERY
 ENV CELERY_BROKER redis://redis:6379/0
@@ -24,17 +27,33 @@ ENV DJANGO_SETTINGS_MODULE "core.settings"
 
 COPY requirements.txt .
 
+# Install required packages
+RUN apt-get update &&  \
+    apt-get install -y \
+        build-essential \
+        wget \
+        gcc \
+        make && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and install TA-Lib
+RUN wget https://github.com/TA-Lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz && \
+    tar -xvf ta-lib-0.6.4-src.tar.gz && \
+    cd ta-lib-0.6.4 && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf ta-lib-0.6.4 ta-lib-0.6.4-src.tar.gz
+
+
+# Install the TA-Lib Python package
+RUN pip install --no-cache-dir TA-Lib
+
 # install python dependencies
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-RUN wget https://github.com/TA-Lib/ta-lib/releases/download/v0.4.0/ta-lib-0.4.0-src.tar.gz && \
-    tar -xvf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
-    ./configure --prefix=/usr --build=`/bin/arch`-unknown-linux-gnu && \
-    make && \
-    make install && \
-    pip install --no-cache-dir TA-Lib
 
 COPY . .
 
@@ -45,4 +64,5 @@ RUN python manage.py migrate
 
 # gunicorn
 EXPOSE 5005
-CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
+CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.asgi:application"]
+

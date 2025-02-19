@@ -1,6 +1,7 @@
 services:
-  smart-trader-app:
-    container_name: smart-trader-app
+  smart-trader:
+    container_name: SmartTrader.portal
+    image: "smart-trader/portal"
     restart: always
     build:
       context: .
@@ -11,30 +12,10 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env.docker
-  nginx:
-    container_name: nginx
-    restart: always
-    image: "nginx:latest"
-    ports:
-      - "5085:5085"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - /home/ubuntu/docker/nginx/html:/var/www/html
-    networks:
-      - web_network
-    depends_on:
-      - smart-trader-app
-  redis:
-    image: redis:7.0.12
-    container_name: redis
-    command: ["redis-server", "--port", "6379", "--slave-read-only", "no"]
-    restart: always
-    ports:
-      - 6379:6379
-    networks:
-      - db_network
+
   celery:
-    container_name: celery
+    container_name: SmartTrader.task
+    image: "smart-trader/celery"
     restart: always
     build:
       context: .
@@ -48,7 +29,31 @@ services:
       DJANGO_SETTINGS_MODULE: "core.settings"
     command: "celery -A apps.tasks worker -l info -B"
     depends_on:
-      - smart-trader-app
+      - smart-trader
+
+  nginx:
+    container_name: SmartTrader.nginx
+    restart: always
+    image: "nginx:latest"
+    ports:
+      - "5085:5085"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      #- /home/ubuntu/docker/nginx/html:/var/www/html
+    networks:
+      - web_network
+    depends_on:
+      - smart-trader
+
+  redis:
+    image: redis:7.0.12
+    container_name: SmartTrader.redis
+    command: ["redis-server", "--port", "6379", "--slave-read-only", "no"]
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - db_network
 
 networks:
   db_network:
