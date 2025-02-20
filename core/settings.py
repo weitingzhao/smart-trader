@@ -32,7 +32,6 @@ except AttributeError:
     bokeh_js_dir = bokeh_settings.bokehjsdir()
 
 
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
