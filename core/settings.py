@@ -154,7 +154,7 @@ TEMPLATES = [
 
 # Redis
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 # to utilize bokeh apps, need disable WSGI and use ASGI
 # WSGI_APPLICATION = 'core.wsgi.application'
@@ -163,7 +163,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': { 'hosts': [({REDIS_HOST}, {REDIS_PORT})], },
+        'CONFIG': { 'hosts': [(REDIS_HOST, REDIS_PORT)], },
     },
 }
 
