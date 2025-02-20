@@ -59,6 +59,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://10.0.0.90:8000',
     'http://127.0.0.1:5085',
     'http://10.0.0.80:5085',
+    'http://0.0.0.0:5085',
     'http://98.206.231.225:5085',
     'http://152.32.172.45:5085',
     'http://www.bifrostrader.com',
@@ -150,6 +151,10 @@ TEMPLATES = [
     },
 ]
 
+# Redis
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+
 # to utilize bokeh apps, need disable WSGI and use ASGI
 # WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
@@ -157,9 +162,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
+        'CONFIG': { 'hosts': [({REDIS_HOST}, {REDIS_PORT})], },
     },
 }
 
@@ -289,13 +292,17 @@ SOCIALACCOUNT_PROVIDERS = {
 ## Notifications
 DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
+
+
 # ### Async Tasks (Celery) Settings ###
+
+CELERY_BROKER = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
 
 CELERY_LOGS_URL           = "/tasks_logs/"
 CELERY_LOGS_DIR           = os.path.join(BASE_DIR, "tasks_logs"    )
 
-CELERY_BROKER_URL         = os.getenv('CELERY_BROKER'     , None)
-CELERY_RESULT_BACKEND     = os.getenv('CELERY_BROKER'     , None)
+CELERY_BROKER_URL         = CELERY_BROKER
+CELERY_RESULT_BACKEND     = CELERY_BROKER
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT    = 4 * 60 * 60 # 2 hours

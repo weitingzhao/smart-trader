@@ -76,7 +76,7 @@ bokeh_apps = [
              views.analytics.strategy_optimize.bokeh_optimize),
 
     #below all sample
-    *directory(apps_path),
+    # *directory(apps_path),
 
     document("bokeh/sea_surface_direct", bokeh_views.sea_surface_handler),
     document("bokeh/sea_surface_with_template", bokeh_views.sea_surface_handler_with_template),

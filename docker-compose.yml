@@ -1,6 +1,6 @@
 services:
   smart-trader:
-    container_name: SmartTrader.portal
+    container_name: smart-trader.portal
     image: "smart-trader/portal"
     restart: always
     build:
@@ -14,7 +14,7 @@ services:
       - .env.docker
 
   celery:
-    container_name: SmartTrader.task
+    container_name: smart-trader.task
     image: "smart-trader/celery"
     restart: always
     build:
@@ -27,12 +27,12 @@ services:
       - .env.docker
     environment:
       DJANGO_SETTINGS_MODULE: "core.settings"
-    command: "celery -A apps.tasks worker -l info -B"
+    command: "celery -A apps.tasks worker -l info -B -Q fetching_queue -n fetching@worker"
     depends_on:
       - smart-trader
 
   nginx:
-    container_name: SmartTrader.nginx
+    container_name: smart-trader.nginx
     restart: always
     image: "nginx:latest"
     ports:
@@ -47,7 +47,7 @@ services:
 
   redis:
     image: redis:7.0.12
-    container_name: SmartTrader.redis
+    container_name: smart-trader.redis
     command: ["redis-server", "--port", "6379", "--slave-read-only", "no"]
     restart: always
     ports:
