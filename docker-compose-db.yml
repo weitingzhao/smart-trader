@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg17
+    container_name: smart-trader.postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - TIMESCALEDB_TELEMETRY=off
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.docker
+    volumes:
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+    user: "${UID}:${GID}" # Add this line
+    command: [
+      "postgres",
+      "-c", "max_connections=100",
+      "-c", "shared_buffers=2GB",
+      "-c", "effective_cache_size=6GB",
+      "-c", "maintenance_work_mem=512MB",
+      "-c", "random_page_cost=1.1",
+      "-c", "work_mem=50MB",
+      "-c", "min_wal_size=1GB",
+      "-c", "max_wal_size=4GB"
+    ]
+    networks:
+      - db_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  db_network:
+    driver: bridge
+  web_network:
+    driver: bridge
