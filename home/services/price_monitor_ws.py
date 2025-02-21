@@ -4,6 +4,7 @@ import redis
 import json
 import pandas as pd
 from business import logic
+from django.conf import settings
 
 class StockMonitorWS(AsyncWebsocketConsumer):
     sms_stock_quote = 'stock_quote'
@@ -11,7 +12,9 @@ class StockMonitorWS(AsyncWebsocketConsumer):
     sms__stock_bt_result = 'stock_bt_result'
 
     async def connect(self):
-        self.redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.redis_client = redis.StrictRedis(
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT, db=0)
 
         self.pubsub = self.redis_client.pubsub()
         self.pubsub.subscribe(

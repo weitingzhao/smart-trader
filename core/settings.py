@@ -153,7 +153,7 @@ TEMPLATES = [
 ]
 
 # Redis
-REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_HOST = os.getenv('REDIS_HOST', 'None')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 # to utilize bokeh apps, need disable WSGI and use ASGI

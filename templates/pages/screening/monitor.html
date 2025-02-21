@@ -1133,7 +1133,12 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         // Web socket for Quote & backtrader Indicator
-        const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_quote/');
+        // With a static port configuration
+        const wsHost = window.location.hostname;
+        const wsPort = window.location.port;
+        console.log(`ws://${wsHost}:${wsPort}/ws/stock_quote/`);
+        const socket = new WebSocket(`ws://${wsHost}:${wsPort}/ws/stock_quote/`);
+        {#const socket = new WebSocket('ws://' + window.location.host + '/ws/stock_quote/');#}
         socket.onmessage = socket_onmessage
         socket.onclose = function(event) {
             console.error('WebSocket closed unexpectedly');

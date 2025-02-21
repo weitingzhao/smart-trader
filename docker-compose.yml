@@ -8,6 +8,9 @@ services:
     networks:
       - db_network
       - web_network
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:

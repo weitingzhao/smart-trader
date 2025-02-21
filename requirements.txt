@@ -62,6 +62,7 @@ daphne==4.1.2
 psycopg2-binary==2.9.10
 PyJWT==2.8.0
 websocket-client==1.8.0
+websockets==15.0
 whitenoise==6.9.0
 colorful==0.5.6
 
