@@ -61,6 +61,7 @@ services:
 
 networks:
   db_network:
-    driver: bridge
+    external: true
+    #driver: bridge
   web_network:
     driver: bridge
