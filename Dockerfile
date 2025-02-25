@@ -10,13 +10,7 @@ ENV PYTHONUNBUFFERED 1
 ENV DEBUG True
 ENV SECRET_KEY <STRONG_KEY_HERE>
 
-# Database settings 这些环境变量在数据库初始化的时候用到
-ENV DB_ENGINE timescale.db.backends.postgresql
-ENV DB_NAME smart_trader
-ENV DB_USERNAME postgres
-ENV DB_PASS Spm123!@#
-ENV DB_HOST localhost
-ENV DB_PORT 5432
+
 
 #CELERY
 ENV CELERY_BROKER redis://redis:6379/0
@@ -58,9 +52,9 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # Manage Assets & DB 
-RUN python manage.py collectstatic --no-input
-RUN python manage.py makemigrations
-RUN python manage.py migrate
+#RUN python manage.py collectstatic --no-input
+#RUN python manage.py makemigrations
+#RUN python manage.py migrate
 
 # gunicorn
 EXPOSE 5005
