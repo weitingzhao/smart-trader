@@ -15,7 +15,7 @@ ENV DB_ENGINE timescale.db.backends.postgresql
 ENV DB_NAME smart_trader
 ENV DB_USERNAME postgres
 ENV DB_PASS Spm123!@#
-ENV DB_HOST 10.0.0.80
+ENV DB_HOST localhost
 ENV DB_PORT 5432
 
 #CELERY
