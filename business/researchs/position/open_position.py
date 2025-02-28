@@ -10,7 +10,7 @@ from ...service import Service
 from .portfolio import Portfolio as PO
 from .position_base import PositionBase
 from django.db.models import (
-    F,Case, When, Value, IntegerField,
+    F,Case, When, Value, IntegerField, DecimalField,
     Sum, Max,Min, Q, BooleanField,Subquery, OuterRef)
 
 
@@ -297,13 +297,31 @@ class OpenPosition(PositionBase):
             )
            .filter(Q(trade_is_finished=False) | Q(trade_is_finished__isnull=True))
            .annotate(amount=F('quantity_final') * F('price_final'))
-           .values('holding_id')
            .annotate(
                 init_tran_id = Min('transaction_id'),
-                quantity=Sum('quantity_final'),
-                invest=Sum('amount'),
-                price=Sum('amount') / Sum('quantity_final')
-           ))
+                adjusted_quantity = Case(
+                    When(transaction_type=1, then=F('quantity_final')),
+                    When(transaction_type=2, then=-F('quantity_final')),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                adjusted_invest = Case(
+                    When(transaction_type=1, then=F('amount')),
+                    When(transaction_type=2, then=-F('amount')),
+                    default=0,
+                    output_field=DecimalField()
+                )
+           )
+           .values('holding_id')
+           .annotate(
+                init_tran_id=Min('transaction_id'),
+                quantity=Sum('adjusted_quantity'),
+                invest=Sum('adjusted_invest')
+            )
+            .annotate(
+                price=F('invest') / F('quantity')
+            )
+        )
 
         transaction_df = pd.DataFrame(list(transaction), columns=['holding_id', 'init_tran_id', 'quantity', 'invest', 'price'])
 
