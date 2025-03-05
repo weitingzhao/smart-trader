@@ -52,6 +52,7 @@ scikit_learn==1.6.1
 SQLAlchemy==2.0.38
 str2bool==1.1
 swapper==1.4.0
+ta-lib==0.6.3
 tablib==3.8.0
 tornado==6.4.2
 tqdm==4.67.1
