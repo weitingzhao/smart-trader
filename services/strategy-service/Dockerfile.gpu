@@ -1,0 +1,46 @@
+# GPU-enabled Dockerfile for Strategy Service
+FROM nvidia/cuda:11.8-devel-ubuntu20.04
+
+# Install Python and system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    gcc \
+    g++ \
+    libhdf5-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python3 as default
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy shared package
+COPY ../../shared /app/shared
+RUN pip install -e /app/shared
+
+# Copy application code
+COPY . /app
+
+# Set environment variables
+ENV CUDA_VISIBLE_DEVICES=0
+ENV PYTHONPATH=/app:/app/shared
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run application
+CMD ["python", "src/main.py"]

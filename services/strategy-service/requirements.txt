@@ -1,0 +1,52 @@
+# Strategy Service Requirements
+
+# FastAPI and Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Database and Caching
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+redis==5.0.1
+
+# Data Processing
+pandas==2.1.4
+numpy==1.24.3
+
+# Backtrader Framework
+backtrader==1.9.78.123
+backtrader-plotting==0.1.0
+
+# GPU Acceleration and Optimization
+ray[default]==2.8.0
+cupy-cuda11x==12.3.0
+
+# Machine Learning
+scikit-learn==1.3.2
+torch==2.1.1
+torchvision==0.16.1
+torchaudio==2.1.1
+
+# Technical Analysis
+ta-lib==0.4.28
+yfinance==0.2.54
+
+# Visualization
+bokeh==3.3.2
+matplotlib==3.8.2
+plotly==5.17.0
+
+# Task Processing
+celery==5.3.4
+
+# Environment and Configuration
+python-dotenv==1.0.0
+
+# Development Dependencies
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
